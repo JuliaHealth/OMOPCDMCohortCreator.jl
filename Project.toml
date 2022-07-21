@@ -1,5 +1,6 @@
 name = "OMOPCDMCohortCreator"
 uuid = "f525a15e-a73f-4eef-870f-f901257eae22"
+authors = ["Jacob Zelko <jacobszelko@gmail.com>"]
 version = "0.0.1"
 
 [deps]
