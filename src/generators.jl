@@ -1,12 +1,12 @@
 """
 GenerateCohorts(
     conn;
-    visit_codes::Vector{T} where T <:Integer = nothing,
-    condition_codes::Vector{T} where T<:Integer = nothing,
-    race_codes::Vector{T} where T<:Integer = nothing,
-    state_codes::Vector{T} where T <:AbstractString = nothing,
-    gender_codes::Vector{T} where T <:Integer = nothing,
-    age_groupings::Vector{Vector{T}} where T<:Integer = nothing,
+    visit_codes = nothing,
+    condition_codes = nothing,
+    race_codes = nothing,
+    state_codes = nothing,
+    gender_codes = nothing,
+    age_groupings = nothing,
 )
 
 Get all unique `person_id`'s matching given cohort criterion filters based on the keyword arguments.
@@ -18,12 +18,12 @@ The keyword arguments act as filters that will build cohorts filtered to match g
 
 # Keyword Arguments:
 
-- `visit_codes::Vector{T} where T <:Integer` - a vector of `visit_concept_id`'s; must be a subtype of `Integer`. Default: `nothing`
-- `condition_codes::Vector{T} where T<:Integer` - a vector of `condition_concept_id`'s; must be a subtype of `Integer`. Default: `nothing`
-- `race_codes::Vector{T} where T<:Integer` - a vector of `race_concept_id`'s; must be a subtype of `Integer`. Default: `nothing`
-- `state_codes::Vector{T} where T <:AbstractString` - a vector of `state`'s; must be a subtype of `AbstractString`. Default: `nothing`
-- `gender_codes::Vector{T} where T <:Integer` - a vector of `gender_concept_id`'s; must be a subtype of `Integer`. Default: `nothing`
-- `age_groupings::Vector{Vector{T}} where T<:Integer` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`. Default: `nothing`
+- `visit_codes` - a vector of `visit_concept_id`'s; must be a subtype of `Integer`. Default: `nothing`
+- `condition_codes` - a vector of `condition_concept_id`'s; must be a subtype of `Integer`. Default: `nothing`
+- `race_codes` - a vector of `race_concept_id`'s; must be a subtype of `Integer`. Default: `nothing`
+- `state_codes` - a vector of `state`'s; must be a subtype of `AbstractString`. Default: `nothing`
+- `gender_codes` - a vector of `gender_concept_id`'s; must be a subtype of `Integer`. Default: `nothing`
+- `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`. Default: `nothing`
 
 # Returns
 
@@ -31,16 +31,16 @@ The keyword arguments act as filters that will build cohorts filtered to match g
 """
 function GenerateCohorts(
     conn;
-    visit_codes::Vector{T} where T <:Integer = nothing,
-    condition_codes::Vector{T} where T<:Integer = nothing,
-    race_codes::Vector{T} where T<:Integer = nothing,
-    state_codes::Vector{T} where T <:AbstractString = nothing,
-    gender_codes::Vector{T} where T <:Integer = nothing,
-    age_groupings::Vector{Vector{T}} where T<:Integer = nothing,
+    visit_codes = nothing,
+    condition_codes = nothing,
+    race_codes = nothing,
+    state_codes = nothing,
+    gender_codes = nothing,
+    age_groupings = nothing,
 )
     filter_list = []
 
-    !isnothing(visit_codes) && push!(filter_list, VisitFilterPersonIDs(visit_codes, conn))
+    !isnothing(visit_codes) && push!(filter_list, VisitFilterPersonIDs(visit_codes, conn)) 
     !isnothing(condition_codes) &&
         push!(filter_list, ConditionFilterPersonIDs(condition_codes, conn))
     !isnothing(race_codes) && push!(filter_list, RaceFilterPersonIDs(race_codes, conn))
@@ -96,6 +96,7 @@ function GenerateStudyPopulation(
     characteristics = Dict()
 
     by_visit && println("Not implemented yet!") # push!(characteristics, :visit => GetPatientVisits(cohort_ids, conn))
+    #TODO: Implement VisitPatientVisits
     by_state && push!(characteristics, :state => GetPatientState(cohort_ids, conn))
     by_gender && push!(characteristics, :gender => GetPatientGender(cohort_ids, conn))
     by_race && push!(characteristics, :race => GetPatientRace(cohort_ids, conn))
@@ -168,8 +169,8 @@ function GenerateTables(conn; inplace = true, exported = false)
 
     if inplace == true
         for key in keys(db_info.tables)
-            @eval global $(Symbol(key)) = $(db_info[key])
-	    @info "$(string(key)) table generated internally"
+            @eval global $(Symbol(lowercase(string(key)))) = $(db_info[key])
+            @info "$(lowercase(string(key))) table generated internally"
         end
 
     end
@@ -177,8 +178,8 @@ function GenerateTables(conn; inplace = true, exported = false)
     if exported == true
         tables = Dict()
         for key in keys(db_info.tables)
-            push!(tables, Symbol(key) => db_info[key])
-	    @info "$(string(key)) table generated publicly"
+            push!(tables, Symbol(lowercase(string(key))) => db_info[key])
+            @info "$(lowercase(string(key))) table generated publicly"
         end
 
         return tables
@@ -188,6 +189,11 @@ function GenerateTables(conn; inplace = true, exported = false)
     return conn
 
 end
+
+#BUG: Recently discovered that not all SQL flavors adhere to having case insensitive fields in their tables.
+#NOTE: Although according to the OMOP CDM, it would appear that implementations across database have uppercase table names and lowercase column names within the given tables. However, it seems that database DDLs create mixed case names across database versions therefore making this implementation aspect inconsistent 
+#TODO: Propose to OMOP CDM consistent capitilization across field and table names in implementation
+#TODO: Create workaround in CohortCreator if proposal 
 
 export GenerateCohorts,
     GenerateDatabaseDetails, GenerateGroupCounts, GenerateStudyPopulation, GenerateTables
