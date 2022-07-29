@@ -28,13 +28,13 @@ Get all unique `person_id`'s from a database.
 end
 
 """
-GetPatientState(ids::Vector{T} where T<:Integer, conn; tab::SQLTable = location, join_tab::SQLTable = person)
+GetPatientState(ids, conn; tab::SQLTable = location, join_tab::SQLTable = person)
 
 Given a list of person IDs, find their home state.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -67,13 +67,13 @@ Given a list of person IDs, find their home state.
 end
 
 """
-GetPatientGender(ids::Vector{T} where T<:Integer, conn; tab::SQLTable = person)
+GetPatientGender(ids, conn; tab::SQLTable = person)
 
 Given a list of person IDs, find their gender.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -102,13 +102,13 @@ Given a list of person IDs, find their gender.
 end
 
 """
-GetPatientRace(ids::Vector{T} where T<:Integer, conn; tab::SQLTable = person)
+GetPatientRace(ids, conn; tab::SQLTable = person)
 
 Given a list of person IDs, find their race.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -154,13 +154,13 @@ Finds all individuals in age groups as specified by `age_groupings`.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
-- `age_groupings::Vector{Vector{T}} where T<:Integer` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+- `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
-- `age_groupings::Vector{Vector{T}} where T<:Integer` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
+- `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
 - `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
 - `join_tab::SQLTable` - the `SQLTable` representing the Observation Period table; default `observation_period`
 
@@ -218,7 +218,7 @@ Given a list of person IDs, find all their visits.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -254,7 +254,7 @@ Given a list of person IDs, find their last recorded conditions.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -300,7 +300,7 @@ Given a list of person IDs, find their last recorded visit.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -346,7 +346,7 @@ Given a list of visit IDs, find their corresponding conditions.
 
 # Arguments:
 
-`visit_ids::Vector{T} where T<:Integer` - list of `visit_id`'s; each ID must be of subtype `Integer`
+`visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
