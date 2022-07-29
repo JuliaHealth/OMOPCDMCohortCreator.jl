@@ -1,11 +1,11 @@
 """
-VisitFilterPersonIDs(visit_codes::Vector{T} where T<:Integer; tab::SQLTable = visit_occurrence)
+VisitFilterPersonIDs(visit_codes; tab::SQLTable = visit_occurrence)
 
 Given a list of visit concept IDs, `visit_codes`  return from the database individuals having at least one entry in the Visit Occurrence table matching at least one of the provided visit types.
 
 # Arguments:
 
-- `visit_codes::Vector{T} where T <:Integer` - a vector of `visit_concept_id`'s; must be a subtype of `Integer`
+- `visit_codes` - a vector of `visit_concept_id`'s; must be a subtype of `Integer`
 
 # Keyword Arguments:
 
@@ -15,7 +15,7 @@ Given a list of visit concept IDs, `visit_codes`  return from the database indiv
 
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
-@memoize Dict function VisitFilterPersonIDs(visit_codes::Vector{T} where T <:Integer, conn; tab::SQLTable = visit_occurrence)
+@memoize Dict function VisitFilterPersonIDs(visit_codes, conn; tab::SQLTable = visit_occurrence)
     ids =
         From(tab) |>
         Where(Fun.in(Get.visit_concept_id, visit_codes...)) |>
@@ -28,13 +28,13 @@ Given a list of visit concept IDs, `visit_codes`  return from the database indiv
 end
 
 """
-ConditionFilterPersonIDs(condition_codes::Vector{T} where T<:Integer; tab::SQLTable = condition_occurrence)
+ConditionFilterPersonIDs(condition_codes; tab::SQLTable = condition_occurrence)
 
 Given a list of condition concept IDs, `condition_codes`, return from the database individuals having at least one entry in the Condition Occurrence table matching at least one of the provided condition types.
 
 # Arguments:
 
-- `condition_codes::Vector{T} where T<:Integer` - a vector of `condition_concept_id`'s; must be a subtype of `Integer`
+- `condition_codes` - a vector of `condition_concept_id`'s; must be a subtype of `Integer`
 
 # Keyword Arguments:
 
@@ -45,7 +45,7 @@ Given a list of condition concept IDs, `condition_codes`, return from the databa
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
 @memoize Dict function ConditionFilterPersonIDs(
-    condition_codes::Vector{T} where T<:Integer, conn;
+    condition_codes, conn;
     tab = condition_occurrence,
 )
     ids =
@@ -60,13 +60,13 @@ Given a list of condition concept IDs, `condition_codes`, return from the databa
 end
 
 """
-RaceFilterPersonIDs(race_codes::Vector{T} where T<:Integer; tab::SQLTable = person)
+RaceFilterPersonIDs(race_codes; tab::SQLTable = person)
 
 Given a list of condition concept IDs, `race_codes`, return from the database individuals having at least one entry in the Person table matching at least one of the provided race types.
 
 # Arguments:
 
-- `race_codes::Vector{T} where T<:Integer` - a vector of `race_concept_id`'s; must be a subtype of `Integer`
+- `race_codes` - a vector of `race_concept_id`'s; must be a subtype of `Integer`
 
 # Keyword Arguments:
 
@@ -76,7 +76,7 @@ Given a list of condition concept IDs, `race_codes`, return from the database in
 
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
-@memoize Dict function RaceFilterPersonIDs(race_codes::Integer, conn; tab = person)
+@memoize Dict function RaceFilterPersonIDs(race_codes, conn; tab = person)
     ids =
         From(tab) |>
         Where(Fun.in(Get.race_concept_id, race_codes...)) |>
@@ -89,13 +89,13 @@ Given a list of condition concept IDs, `race_codes`, return from the database in
 end
 
 """
-GenderFilterPersonIDs(gender_codes::Vector{T} where T<:Integer; tab::SQLTable = visit_occurrence)
+GenderFilterPersonIDs(gender_codes; tab::SQLTable = visit_occurrence)
 
 Given a list of visit concept IDs, `gender_codes` return from the database individuals having at least one entry in the Person table matching at least one of the provided gender types.
 
 # Arguments:
 
-- `visit_codes::Vector{T} where T <:Integer` - a vector of `gender_concept_id`'s; must be a subtype of `Integer`
+- `visit_codes` - a vector of `gender_concept_id`'s; must be a subtype of `Integer`
 
 # Keyword Arguments:
 
@@ -105,7 +105,7 @@ Given a list of visit concept IDs, `gender_codes` return from the database indiv
 
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
-@memoize Dict function GenderFilterPersonIDs(gender_codes::Integer, conn; tab = person)
+@memoize Dict function GenderFilterPersonIDs(gender_codes, conn; tab = person)
     ids =
         From(tab) |>
         Where(Fun.in(Get.gender_concept_id, gender_codes...)) |>
@@ -118,13 +118,13 @@ Given a list of visit concept IDs, `gender_codes` return from the database indiv
 end
 
 """
-StateFilterPersonIDs(state::Vector{T} where T<:AbstractString; tab::SQLTable = location, join_tab::SQLTable = person)
+StateFilterPersonIDs(state; tab::SQLTable = location, join_tab::SQLTable = person)
 
 Given a list of states, `states`, return from the database individuals found in the provided state list.
 
 # Arguments:
 
-- `state::Vector{T} where T <:AbstractString` - a vector of `state`'s; must be a subtype of `AbstractString`
+- `state` - a vector of `state`'s; must be a subtype of `AbstractString`
 
 # Keyword Arguments:
 
@@ -135,7 +135,7 @@ Given a list of states, `states`, return from the database individuals found in 
 
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
-@memoize Dict function StateFilterPersonIDs(states::Vector{T} where T<:AbstractString, conn; tab::SQLTable = location, join_tab::SQLTable = person)
+@memoize Dict function StateFilterPersonIDs(states, conn; tab::SQLTable = location, join_tab::SQLTable = person)
     ids =
         From(tab) |>
         Select(Get.location_id, Get.state) |>
@@ -150,13 +150,13 @@ Given a list of states, `states`, return from the database individuals found in 
 end
 
 """
-AgeGroupFilterPersonIDs(age_groupings::Vector{Vector{T}} where T<:Integer; tab::SQLTable = location, join_tab::SQLTable = observation_period)
+AgeGroupFilterPersonIDs(age_groupings; tab::SQLTable = location, join_tab::SQLTable = observation_period)
 
 Finds all individuals in age groups as specified by `age_groupings`.
 
 # Arguments:
 
-- `age_groupings::Vector{Vector{T}} where T<:Integer` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
+- `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
 
 # Keyword Arguments:
 
@@ -167,7 +167,7 @@ Finds all individuals in age groups as specified by `age_groupings`.
 
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
-@memoize Dict function AgeGroupFilterPersonIDs(age_groupings::Vector{Vector{T}} where T<:Integer, conn; tab = person, join_tab = observation_period)
+@memoize Dict function AgeGroupFilterPersonIDs(age_groupings, conn; tab = person, join_tab = observation_period)
 
     age_arr = []
     age_ranges = []
@@ -186,7 +186,8 @@ Finds all individuals in age groups as specified by `age_groupings`.
         Select(
             Get.person_id,
             Fun.make_date(Get.year_of_birth, Get.month_of_birth, Get.day_of_birth) |>
-            As(:dob),
+            As(:dob), #BUG: This only works for PostgreSQL, MySQL right now; breaks on SQLite.
+            #TODO: Refactor how to get the date agnostic from implementation: https://www.sqltutorial.org/sql-date-functions/sql-convert-string-to-date-functions/
             Get.observation_group |>
             Agg.max(Get.observation_period_end_date) |>
             As(:record),
