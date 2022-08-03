@@ -190,10 +190,7 @@ function GenerateTables(conn; inplace = true, exported = false)
 
 end
 
-#BUG: Recently discovered that not all SQL flavors adhere to having case insensitive fields in their tables.
-#NOTE: Although according to the OMOP CDM, it would appear that implementations across database have uppercase table names and lowercase column names within the given tables. However, it seems that database DDLs create mixed case names across database versions therefore making this implementation aspect inconsistent 
-#TODO: Propose to OMOP CDM consistent capitilization across field and table names in implementation
-#TODO: Create workaround in CohortCreator if proposal 
+#NOTE: Create workaround for case matching across SQL flavors if Casing proposal fails: https://github.com/OHDSI/CommonDataModel/issues/509
 
 export GenerateCohorts,
     GenerateDatabaseDetails, GenerateGroupCounts, GenerateStudyPopulation, GenerateTables
