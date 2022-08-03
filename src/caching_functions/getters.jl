@@ -28,13 +28,13 @@ Get all unique `person_id`'s from a database.
 end
 
 """
-GetPatientState(ids::Vector{T} where T<:Integer, conn; tab::SQLTable = location, join_tab::SQLTable = person)
+GetPatientState(ids, conn; tab::SQLTable = location, join_tab::SQLTable = person)
 
 Given a list of person IDs, find their home state.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -47,7 +47,7 @@ Given a list of person IDs, find their home state.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:state`
 """
 @memoize Dict function GetPatientState(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
     tab = location,
     join_tab = person,
@@ -67,13 +67,13 @@ Given a list of person IDs, find their home state.
 end
 
 """
-GetPatientGender(ids::Vector{T} where T<:Integer, conn; tab::SQLTable = person)
+GetPatientGender(ids, conn; tab::SQLTable = person)
 
 Given a list of person IDs, find their gender.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -85,7 +85,7 @@ Given a list of person IDs, find their gender.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:gender_concept_id`
 """
 @memoize Dict function GetPatientGender(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
     tab = person,
 )
@@ -102,13 +102,13 @@ Given a list of person IDs, find their gender.
 end
 
 """
-GetPatientRace(ids::Vector{T} where T<:Integer, conn; tab::SQLTable = person)
+GetPatientRace(ids, conn; tab::SQLTable = person)
 
 Given a list of person IDs, find their race.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -119,7 +119,7 @@ Given a list of person IDs, find their race.
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:race_concept_id`
 """
-@memoize Dict function GetPatientRace(ids::Vector{T} where {T<:Integer}, conn; tab = person)
+@memoize Dict function GetPatientRace(ids, conn; tab = person)
     df =
         From(tab) |>
         Where(Fun.in(Get.person_id, ids...)) |>
@@ -134,7 +134,7 @@ end
 
 """
 GetPatientAgeGroup(
-    ids::Vector{T} where {T<:Integer}, conn;
+    ids, conn;
     age_groupings::Vector{Vector{T}} where {T<:Integer} = [
         [0, 9],
         [10, 19],
@@ -154,13 +154,13 @@ Finds all individuals in age groups as specified by `age_groupings`.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
-- `age_groupings::Vector{Vector{T}} where T<:Integer` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+- `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
-- `age_groupings::Vector{Vector{T}} where T<:Integer` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
+- `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
 - `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
 - `join_tab::SQLTable` - the `SQLTable` representing the Observation Period table; default `observation_period`
 
@@ -169,9 +169,9 @@ Finds all individuals in age groups as specified by `age_groupings`.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:age_group`
 """
 @memoize Dict function GetPatientAgeGroup(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
-    age_groupings::Vector{Vector{T}} where {T<:Integer} = [
+    age_groupings = [
         [0, 9],
         [10, 19],
         [20, 29],
@@ -212,13 +212,13 @@ Finds all individuals in age groups as specified by `age_groupings`.
 end
 
 """
-GetPatientVisits(ids::Vector{T} where {T<:Integer}, conn; tab::SQLTable = visit_occurrence)
+GetPatientVisits(ids, conn; tab::SQLTable = visit_occurrence)
 
 Given a list of person IDs, find all their visits.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -227,18 +227,19 @@ Given a list of person IDs, find all their visits.
 
 # Returns
 
-- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:visit_concept_id`
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:visit_occurrence_id`
 
 """
 @memoize Dict function GetPatientVisits(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
     tab::SQLTable = visit_occurrence,
 )
+
     df =
         From(tab) |>
         Where(Fun.in(Get.person_id, ids...)) |>
-        Select(Get.person_id, Get.visit_concept_id) |>
+        Select(Get.person_id, Get.visit_occurrence_id) |>
         q ->
             render(q, dialect = dialect) |>
             x -> DBInterface.execute(conn, String(x)) |> DataFrame
@@ -248,13 +249,13 @@ Given a list of person IDs, find all their visits.
 end
 
 """
-GetMostRecentConditions(ids::Vector{T} where {T<:Integer}, conn; tab::SQLTable = condition_occurrence)
+GetMostRecentConditions(ids, conn; tab::SQLTable = condition_occurrence)
 
 Given a list of person IDs, find their last recorded conditions.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -266,7 +267,7 @@ Given a list of person IDs, find their last recorded conditions.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:condition_concept_id`
 """
 @memoize Dict function GetMostRecentConditions(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
     tab::SQLTable = condition_occurrence,
 )
@@ -294,13 +295,13 @@ Given a list of person IDs, find their last recorded conditions.
 end
 
 """
-GetMostRecentVisit(ids::Vector{T} where {T<:Integer}, conn; tab::SQLTable = visit_occurrence)
+GetMostRecentVisit(ids, conn; tab::SQLTable = visit_occurrence)
 
 Given a list of person IDs, find their last recorded visit.
 
 # Arguments:
 
-`ids::Vector{T} where T<:Integer` - list of `person_id`'s; each ID must be of subtype `Integer`
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -312,7 +313,7 @@ Given a list of person IDs, find their last recorded visit.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:visit_occurrence_id`
 """
 @memoize Dict function GetMostRecentVisit(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
     tab::SQLTable = visit_occurrence,
 )
@@ -340,13 +341,13 @@ Given a list of person IDs, find their last recorded visit.
 end
 
 """
-GetVisitCondition(visit_ids::Vector{T} where {T<:Integer}, conn; tab::SQLTable = visit_occurrence)
+GetVisitCondition(visit_ids, conn; tab::SQLTable = visit_occurrence)
 
 Given a list of visit IDs, find their corresponding conditions.
 
 # Arguments:
 
-`visit_ids::Vector{T} where T<:Integer` - list of `visit_id`'s; each ID must be of subtype `Integer`
+`visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
@@ -358,7 +359,7 @@ Given a list of visit IDs, find their corresponding conditions.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:visit_occurrence_id` and `:condition_concept_id`
 """
 @memoize Dict function GetVisitCondition(
-    visit_ids::Vector{T} where {T<:Integer},
+    visit_ids,
     conn;
     tab::SQLTable = condition_occurrence,
 )
