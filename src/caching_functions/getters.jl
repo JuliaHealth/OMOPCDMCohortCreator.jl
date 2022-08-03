@@ -47,7 +47,7 @@ Given a list of person IDs, find their home state.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:state`
 """
 @memoize Dict function GetPatientState(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
     tab = location,
     join_tab = person,
@@ -85,7 +85,7 @@ Given a list of person IDs, find their gender.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:gender_concept_id`
 """
 @memoize Dict function GetPatientGender(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
     tab = person,
 )
@@ -119,7 +119,7 @@ Given a list of person IDs, find their race.
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:race_concept_id`
 """
-@memoize Dict function GetPatientRace(ids::Vector{T} where {T<:Integer}, conn; tab = person)
+@memoize Dict function GetPatientRace(ids, conn; tab = person)
     df =
         From(tab) |>
         Where(Fun.in(Get.person_id, ids...)) |>
@@ -134,7 +134,7 @@ end
 
 """
 GetPatientAgeGroup(
-    ids::Vector{T} where {T<:Integer}, conn;
+    ids, conn;
     age_groupings::Vector{Vector{T}} where {T<:Integer} = [
         [0, 9],
         [10, 19],
@@ -169,9 +169,9 @@ Finds all individuals in age groups as specified by `age_groupings`.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:age_group`
 """
 @memoize Dict function GetPatientAgeGroup(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
-    age_groupings::Vector{Vector{T}} where {T<:Integer} = [
+    age_groupings = [
         [0, 9],
         [10, 19],
         [20, 29],
@@ -212,7 +212,7 @@ Finds all individuals in age groups as specified by `age_groupings`.
 end
 
 """
-GetPatientVisits(ids::Vector{T} where {T<:Integer}, conn; tab::SQLTable = visit_occurrence)
+GetPatientVisits(ids, conn; tab::SQLTable = visit_occurrence)
 
 Given a list of person IDs, find all their visits.
 
@@ -227,18 +227,19 @@ Given a list of person IDs, find all their visits.
 
 # Returns
 
-- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:visit_concept_id`
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:visit_occurrence_id`
 
 """
 @memoize Dict function GetPatientVisits(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
     tab::SQLTable = visit_occurrence,
 )
+
     df =
         From(tab) |>
         Where(Fun.in(Get.person_id, ids...)) |>
-        Select(Get.person_id, Get.visit_concept_id) |>
+        Select(Get.person_id, Get.visit_occurrence_id) |>
         q ->
             render(q, dialect = dialect) |>
             x -> DBInterface.execute(conn, String(x)) |> DataFrame
@@ -248,7 +249,7 @@ Given a list of person IDs, find all their visits.
 end
 
 """
-GetMostRecentConditions(ids::Vector{T} where {T<:Integer}, conn; tab::SQLTable = condition_occurrence)
+GetMostRecentConditions(ids, conn; tab::SQLTable = condition_occurrence)
 
 Given a list of person IDs, find their last recorded conditions.
 
@@ -266,7 +267,7 @@ Given a list of person IDs, find their last recorded conditions.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:condition_concept_id`
 """
 @memoize Dict function GetMostRecentConditions(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
     tab::SQLTable = condition_occurrence,
 )
@@ -294,7 +295,7 @@ Given a list of person IDs, find their last recorded conditions.
 end
 
 """
-GetMostRecentVisit(ids::Vector{T} where {T<:Integer}, conn; tab::SQLTable = visit_occurrence)
+GetMostRecentVisit(ids, conn; tab::SQLTable = visit_occurrence)
 
 Given a list of person IDs, find their last recorded visit.
 
@@ -312,7 +313,7 @@ Given a list of person IDs, find their last recorded visit.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:visit_occurrence_id`
 """
 @memoize Dict function GetMostRecentVisit(
-    ids::Vector{T} where {T<:Integer},
+    ids,
     conn;
     tab::SQLTable = visit_occurrence,
 )
@@ -340,7 +341,7 @@ Given a list of person IDs, find their last recorded visit.
 end
 
 """
-GetVisitCondition(visit_ids::Vector{T} where {T<:Integer}, conn; tab::SQLTable = visit_occurrence)
+GetVisitCondition(visit_ids, conn; tab::SQLTable = visit_occurrence)
 
 Given a list of visit IDs, find their corresponding conditions.
 
@@ -358,7 +359,7 @@ Given a list of visit IDs, find their corresponding conditions.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:visit_occurrence_id` and `:condition_concept_id`
 """
 @memoize Dict function GetVisitCondition(
-    visit_ids::Vector{T} where {T<:Integer},
+    visit_ids,
     conn;
     tab::SQLTable = condition_occurrence,
 )
