@@ -118,13 +118,13 @@ Given a list of visit concept IDs, `gender_codes` return from the database indiv
 end
 
 """
-StateFilterPersonIDs(state; tab::SQLTable = location, join_tab::SQLTable = person)
+StateFilterPersonIDs(states; tab::SQLTable = location, join_tab::SQLTable = person)
 
 Given a list of states, `states`, return from the database individuals found in the provided state list.
 
 # Arguments:
 
-- `state` - a vector of `state`'s; must be a subtype of `AbstractString`
+- `states` - a vector of state abbreviations; must be a subtype of `AbstractString`
 
 # Keyword Arguments:
 
@@ -139,7 +139,7 @@ Given a list of states, `states`, return from the database individuals found in 
     ids =
         From(tab) |>
         Select(Get.location_id, Get.state) |>
-        Where(Fun.in(Get.state, states...)) |>
+        Where(Fun.in(Get.state, uppercase.(states)...)) |>
         Join(:join => join_tab, Get.location_id .== Get.join.location_id) |>
         Select(Get.join.person_id) |>
         q -> render(q, dialect = dialect) |>
@@ -205,3 +205,5 @@ Finds all individuals in age groups as specified by `age_groupings`.
     return convert(Vector{Int}, ids.person_id)
 
 end
+
+export VisitFilterPersonIDs, ConditionFilterPersonIDs, RaceFilterPersonIDs, GenderFilterPersonIDs, StateFilterPersonIDs, AgeGroupFilterPersonIDs
