@@ -1,0 +1,3 @@
+var documenterSearchIndex = {"docs":
+[{"location":"#Welcome-to-the-OMOPCDMCohortCreator.jl-Docs!","page":"Home","title":"Welcome to the OMOPCDMCohortCreator.jl Docs!","text":"","category":"section"},{"location":"","page":"Home","title":"Home","text":"Test page - here is a :smiley: ","category":"page"},{"location":"","page":"Home","title":"Home","text":"Here is some code:","category":"page"},{"location":"","page":"Home","title":"Home","text":"function hello()\n\tprintln(\"world\")\nend","category":"page"},{"location":"","page":"Home","title":"Home","text":"Here is some math:","category":"page"},{"location":"","page":"Home","title":"Home","text":"2pi","category":"page"}]
+}
