@@ -19,7 +19,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/JuliaAnimators/Javis.jl",
+    repo = "github.com/JuliaHealth/OMOPCDMCohortCreator.jl",
     push_preview = true,
     devbranch = "main",
 )
