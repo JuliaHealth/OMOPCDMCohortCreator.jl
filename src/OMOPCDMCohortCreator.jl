@@ -1,6 +1,9 @@
 module OMOPCDMCohortCreator
 
+#TODO: Bump minor version due to new dependencies added
+
 using DataFrames
+using Dates
 using DBInterface
 using FunSQL:
     SQLTable,
@@ -22,6 +25,7 @@ using FunSQL:
     LeftJoin,
     reflect
 using Memoization
+using TimeZones
 
 include("caching_functions/getters.jl")
 include("caching_functions/filters.jl")
