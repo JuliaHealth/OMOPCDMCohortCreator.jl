@@ -135,6 +135,7 @@ end
 """
 GetPatientAgeGroup(
     ids, conn;
+    minuend = :now,
     age_groupings::Vector{Vector{T}} where {T<:Integer} = [
         [0, 9],
         [10, 19],
@@ -152,37 +153,46 @@ GetPatientAgeGroup(
 
 Finds all individuals in age groups as specified by `age_groupings`.
 
-TODO: Add note on age calculation
-This calculation is based on the following assumptions:
-
-1. According to the OMOP CDM v5.4, only the variable `year_of_birth` is guaranteed for a given patient 
-
-2. Based on 1, this is used as the minuend
-
-3. The latest_year is calculated in GenerateDatabaseDefaults where it can attain one of three possible values:
-    1. The year as of the day the code is executed given in UTC time
-    2. The last year that any record was found in the database using the "observation_period" table - this table tends to be the most up to date per OHDSI experts
-    3. Any year provided by a user
-
 # Arguments:
 
 `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 - `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
+
 `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
 - `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
+
+- `minuend` - the year that a patient's `year_of_birth` variable is subtracted from; default `:now`. There are three different options that can be set: 
+    - `:now` - the year as of the day the code is executed given in UTC time
+    - `:db` - the last year that any record was found in the database using the "observation_period" table (considered by OHDSI experts to have the latest records in a database)
+    - any year provided by a user as long as it is an `Integer` (such as 2022, 1998, etc.)
+
 - `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+
 - `join_tab::SQLTable` - the `SQLTable` representing the Observation Period table; default `observation_period`
 
 # Returns
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:age_group`
+
+# Note
+
+Age can be difficult to be calculated consistently.
+In this case, there are some assumptions made to ensure consistency: 
+
+1. According to the OMOP CDM v5.4, only the variable `year_of_birth` is guaranteed for a given patient. This is one of three options used as the minuend in age calculations.
+
+2. The subtrahend is based on what one chooses for the `minuend` key word argument.
+
+The age is then calculated following what is selected based on 1 and 2.
+This flexibility is encoded to allow a user to choose how they want age groups calculated as well as clear up an ambiguity on how this is determined.
 """
 @memoize Dict function GetPatientAgeGroup(
     ids,
     conn;
+    minuend = :now,
     age_groupings = [
         [0, 9],
         [10, 19],
@@ -194,10 +204,10 @@ This calculation is based on the following assumptions:
         [70, 79],
         [80, 89],
     ],
-    end_year = 
     tab::SQLTable = person,
     join_tab::SQLTable = observation_period,
 )
+    minuend = _determine_calculated_year(conn, minuend)
     age_arr = []
     for grp in age_groupings
         push!(age_arr, Get.age .< grp[2] + 1)
@@ -210,7 +220,7 @@ This calculation is based on the following assumptions:
         :observation_group => From(join_tab) |> Group(Get.person_id),
         on = Get.person_id .== Get.observation_group.person_id,
     ) |>
-    Select(Get.person_id, :age => latest_year .- Get.year_of_birth) |>
+    Select(Get.person_id, :age => minuend .- Get.year_of_birth) |>
     Define(:age_group => Fun.case(age_arr...)) |>
     Select(Get.person_id, Get.age_group) |>
     q ->
