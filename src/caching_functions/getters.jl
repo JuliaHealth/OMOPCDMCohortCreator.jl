@@ -152,6 +152,18 @@ GetPatientAgeGroup(
 
 Finds all individuals in age groups as specified by `age_groupings`.
 
+TODO: Add note on age calculation
+This calculation is based on the following assumptions:
+
+1. According to the OMOP CDM v5.4, only the variable `year_of_birth` is guaranteed for a given patient 
+
+2. Based on 1, this is used as the minuend
+
+3. The latest_year is calculated in GenerateDatabaseDefaults where it can attain one of three possible values:
+    1. The year as of the day the code is executed given in UTC time
+    2. The last year that any record was found in the database using the "observation_period" table - this table tends to be the most up to date per OHDSI experts
+    3. Any year provided by a user
+
 # Arguments:
 
 `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
@@ -182,6 +194,7 @@ Finds all individuals in age groups as specified by `age_groupings`.
         [70, 79],
         [80, 89],
     ],
+    end_year = 
     tab::SQLTable = person,
     join_tab::SQLTable = observation_period,
 )
@@ -197,12 +210,7 @@ Finds all individuals in age groups as specified by `age_groupings`.
         :observation_group => From(join_tab) |> Group(Get.person_id),
         on = Get.person_id .== Get.observation_group.person_id,
     ) |>
-    Select(
-        Get.person_id,
-        Fun.make_date(Get.year_of_birth, Get.month_of_birth, Get.day_of_birth) |> As(:dob),
-        Get.observation_group |> Agg.max(Get.observation_period_end_date) |> As(:record),
-    ) |>
-    Select(Get.person_id, :age => Fun.date_part("year", Fun.age(Get.record, Get.dob))) |>
+    Select(Get.person_id, :age => latest_year .- Get.year_of_birth) |>
     Define(:age_group => Fun.case(age_arr...)) |>
     Select(Get.person_id, Get.age_group) |>
     q ->
