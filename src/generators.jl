@@ -189,8 +189,24 @@ function GenerateTables(conn; inplace = true, exported = false)
     return conn
 
 end
-
 #NOTE: Create workaround for case matching across SQL flavors if Casing proposal fails: https://github.com/OHDSI/CommonDataModel/issues/509
 
-export GenerateCohorts,
-    GenerateDatabaseDetails, GenerateGroupCounts, GenerateStudyPopulation, GenerateTables
+"""
+TODO: Add documentation!
+TODO: Merge this to GenerateDatabaseDefaults 
+"""
+function GenerateDatabaseDefaults(conn; latest_year = :today)
+    if latest_year == :today 
+        @eval global latest_year = $(year(now(tz"UTC")))
+    elseif latest_year == :db
+        #OPTIM: Get the max observation_period_end_date down to only one values
+        #OPTIM: Figure out how to do this with FunSQL or default to a SQL string
+        latest_year = From(observation_period) |> Select(Get.observation_period_end_date) |> q -> render(q, dialect) |> x -> DBInterface.execute(conn, String(x)) |> DataFrame |> df -> maximum(df.observation_period_end_date) |> unix2datetime |> year
+        @eval global latest_year = $(latest_year)
+    else
+        @eval global latest_year = $(latest_year)
+    end
+end
+
+export 
+    GenerateDatabaseDetails, GenerateGroupCounts, GenerateTables
