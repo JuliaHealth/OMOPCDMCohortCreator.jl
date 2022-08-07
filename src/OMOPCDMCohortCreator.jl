@@ -1,7 +1,5 @@
 module OMOPCDMCohortCreator
 
-#TODO: Bump minor version due to new dependencies added
-
 using DataFrames
 using Dates
 using DBInterface
@@ -27,8 +25,9 @@ using FunSQL:
 using Memoization
 using TimeZones
 
-include("caching_functions/getters.jl")
-include("caching_functions/filters.jl")
+include("helpers.jl")
+include("getters.jl")
+include("filters.jl")
 include("generators.jl")
 include("executors.jl")
 
