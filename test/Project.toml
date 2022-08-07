@@ -1,0 +1,8 @@
+[deps]
+DBInterface = "a10d1c49-ce27-4219-8d33-6db1a4562965"
+DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+SQLite = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
+SampleData = "b8464e9a-ae38-46a4-977b-86f00930f698"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
