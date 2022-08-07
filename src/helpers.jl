@@ -20,7 +20,7 @@ function _determine_calculated_year(conn, calculated_year)
     elseif calculated_year == :db
         #OPTIM: Get the max observation_period_end_date down to only one values
         #OPTIM: Figure out how to do this with FunSQL or default to a SQL string
-        calculated_year = From(observation_period) |> Select(Get.observation_period_end_date) |> q -> render(q, dialect) |> x -> DBInterface.execute(conn, String(x)) |> DataFrame |> df -> maximum(df.observation_period_end_date) |> unix2datetime |> Dates.year
+        calculated_year = From(observation_period) |> Select(Get.observation_period_end_date) |> q -> render(q, dialect = dialect) |> x -> DBInterface.execute(conn, String(x)) |> DataFrame |> df -> maximum(df.observation_period_end_date) |> unix2datetime |> Dates.year
     end
 
     return calculated_year
