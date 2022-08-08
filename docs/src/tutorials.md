@@ -22,10 +22,10 @@ TUTORIAL> add OMOPCDMCohortCreator
 TUTORIAL> add OMOPCDMDatabaseConnector
 TUTORIAL> add SQLite
 TUTORIAL> add DataFrames
-TURORIAL> add SampleHealthData
+TURORIAL> add HealthSampleData
 ```
 
-> **NOTE:** For `SampleHealthData`, the package is in the process of being registered so for now, you may have to instead do if the `add` command fails.
+> **NOTE:** For `HealthSampleData`, the package is in the process of being registered so for now, you may have to instead do if the `add` command fails.
 
 > 
 > ```julia-repl
@@ -41,7 +41,7 @@ For this tutorial, we will work with data from [Eunomia](https://github.com/OHDS
 To install the data on your machine, execute the following code block and follow the prompts - you will need a stable internet connection for the download to complete: 
 
 ```julia
-using SampleHealthData
+using HealthSampleData
 
 eunomia = Eunomia()
 ```
@@ -89,13 +89,11 @@ As all the tools are working properly, let's do what is called a characterizatio
 We are going to do miniature version of such a study looking at patients with strep throat.
 For this, we will use the `condition_concept_id`: $28060$ - this will be needed for you to get correct results.
 
-> **NOTE:** As we go through this example, do not immediately jump to the code block required but try to use the [API] to come up with solutions as there may be more than one answer.
-
-<!--TODO: Add link to API page-->
+> **NOTE:** As we go through this example, do not immediately jump to the code block required but try to use the [API](@ref) to come up with solutions as there may be more than one answer.
 
 #### Task: Find All Patients with Strep Throat
 
-Using the API, find all patients with strep throat.
+Using the [API](@ref), find all patients with strep throat.
 
 Suggested solution:
 
@@ -120,7 +118,7 @@ For the patients who have strep throat diagnoses, find their gender.
 Suggested solution:
 
 ```julia
-strep_patients_race = GetPatientGender(strep_patients, conn)
+strep_patients_gender = GetPatientGender(strep_patients, conn)
 ```
 
 #### Task: Create Age Groupings of Patients with Strep Throat
@@ -160,15 +158,16 @@ strep_patients_age_group = GetPatientAgeGroup(strep_patients, conn; age_grouping
 
 With the previous tasks, we now know patients' gender, race, and age group.
 Using this information, combine these features to create a final table where each patient's `person_id`, gender, race, and age group is found in a given row.
-Hint: The DataFrames.jl documentation section on joins will be of strong use here.
+Hint: The DataFrames.jl [documentation section on joins](https://dataframes.juliadata.org/stable/man/joins/) will be of strong use here.
 
 Suggested solution:
 
 ```julia
+using DataFrames
+
+strep_patients_characterized = outerjoin(strep_patients_race, strep_patients_gender, strep_patients_age_group; on = :person_id, matchmissing = :equal)
 strep_patients_age_group = GetPatientAgeGroup(strep_patients)
 ```
-<!--TODO: Add solution here-->
-<!--TODO: Add link to DataFrames documentation-->
 
 #### Task: Create Patient Groupings
 
@@ -179,11 +178,20 @@ To protect the anonymity of patients with perhaps severely sensitive conditions 
 For this task, add to the table you created in the previous task a new column called `counts` and remove the `person_id` column.
 The `counts` column should represent the total number of patients belonging to a group's gender, race, and age group.
 Here is an example on how to calculate `counts`: if there are $5$ rows in your table that have patients who are between the ages of $20 - 24$, are African American, and are female, the value for that age, race, and gender group is $5$.
-The $5$ rows would then collapse into $1$ row as unique patient identifiers (the `person_id` column) would be removed. Hint: removing the `person_id` column first may make things easier.
+The $5$ rows would then collapse into $1$ row as unique patient identifiers (the `person_id` column) would be removed. Hint: removing the `person_id` column first may make things easier; also, look at the [DataFrames.jl documentation on the Split-Apply-Combine](https://dataframes.juliadata.org/stable/man/split_apply_combine/) approach to generate the `counts` column.
 
 Suggested solution:
 
 ```julia
-
+strep_patients_characterized = strep_patients_characterized[:, Not(:person_id)]
+strep_patient_groups = groupby(strep_patients_characterized, [:race_concept_id, :gender_concept_id, :age_group])
+strep_patient_groups = combine(strep_patient_groups, nrow => :counts)
 ```
-<!--TODO: Add solution here-->
+
+#### Conclusion
+
+This mini characterization study that we just conducted on this dataset opens up a whole new avenue for a researcher to pursue.
+For example, we could now calculate prevalence rates across different patient characteristics or compare and contrast multiple conditions at once.
+It should also be apparent that the API is set up in a very particular way: it is functional meaning that each function does one thing only.
+This gives a lot of flexibility to a user to build together study incrementally using OMOPCDMCohortCreator.
+Congratulations on finishing this tutorial and if there are any issues you encountered, [feel free to open an issue here](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl/issues/new/choose)!
