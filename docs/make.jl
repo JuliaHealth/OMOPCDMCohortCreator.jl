@@ -11,12 +11,12 @@ makedocs(;
         canonical = "https://JuliaHealth.github.io/OMOPCDMCohortCreator.jl",
         assets = String[],
         edit_branch = "main",
-        footer = "Created by [Jacob Zelko](https://jacobzelko.com). Funded through [Georgia Tech Research Institute](https://www.gtri.gatech.edu). [License](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl/blob/main/LICENSE)"
+	footer = "Created by [Jacob Zelko](https://jacobzelko.com) & [Georgia Tech Research Institute](https://www.gtri.gatech.edu). [License](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl/blob/main/LICENSE)"
     ),
     pages = [
         "Home" => "index.md",
-        "API" => "api.md",
-        "Tutorials" => "tutorials.md"
+        "Tutorials" => "tutorials.md",
+        "API" => "api.md"
     ],
 )
 
