@@ -189,8 +189,7 @@ function GenerateTables(conn; inplace = true, exported = false)
     return conn
 
 end
-
 #NOTE: Create workaround for case matching across SQL flavors if Casing proposal fails: https://github.com/OHDSI/CommonDataModel/issues/509
 
-export GenerateCohorts,
-    GenerateDatabaseDetails, GenerateGroupCounts, GenerateStudyPopulation, GenerateTables
+export 
+    GenerateDatabaseDetails, GenerateGroupCounts, GenerateTables
