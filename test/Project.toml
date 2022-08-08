@@ -1,8 +1,21 @@
 [deps]
 DBInterface = "a10d1c49-ce27-4219-8d33-6db1a4562965"
 DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+FunSQL = "cf6cc811-59f4-4a10-b258-a8547a8f6407"
+HealthSampleData = "b8464e9a-ae38-46a4-977b-86f00930f698"
+OMOPCDMCohortCreator = "f525a15e-a73f-4eef-870f-f901257eae22"
 SQLite = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
-SampleData = "b8464e9a-ae38-46a4-977b-86f00930f698"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
+
+[compat]
+DBInterface = "2"
+DataDeps = "0.7"
+DataFrames = "1"
+FunSQL = "0.10"
+HealthSampleData = "0.0"
+SQLite = "1"
+TimeZones = "1"
+julia = "1.7"

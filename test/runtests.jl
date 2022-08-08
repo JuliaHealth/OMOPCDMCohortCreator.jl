@@ -1,6 +1,15 @@
+using DataFrames
 using Dates
+using DBInterface
+using FunSQL:
+	From,
+	Get,
+	Group,
+	Limit,
+	Select,
+	render
+using HealthSampleData
 using OMOPCDMCohortCreator
-using SampleData
 using SQLite
 using Test
 using TimeZones
@@ -15,9 +24,9 @@ GenerateTables(sqlite_conn)
 	@testset "SQLite Helper Functions" begin
 		include("sqlite/helpers.jl")
 	end
-	# @testset "SQLite Getter Functions" begin
-	#	include("sqlite/getters.jl")
-	# end
+	@testset "SQLite Getter Functions" begin
+		include("sqlite/getters.jl")
+	end
 	# @testset "SQLite Filter Functions" begin
 	#	include("sqlite/filters.jl")
 	# end
@@ -31,7 +40,6 @@ GenerateTables(sqlite_conn)
 end
 
 
-#TODO: Write tests for getters 
 #TODO: Write tests for filters 
 #TODO: Write tests for generators 
 #TODO: Write tests for executors
