@@ -66,7 +66,13 @@ end
 	@test isequal(minuend_2_test, GetPatientAgeGroup(test_ids, sqlite_conn; minuend = minuend_2, age_groupings = test_age_grouping_2))
 end
 
+#= TODO: Create tests for GetPatientVisits
+Reference the test set for GetPatientRace. There should be at least one test for a person who has only 1 visit and another that has multiple visits
+labels: tests
+assignees: malinahy, jomoanime, VarshC
+=#
 # @testset "GetPatientVisits Tests" begin
+
 # end
 
 # @testset "GetMostRecentConditions Tests" begin
@@ -76,6 +82,11 @@ end
 # 	@test # Multiple ids
 # end
 
+#= TODO: Create tests for GetMostRecentVisit
+Reference the test set for GetPatientVisits when done. There should be at least one test for a person who has only 1 visit and another that has multiple visits. Confirm using SQL or FunSQL to determine accuracy
+labels: tests, good first issue
+assignees: malinahy, jomoanime, VarshC
+=#
 # @testset "GetMostRecentVisit Tests" begin
 # 	test_ids = 
 # 
@@ -83,6 +94,11 @@ end
 # 	@test # Multiple ids
 # end
 
+#= TODO: Create tests for GetVisitCondition
+Reference the test set for GetPatientVisits when done. Two tests for about three different codes works well and one test for multiple visit codes is great
+labels: tests, good first issue
+assignees: malinahy, jomoanime, VarshC
+=#
 # @testset "GetVisitCondition Tests" begin
 # 	test_ids = 
 # 
