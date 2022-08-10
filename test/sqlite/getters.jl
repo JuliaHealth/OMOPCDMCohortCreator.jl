@@ -4,7 +4,6 @@
 	@test ids == GetDatabasePersonIDs(sqlite_conn)
 end
 
-#TODO: Determine best way to create tests for any location based test
 # @testset "GetPatientState Tests" begin
 # 
 # end
@@ -67,33 +66,26 @@ end
 	@test isequal(minuend_2_test, GetPatientAgeGroup(test_ids, sqlite_conn; minuend = minuend_2, age_groupings = test_age_grouping_2))
 end
 
-#TODO: Create GetPatientVisits tests after refactoring
 # @testset "GetPatientVisits Tests" begin
 # end
 
 # @testset "GetMostRecentConditions Tests" begin
-# 	#TODO: Create a list of test_ids
 # 	test_ids = 
 # 
-# 	#TODO: Create matching DataFrame for test_ids that has genders
 # 
 # 	@test # Multiple ids
 # end
 
 # @testset "GetMostRecentVisit Tests" begin
-# 	#TODO: Create a list of test_ids
 # 	test_ids = 
 # 
-# 	#TODO: Create matching DataFrame for test_ids that has genders
 # 
 # 	@test # Multiple ids
 # end
 
 # @testset "GetVisitCondition Tests" begin
-# 	#TODO: Create a list of test_ids
 # 	test_ids = 
 # 
-# 	#TODO: Create matching DataFrame for test_ids that has genders
 # 
 # 	@test # Multiple ids
 # 	

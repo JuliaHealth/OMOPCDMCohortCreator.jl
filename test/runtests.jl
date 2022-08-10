@@ -40,6 +40,3 @@ GenerateTables(sqlite_conn)
 end
 
 
-#TODO: Write tests for filters 
-#TODO: Write tests for generators 
-#TODO: Write tests for executors
