@@ -4,6 +4,10 @@
 	@test ids == GetDatabasePersonIDs(sqlite_conn)
 end
 
+#= TODO: Determine how to add states to Eunomia database for testing 
+Currently, states are not present in the Eunomia database - it may be as simple a fix as to alter the location table and insert random state initials in the appropriate locations for each patient.
+labels: tests, moderate
+=# 
 # @testset "GetPatientState Tests" begin
 # 
 # end
