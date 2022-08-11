@@ -27,16 +27,19 @@ GenerateTables(sqlite_conn)
 	@testset "SQLite Getter Functions" begin
 		include("sqlite/getters.jl")
 	end
-	# @testset "SQLite Filter Functions" begin
-	#	include("sqlite/filters.jl")
-	# end
+	@testset "SQLite Filter Functions" begin
+		include("sqlite/filters.jl")
+	end
+	#= TODO: Add Generator function testset
+	This set of tests needs a bit more scrutiny as there are some functions that need to be reviewed and most likely deprecated.
+	labels: tests, moderate
+	assignees: thecedarprince
+	=#
 	# @testset "SQLite Generator Functions" begin
 	#	include("sqlite/generators.jl")
 	# end
-	# @testset "SQLite Executors Functions" begin
-	#	include("sqlite/generators.jl")
-	# end
+	@testset "SQLite Executors Functions" begin
+		include("sqlite/executors.jl")
+	end
 
 end
-
-
