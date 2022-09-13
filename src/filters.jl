@@ -17,7 +17,7 @@ Given a list of visit concept IDs, `visit_codes` return from the database patien
 
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
-@memoize Dict function VisitFilterPersonIDs(visit_codes, conn; tab::SQLTable = visit_occurrence)
+function VisitFilterPersonIDs(visit_codes, conn; tab::SQLTable = visit_occurrence)
     ids =
         From(tab) |>
         Where(Fun.in(Get.visit_concept_id, visit_codes...)) |>
@@ -48,7 +48,7 @@ Given a list of condition concept IDs, `condition_codes`, return from the databa
 
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
-@memoize Dict function ConditionFilterPersonIDs(
+function ConditionFilterPersonIDs(
     condition_codes, conn;
     tab = condition_occurrence,
 )
@@ -82,7 +82,7 @@ Given a list of condition concept IDs, `race_codes`, return from the database in
 
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
-@memoize Dict function RaceFilterPersonIDs(race_codes, conn; tab = person)
+function RaceFilterPersonIDs(race_codes, conn; tab = person)
     ids =
         From(tab) |>
         Where(Fun.in(Get.race_concept_id, race_codes...)) |>
@@ -113,7 +113,7 @@ Given a list of visit concept IDs, `gender_codes` return from the database indiv
 
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
-@memoize Dict function GenderFilterPersonIDs(gender_codes, conn; tab = person)
+function GenderFilterPersonIDs(gender_codes, conn; tab = person)
     ids =
         From(tab) |>
         Where(Fun.in(Get.gender_concept_id, gender_codes...)) |>
@@ -145,7 +145,7 @@ Given a list of states, `states`, return from the database individuals found in 
 
 - `ids::Vector{Int64}` - the list of persons resulting from the filter
 """
-@memoize Dict function StateFilterPersonIDs(states, conn; tab::SQLTable = location, join_tab::SQLTable = person)
+function StateFilterPersonIDs(states, conn; tab::SQLTable = location, join_tab::SQLTable = person)
     ids =
         From(tab) |>
         Select(Get.location_id, Get.state) |>

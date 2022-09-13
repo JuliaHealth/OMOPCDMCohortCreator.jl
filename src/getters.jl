@@ -15,7 +15,7 @@ Get all unique `person_id`'s from a database.
 
 - `ids::Vector{Int64}` - the list of persons
 """
-@memoize Dict function GetDatabasePersonIDs(conn; tab = person)
+function GetDatabasePersonIDs(conn; tab = person)
     ids =
         From(tab) |>
         Group(Get.person_id) |>
@@ -46,7 +46,7 @@ Given a list of person IDs, find their home state.
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:state`
 """
-@memoize Dict function GetPatientState(
+function GetPatientState(
     ids,
     conn;
     tab = location,
@@ -84,7 +84,7 @@ Given a list of person IDs, find their gender.
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:gender_concept_id`
 """
-@memoize Dict function GetPatientGender(
+function GetPatientGender(
     ids,
     conn;
     tab = person,
@@ -119,7 +119,7 @@ Given a list of person IDs, find their race.
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:race_concept_id`
 """
-@memoize Dict function GetPatientRace(ids, conn; tab = person)
+function GetPatientRace(ids, conn; tab = person)
     df =
         From(tab) |>
         Where(Fun.in(Get.person_id, ids...)) |>
@@ -186,7 +186,7 @@ In this case, there are some assumptions made to ensure consistency:
 The age is then calculated following what is selected based on 1 and 2.
 This flexibility is encoded to allow a user to choose how they want age groups calculated as well as clear up an ambiguity on how this is determined.
 """
-@memoize Dict function GetPatientAgeGroup(
+function GetPatientAgeGroup(
     ids,
     conn;
     minuend = :now,
@@ -242,7 +242,7 @@ Given a list of person IDs, find all their visits.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:visit_occurrence_id`
 
 """
-@memoize Dict function GetPatientVisits(
+function GetPatientVisits(
     ids,
     conn;
     tab::SQLTable = visit_occurrence,
@@ -278,7 +278,7 @@ Given a list of person IDs, find their last recorded conditions.
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:condition_concept_id`
 """
-@memoize Dict function GetMostRecentConditions(
+function GetMostRecentConditions(
     ids,
     conn;
     tab::SQLTable = condition_occurrence,
@@ -324,7 +324,7 @@ Given a list of person IDs, find their last recorded visit.
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:visit_occurrence_id`
 """
-@memoize Dict function GetMostRecentVisit(
+function GetMostRecentVisit(
     ids,
     conn;
     tab::SQLTable = visit_occurrence,
@@ -370,7 +370,7 @@ Given a list of visit IDs, find their corresponding conditions.
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:visit_occurrence_id` and `:condition_concept_id`
 """
-@memoize Dict function GetVisitCondition(
+function GetVisitCondition(
     visit_ids,
     conn;
     tab::SQLTable = condition_occurrence,
