@@ -70,12 +70,7 @@ end
 	@test isequal(minuend_2_test, GetPatientAgeGroup(test_ids, sqlite_conn; minuend = minuend_2, age_groupings = test_age_grouping_2))
 end
 
-#= TODO: Create tests for GetPatientVisits
-Reference the test set for GetPatientRace. There should be at least one test for a person who has only 1 visit and another that has multiple visits
-labels: tests
-assignees: malinahy, jomoanime, VarshC
-=#
-
+#Tests for GetPatientVisits
 @testset "GetPatientVisits Tests" begin
 	#test for person with multiple visits 
 	test_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
@@ -100,12 +95,23 @@ Reference the test set for GetPatientVisits when done. There should be at least 
 labels: tests, good first issue
 assignees: malinahy, jomoanime, VarshC
 =#
-#  @testset "GetMostRecentVisit Tests" begin
-#  	test_ids = 
- 
- 
-#  	@test # Multiple ids
-#  end
+ @testset "GetMostRecentVisit Tests" begin
+	#test for person with multiple visits
+	data_table = From(OMOPCDMCohortCreator.visit_occurrence) |> Group(Get.person_id) |> Select(:id => Get.person_id, :count => Agg.count())|> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+	test_visits = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_ids...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+
+	id_with_2_visits = 222
+	recent_visits = test_visits[in([222]).(test_visits.person_id), :].visit_occurrence_id
+	most_recent_visit = maximum(recent_visits)
+	evaluated_visit = (GetMostRecentVisit(222, sqlite_conn)).visit_occurrence_id
+	@test most_recent_visit == evaluated_visit[1]
+
+	id_with_1_visits = 986
+	recent_visit = test_visits[in([986]).(test_visits.person_id), :].visit_occurrence_id
+	evaluated_visit = (GetMostRecentVisit(986, sqlite_conn))
+	evaluated_visit.visit_occurrence_id
+	@test recent_visit == evaluated_visit.visit_occurrence_id
+end
 
 #= TODO: Create tests for GetVisitCondition
 Reference the test set for GetPatientVisits when done. Two tests for about three different codes works well and one test for multiple visit codes is great

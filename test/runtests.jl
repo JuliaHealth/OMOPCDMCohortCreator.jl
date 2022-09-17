@@ -9,7 +9,8 @@ using FunSQL:
 	Group,
 	Limit,
 	Select,
-	render
+	render, 
+	Agg
 using HealthSampleData
 using OMOPCDMCohortCreator
 using SQLite
