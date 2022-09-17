@@ -75,9 +75,18 @@ Reference the test set for GetPatientRace. There should be at least one test for
 labels: tests
 assignees: malinahy, jomoanime, VarshC
 =#
-# @testset "GetPatientVisits Tests" begin
 
-# end
+@testset "GetPatientVisits Tests" begin
+	#test for person with multiple visits 
+	test_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+	test_visits = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_ids...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+	@test test_visits == GetPatientVisits(test_ids, sqlite_conn)
+
+	#test for person with single visit
+	test_id = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(1) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+	test_visit = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_id...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+	@test test_visit == GetPatientVisits(test_id, sqlite_conn)
+end
 
 # @testset "GetMostRecentConditions Tests" begin
 # 	test_ids = 
@@ -91,12 +100,12 @@ Reference the test set for GetPatientVisits when done. There should be at least 
 labels: tests, good first issue
 assignees: malinahy, jomoanime, VarshC
 =#
-# @testset "GetMostRecentVisit Tests" begin
-# 	test_ids = 
-# 
-# 
-# 	@test # Multiple ids
-# end
+#  @testset "GetMostRecentVisit Tests" begin
+#  	test_ids = 
+ 
+ 
+#  	@test # Multiple ids
+#  end
 
 #= TODO: Create tests for GetVisitCondition
 Reference the test set for GetPatientVisits when done. Two tests for about three different codes works well and one test for multiple visit codes is great
