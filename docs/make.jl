@@ -1,13 +1,5 @@
 using Documenter
 
-try
-    using OMOPCDMCohortCreator
-catch
-    using Pkg
-    Pkg.add(url="github.com/JuliaHealth/OMOPCDMCohortCreator.jl", rev="main")
-    using OMOPCDMCohortCreator
-end
-
 makedocs(;
     modules = [OMOPCDMCohortCreator],
     authors = "Jacob Zelko (aka TheCedarPrince) <jacobszelko@gmail.com> and contributors",
