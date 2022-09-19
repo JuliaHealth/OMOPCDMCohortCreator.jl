@@ -16,6 +16,7 @@ GetDatabasePersonIDs
 GetPatientState
 GetPatientGender
 GetPatientRace
+GetPatientEthnicity
 GetPatientAgeGroup
 GetPatientVisits
 GetMostRecentConditions
