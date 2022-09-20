@@ -97,6 +97,7 @@ assignees: malinahy, jomoanime, VarshC
 =#
  @testset "GetMostRecentVisit Tests" begin
 	#test for person with multiple visits
+	test_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
 	data_table = From(OMOPCDMCohortCreator.visit_occurrence) |> Group(Get.person_id) |> Select(:id => Get.person_id, :count => Agg.count())|> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 	test_visits = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_ids...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 

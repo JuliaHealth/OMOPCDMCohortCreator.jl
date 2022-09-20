@@ -3,5 +3,5 @@
 @testset "ExecuteAudit Tests" begin
     original_data = DataFrame(count=1:20)
     new_data = DataFrame(count=11:20)
-    @test ExecuteAudit(data) == new_data
+    @test ExecuteAudit(original_data) == new_data
 end
