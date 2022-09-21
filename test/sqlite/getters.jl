@@ -90,24 +90,22 @@ end
 # 	@test # Multiple ids
 # end
 
-#= TODO: Create tests for GetMostRecentVisit
-Reference the test set for GetPatientVisits when done. There should be at least one test for a person who has only 1 visit and another that has multiple visits. Confirm using SQL or FunSQL to determine accuracy
-labels: tests, good first issue
-assignees: malinahy, jomoanime, VarshC
-=#
+#tests for GetMostRecentVisit
  @testset "GetMostRecentVisit Tests" begin
-	#test for person with multiple visits
 	test_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
 	data_table = From(OMOPCDMCohortCreator.visit_occurrence) |> Group(Get.person_id) |> Select(:id => Get.person_id, :count => Agg.count())|> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 	test_visits = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_ids...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-	id_with_2_visits = 222
-	recent_visits = test_visits[in([222]).(test_visits.person_id), :].visit_occurrence_id
-	most_recent_visit = maximum(recent_visits)
+	#id with multiple visits = 222
+	sql = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id, Get.visit_end_date) |> Where(Fun.in(Get.person_id, [222]...)) |> render
+	result = DBInterface.execute(sqlite_conn, sql) |> DataFrame
+	result.Date = Dates.unix2datetime.(result.visit_end_date)
+	max_index = argmax(result.Date)
+	most_recent_visit = result.visit_occurrence_id[max_index]
 	evaluated_visit = (GetMostRecentVisit(222, sqlite_conn)).visit_occurrence_id
 	@test most_recent_visit == evaluated_visit[1]
 
-	id_with_1_visits = 986
+	#id with 1 visits = 986
 	recent_visit = test_visits[in([986]).(test_visits.person_id), :].visit_occurrence_id
 	evaluated_visit = (GetMostRecentVisit(986, sqlite_conn))
 	evaluated_visit.visit_occurrence_id
@@ -120,9 +118,20 @@ labels: tests, good first issue
 assignees: malinahy, jomoanime, VarshC
 =#
 # @testset "GetVisitCondition Tests" begin
-# 	test_ids = 
-# 
-# 
-# 	@test # Multiple ids
-# 	
+# 	#test for multiple codes 
+# 	#test by hardcoding instead? Using athena results
+# 	visit_codes1 = [17479.0, 18192.0, 18859.0]
+# 	#4112343
+# 	test_df = DataFrame(visit_occurrence_id = [17479.0, 18192.0, 18859.0], condition_concept_id = [4.112343e6, 192671.0, 28060.0])
+# 	test_condition_ids = [4.112343e6, 192671.0, 28060.0]
+
+# 	#test_ids = From(OMOPCDMCohortCreator.condition_occurrence) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+# 	evaluated_result = (GetVisitCondition(visit_codes1, sqlite_conn))[!,2]
+# 	@test test_condition_ids == evaluated_result
+
+# 	#test for person with single visit
+# 	test_id = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(1) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+# 	test_visit = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_id...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+# 	@test test_visit == GetPatientVisits(test_id, sqlite_conn)
 # end
+
