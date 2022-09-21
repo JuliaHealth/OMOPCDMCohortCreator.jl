@@ -174,6 +174,65 @@ function GetPatientGender(
 end
 
 """
+GetPatientEthnicity(ids, conn; tab::SQLTable = person)
+
+Given a list of person IDs, find their ethnicity.
+
+# Arguments:
+
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+`conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:ethnicity_concept_id`
+"""
+function GetPatientEthnicity(
+    ids,
+    conn;
+    tab=person
+)
+    df = DBInterface.execute(conn, GetPatientEthnicity(ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+GetPatientEthnicity(ids, conn; tab::SQLTable = person)
+
+TODO: Add dispatch docstring
+
+# Arguments:
+
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+`conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:ethnicity_concept_id`
+"""
+function GetPatientEthnicity(ids; tab = person)
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.person_id, ids...)) |>
+        Select(Get.person_id, Get.ethnicity_concept_id) |>
+        q ->
+            render(q, dialect = dialect)
+
+    return String(sql)
+
+end
+
+"""
 GetPatientRace(ids, conn; tab::SQLTable = person)
 
 Given a list of person IDs, find their race.
@@ -672,4 +731,4 @@ function GetVisitCondition(
 
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity
