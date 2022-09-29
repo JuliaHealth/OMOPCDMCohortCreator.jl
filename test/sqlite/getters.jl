@@ -117,21 +117,26 @@ Reference the test set for GetPatientVisits when done. Two tests for about three
 labels: tests, good first issue
 assignees: malinahy, jomoanime, VarshC
 =#
-# @testset "GetVisitCondition Tests" begin
-# 	#test for multiple codes 
-# 	#test by hardcoding instead? Using athena results
-# 	visit_codes1 = [17479.0, 18192.0, 18859.0]
-# 	#4112343
-# 	test_df = DataFrame(visit_occurrence_id = [17479.0, 18192.0, 18859.0], condition_concept_id = [4.112343e6, 192671.0, 28060.0])
-# 	test_condition_ids = [4.112343e6, 192671.0, 28060.0]
+@testset "GetVisitCondition Tests" begin
 
-# 	#test_ids = From(OMOPCDMCohortCreator.condition_occurrence) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
-# 	evaluated_result = (GetVisitCondition(visit_codes1, sqlite_conn))[!,2]
-# 	@test test_condition_ids == evaluated_result
+	#test for 3 visit ids with only 1 condition each
+	visit_codes_single = [17479.0, 18192.0, 18859.0]
+	test_condition_ids = [4.112343e6, 192671.0, 28060.0]
+	test_df_single = DataFrame(visit_occurrence_id = [17479.0, 18192.0, 18859.0], condition_concept_id = [4.112343e6, 192671.0, 28060.0])
 
-# 	#test for person with single visit
-# 	test_id = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(1) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
-# 	test_visit = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_id...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
-# 	@test test_visit == GetPatientVisits(test_id, sqlite_conn)
-# end
+	evaluated_result_single = GetVisitCondition(visit_codes_single, sqlite_conn)
+	@test test_df_single == evaluated_result_single
+
+	#test for person with multiple visits
+	visit_codes_multiple = [3.0]
+	test_condition_ids_multiple = [372328.0, 81893.0]
+	test_df_multiple = DataFrame(visit_occurrence_id = [3.0, 3.0], condition_concept_id = [372328.0, 81893.0])
+
+	evaluated_result_multiple = GetVisitCondition(visit_codes_multiple, sqlite_conn)
+	@test test_df_multiple == evaluated_result_multiple
+
+	# test_id = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(1) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+	# test_visit = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_id...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+	# @test test_visit == GetPatientVisits(test_id, sqlite_conn)
+end
 
