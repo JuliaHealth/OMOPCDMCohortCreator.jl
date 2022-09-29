@@ -3,7 +3,12 @@
 labels: tests, good first issue
 =#
 @testset "VisitFilterPersonIDs Tests" begin
-	
+    #9201 was the only visit_concept)id?
+    VisitFilterPersonIDs([9201.0], sqlite_conn)
+    test_person_ids = [1, 2, 3, 5, 32, 35, 36, 42, 61, 80]
+
+    res =  sort(VisitFilterPersonIDs([9201.0], sqlite_conn))
+    @test test_person_ids == res[1:10]
 end
 
 #= TODO: Add tests to ConditionFilterPersonIDs
