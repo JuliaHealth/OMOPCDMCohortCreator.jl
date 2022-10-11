@@ -33,7 +33,37 @@ end
 labels: tests, good first issue
 =#
 @testset "RaceFilterPersonIDs Tests" begin
-	
+    #test for single ID - check if output matches that of querying from Eunomia
+    #sql command: > select distinct(person_id), race_concept_id from person where race_concept_id = 8516.0 order by person_id asc limit 10;
+    race_id_single = [8516.0]
+    person_list_8516 = [6.0,
+    9.0,
+    41.0,
+    65.0,
+    81.0,
+    99.0,
+    103.0,
+    148.0,
+    164.0,
+    190.0]
+    res_single = sort(RaceFilterPersonIDs(race_id_single, sqlite_conn))[1:10]
+    @test person_list_8516 == res_single
+
+    #test for multiple IDs
+    #sql command:  select distinct(person_id) from person where race_concept_id = 8516.0 or race_concept_id = 8515.0 or race_concept_id = 8527.0 order by person_id asc limit 10;
+    race_ids_multiple = [8516.0, 8527.0, 8515.0]
+    person_list_multiple = [1.0,
+    2.0,
+    3.0,
+    5.0,
+    6.0,
+    9.0,
+    11.0,
+    12.0,
+    16.0,
+    17.0]
+    res_multiple = sort(RaceFilterPersonIDs(race_ids_multiple, sqlite_conn))[1:10]
+    @test person_list_multiple == res_multiple
 end
 
 #= TODO: Add tests to GenderFilterPersonIDs
@@ -41,7 +71,36 @@ end
 labels: tests, good first issue
 =#
 @testset "GenderFilterPersonIDs Tests" begin
-	
+   #sql to get ids: select distinct(gender_concept_id) from person limit 10;
+   gender_id_single = [8532.0]
+   #sql: select distinct(person_id) from person where gender_concept_id = 8532.0 order by person_id asc limit 10;
+   person_list_8532 = [2.0,
+   6.0,
+   7.0,
+   9.0,
+   12.0,
+   16.0,
+   17.0,
+   18.0,
+   19.0,
+   30.0]
+   res_single = sort(GenderFilterPersonIDs(gender_id_8532, sqlite_conn))[1:10]
+   @test person_list_single == res_single
+
+   gender_id_multiple = [8532, 8507.0]
+   #select distinct(person_id) from person where gender_concept_id = 8532.0 or gender_concept_id = 8507.0 order by person_id asc limit 10;
+   person_list_multiple = [1.0,
+   2.0,
+   3.0,
+   5.0,
+   6.0,
+   7.0,
+   9.0,
+   11.0,
+   12.0,
+   16.0]
+   res_multiple = sort(GenderFilterPersonIDs(gender_id_multiple, sqlite_conn))[1:10]
+   @test person_list_multiple == res_multiple
 end
 
 #= TODO: Add tests to StateFilterPersonIDs
