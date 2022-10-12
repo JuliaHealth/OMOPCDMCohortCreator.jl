@@ -112,11 +112,6 @@ end
 	@test recent_visit == evaluated_visit.visit_occurrence_id
 end
 
-#= TODO: Create tests for GetVisitCondition
-Reference the test set for GetPatientVisits when done. Two tests for about three different codes works well and one test for multiple visit codes is great
-labels: tests, good first issue
-assignees: malinahy, jomoanime, VarshC
-=#
 @testset "GetVisitCondition Tests" begin
 
 	#test for 3 visit ids with only 1 condition each
@@ -135,8 +130,5 @@ assignees: malinahy, jomoanime, VarshC
 	evaluated_result_multiple = GetVisitCondition(visit_codes_multiple, sqlite_conn)
 	@test test_df_multiple == evaluated_result_multiple
 
-	# test_id = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(1) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
-	# test_visit = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_id...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
-	# @test test_visit == GetPatientVisits(test_id, sqlite_conn)
 end
 
