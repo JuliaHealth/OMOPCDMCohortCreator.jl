@@ -17,6 +17,9 @@ using SQLite
 using Test
 using TimeZones
 
+# For allowing HealthSampleData to always download sample data
+ENV["DATADEPS_ALWAYS_ACCEPT"] = true
+
 # SQLite Data Source
 sqlite_data = Eunomia()
 sqlite_conn = SQLite.DB(sqlite_data)
