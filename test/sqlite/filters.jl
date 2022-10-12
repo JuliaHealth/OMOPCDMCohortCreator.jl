@@ -1,7 +1,3 @@
-#= TODO: Add tests to VisitFilterPersonIDs 
-**Description:** Add two tests - one for a single ID and another for multiple IDs. Reference the tests in GetPatientGender.
-labels: tests, good first issue
-=#
 @testset "VisitFilterPersonIDs Tests" begin
     #9201 was the only visit_concept id?
     VisitFilterPersonIDs([9201.0], sqlite_conn)
@@ -11,10 +7,6 @@ labels: tests, good first issue
     @test test_person_ids == res[1:10]
 end
 
-#= TODO: Add tests to ConditionFilterPersonIDs
-**Description:** Add two tests - one for a single ID and another for multiple IDs. Reference the tests in GetPatientGender.
-labels: tests, good first issue
-=#
 @testset "ConditionFilterPersonIDs Tests" begin
     #test for 192671.0 - singe condition code
     test_person_ids_single = [3, 32, 35, 61, 80, 99, 115, 116, 133, 135]
@@ -28,10 +20,6 @@ labels: tests, good first issue
 	
 end
 
-#= TODO: Add tests to RaceFilterPersonIDs
-**Description:** Add two tests - one for a single ID and another for multiple IDs. Reference the tests in GetPatientGender.
-labels: tests, good first issue
-=#
 @testset "RaceFilterPersonIDs Tests" begin
     #test for single ID - check if output matches that of querying from Eunomia
     #sql command: > select distinct(person_id), race_concept_id from person where race_concept_id = 8516.0 order by person_id asc limit 10;
@@ -66,15 +54,11 @@ labels: tests, good first issue
     @test person_list_multiple == res_multiple
 end
 
-#= TODO: Add tests to GenderFilterPersonIDs
-**Description:** Add two tests - one for a single ID and another for multiple IDs. Reference the tests in GetPatientGender.
-labels: tests, good first issue
-=#
 @testset "GenderFilterPersonIDs Tests" begin
    #sql to get ids: select distinct(gender_concept_id) from person limit 10;
-   gender_id_single = [8532.0]
+   gender_single = [8532.0]
    #sql: select distinct(person_id) from person where gender_concept_id = 8532.0 order by person_id asc limit 10;
-   person_list_8532 = [2.0,
+   person_list_genders = [2.0,
    6.0,
    7.0,
    9.0,
@@ -84,8 +68,8 @@ labels: tests, good first issue
    18.0,
    19.0,
    30.0]
-   res_single = sort(GenderFilterPersonIDs(gender_id_8532, sqlite_conn))[1:10]
-   @test person_list_single == res_single
+   res_single = sort(GenderFilterPersonIDs(gender_single, sqlite_conn))[1:10]
+   @test person_list_genders == res_single
 
    gender_id_multiple = [8532, 8507.0]
    #select distinct(person_id) from person where gender_concept_id = 8532.0 or gender_concept_id = 8507.0 order by person_id asc limit 10;
@@ -107,6 +91,6 @@ end
 This depends on getting the test set for GetPatientState sorted out
 labels: tests, moderate
 =#
-@testset "StateFilterPersonIDs Tests" begin
-	
-end
+# @testset "StateFilterPersonIDs Tests" begin
+#	
+# end
