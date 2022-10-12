@@ -4,7 +4,10 @@
 	@test ids == GetDatabasePersonIDs(sqlite_conn)
 end
 
-#TODO: Determine best way to create tests for any location based test
+#= TODO: Determine how to add states to Eunomia database for testing 
+Currently, states are not present in the Eunomia database - it may be as simple a fix as to alter the location table and insert random state initials in the appropriate locations for each patient.
+labels: tests, moderate
+=# 
 # @testset "GetPatientState Tests" begin
 # 
 # end
@@ -67,34 +70,65 @@ end
 	@test isequal(minuend_2_test, GetPatientAgeGroup(test_ids, sqlite_conn; minuend = minuend_2, age_groupings = test_age_grouping_2))
 end
 
-#TODO: Create GetPatientVisits tests after refactoring
-# @testset "GetPatientVisits Tests" begin
-# end
+#Tests for GetPatientVisits
+@testset "GetPatientVisits Tests" begin
+	#test for person with multiple visits 
+	test_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+	test_visits = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_ids...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+	@test test_visits == GetPatientVisits(test_ids, sqlite_conn)
+
+	#test for person with single visit
+	test_id = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(1) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+	test_visit = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_id...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+	@test test_visit == GetPatientVisits(test_id, sqlite_conn)
+end
 
 # @testset "GetMostRecentConditions Tests" begin
-# 	#TODO: Create a list of test_ids
 # 	test_ids = 
 # 
-# 	#TODO: Create matching DataFrame for test_ids that has genders
 # 
 # 	@test # Multiple ids
 # end
 
-# @testset "GetMostRecentVisit Tests" begin
-# 	#TODO: Create a list of test_ids
-# 	test_ids = 
-# 
-# 	#TODO: Create matching DataFrame for test_ids that has genders
-# 
-# 	@test # Multiple ids
-# end
+#tests for GetMostRecentVisit
+ @testset "GetMostRecentVisit Tests" begin
+	test_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+	data_table = From(OMOPCDMCohortCreator.visit_occurrence) |> Group(Get.person_id) |> Select(:id => Get.person_id, :count => Agg.count())|> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+	test_visits = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_ids...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-# @testset "GetVisitCondition Tests" begin
-# 	#TODO: Create a list of test_ids
-# 	test_ids = 
-# 
-# 	#TODO: Create matching DataFrame for test_ids that has genders
-# 
-# 	@test # Multiple ids
-# 	
-# end
+	#id with multiple visits = 222
+	sql = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id, Get.visit_end_date) |> Where(Fun.in(Get.person_id, [222]...)) |> render
+	result = DBInterface.execute(sqlite_conn, sql) |> DataFrame
+	result.Date = Dates.unix2datetime.(result.visit_end_date)
+	max_index = argmax(result.Date)
+	most_recent_visit = result.visit_occurrence_id[max_index]
+	evaluated_visit = (GetMostRecentVisit(222, sqlite_conn)).visit_occurrence_id
+	@test most_recent_visit == evaluated_visit[1]
+
+	#id with 1 visits = 986
+	recent_visit = test_visits[in([986]).(test_visits.person_id), :].visit_occurrence_id
+	evaluated_visit = (GetMostRecentVisit(986, sqlite_conn))
+	evaluated_visit.visit_occurrence_id
+	@test recent_visit == evaluated_visit.visit_occurrence_id
+end
+
+@testset "GetVisitCondition Tests" begin
+
+	#test for 3 visit ids with only 1 condition each
+	visit_codes_single = [17479.0, 18192.0, 18859.0]
+	test_condition_ids = [4.112343e6, 192671.0, 28060.0]
+	test_df_single = DataFrame(visit_occurrence_id = [17479.0, 18192.0, 18859.0], condition_concept_id = [4.112343e6, 192671.0, 28060.0])
+
+	evaluated_result_single = GetVisitCondition(visit_codes_single, sqlite_conn)
+	@test test_df_single == evaluated_result_single
+
+	#test for person with multiple visits
+	visit_codes_multiple = [3.0]
+	test_condition_ids_multiple = [372328.0, 81893.0]
+	test_df_multiple = DataFrame(visit_occurrence_id = [3.0, 3.0], condition_concept_id = [372328.0, 81893.0])
+
+	evaluated_result_multiple = GetVisitCondition(visit_codes_multiple, sqlite_conn)
+	@test test_df_multiple == evaluated_result_multiple
+
+end
+

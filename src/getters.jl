@@ -407,7 +407,7 @@ Given a list of visit IDs, find their corresponding conditions.
     tab::SQLTable = condition_occurrence,
 )
 
-    df =
+    df = #get the visit ids that are in the table's visit_occurrence_ids & select that that occurrence id + the condition code
         From(tab) |>
         Where(Fun.in(Get.visit_occurrence_id, visit_ids...)) |>
         Select(Get.visit_occurrence_id, Get.condition_concept_id) |>

@@ -1,12 +1,11 @@
 # OMOPCDMCohortCreator
 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliahealth.org/OMOPCDMCohortCreator.jl/dev/)
+[![Test Coverage](https://codecov.io/gh/JuliaHealth/OMOPCDMCohortCreator.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JuliaHealth/OMOPCDMCohortCreator.jl)
 [![Zulip](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://julialang.zulipchat.com/#narrow/stream/237221-biology-health-and-medicine)
 [![Build Status](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl/workflows/CI/badge.svg)](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl/actions)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 [![DOI](https://zenodo.org/badge/508759910.svg)](https://zenodo.org/badge/latestdoi/508759910)
-
-<!--TODO: Maybe add code coverage one day-->
 
 Create cohorts from databases utilizing the OMOP CDM.
 
