@@ -102,6 +102,37 @@ Given a list of person IDs, find their gender.
 end
 
 """
+GetPatientEthnicity(ids, conn; tab::SQLTable = person)
+
+Given a list of person IDs, find their ethnicity.
+
+# Arguments:
+
+`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+`conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:ethnicity_concept_id`
+"""
+@memoize Dict function GetPatientEthnicity(ids, conn; tab = person)
+    df =
+        From(tab) |>
+        Where(Fun.in(Get.person_id, ids...)) |>
+        Select(Get.person_id, Get.ethnicity_concept_id) |>
+        q ->
+            render(q, dialect = dialect) |>
+            x -> DBInterface.execute(conn, String(x)) |> DataFrame
+
+    return df
+
+end
+
+"""
 GetPatientRace(ids, conn; tab::SQLTable = person)
 
 Given a list of person IDs, find their race.
