@@ -1,5 +1,5 @@
 """
-GetDatabasePersonIDs(conn; tab::SQLTable = person)
+GetDatabasePersonIDs(conn; tab = person)
 
 Get all unique `person_id`'s from a database.
 
@@ -9,7 +9,7 @@ Get all unique `person_id`'s from a database.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -23,13 +23,63 @@ function GetDatabasePersonIDs(conn; tab=person)
 end
 
 """
-GetDatabasePersonIDs(; tab::SQLTable = person)
+GetDatabaseYearRange(conn; tab = observation_period)
+
+Get the years for which data is available from a database.
+
+# Arguments:
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Observation Period table; default `observation_period`
+
+# Returns
+
+- `year_range::NamedTuple{(:first_year, :last_year), Tuple{Int64, Int64}}` - a NamedTuple where `first_year` is the first year data from the database was available and `last_year` where the last year data from the database was available
+"""
+function GetDatabaseYearRange(conn; tab=observation_period)
+    years = DBInterface.execute(conn, String(GetDatabaseYearRange(tab=tab))) |> DataFrame 
+
+    return (first_year = first(years.first_year), last_year = first(years.last_year))
+
+end
+
+"""
+GetDatabaseYearRange(; tab = observation_period)
+
+TODO: Add docstring for dispatch
+
+# Arguments:
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Observation Period table; default `observation_period`
+
+# Returns
+
+- `year_range::NamedTuple{(:first_year, :last_year), Tuple{Int64, Int64}}` - a NamedTuple where `first_year` is the first year data from the database was available and `last_year` where the last year data from the database was available
+"""
+function GetDatabaseYearRange(; tab=observation_period)
+    sql = From(tab) |> 
+    Group() |> 
+    Select(:first_year => Agg.min(Get.observation_period_end_date), 
+           :last_year => Agg.max(Get.observation_period_end_date)) |>
+           q -> render(q, dialect = OMOPCDMCohortCreator.dialect)
+
+    return sql
+
+end
+
+"""
+GetDatabasePersonIDs(; tab = person)
 
 Return SQL statement that gets all unique `person_id`'s from a database.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -46,7 +96,7 @@ function GetDatabasePersonIDs(; tab=person)
 end
 
 """
-GetPatientState(ids, conn; tab::SQLTable = location, join_tab::SQLTable = person)
+GetPatientState(ids, conn; tab = location, join_tab = person)
 
 Given a list of person IDs, find their home state.
 
@@ -57,8 +107,8 @@ Given a list of person IDs, find their home state.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Location table; default `location`
-- `join_tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Location table; default `location`
+- `join_tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -77,7 +127,7 @@ function GetPatientState(
 end
 
 """
-GetPatientState(ids; tab::SQLTable = location, join_tab::SQLTable = person)
+GetPatientState(ids; tab = location, join_tab = person)
 
 Return SQL statement where if given a list of person IDs, find their home state.
 
@@ -88,8 +138,8 @@ Return SQL statement where if given a list of person IDs, find their home state.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Location table; default `location`
-- `join_tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Location table; default `location`
+- `join_tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -113,7 +163,7 @@ function GetPatientState(
 end
 
 """
-GetPatientGender(ids, conn; tab::SQLTable = person)
+GetPatientGender(ids, conn; tab = person)
 
 Given a list of person IDs, find their gender.
 
@@ -124,7 +174,7 @@ Given a list of person IDs, find their gender.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -142,7 +192,7 @@ function GetPatientGender(
 end
 
 """
-GetPatientGender(ids, conn; tab::SQLTable = person)
+GetPatientGender(ids, conn; tab = person)
 
 TODO: Add docstring for this dispatch
 
@@ -153,7 +203,7 @@ TODO: Add docstring for this dispatch
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -174,7 +224,7 @@ function GetPatientGender(
 end
 
 """
-GetPatientEthnicity(ids, conn; tab::SQLTable = person)
+GetPatientEthnicity(ids, conn; tab = person)
 
 Given a list of person IDs, find their ethnicity.
 
@@ -185,7 +235,7 @@ Given a list of person IDs, find their ethnicity.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -203,7 +253,7 @@ function GetPatientEthnicity(
 end
 
 """
-GetPatientEthnicity(ids, conn; tab::SQLTable = person)
+GetPatientEthnicity(ids, conn; tab = person)
 
 TODO: Add dispatch docstring
 
@@ -214,7 +264,7 @@ TODO: Add dispatch docstring
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -233,7 +283,7 @@ function GetPatientEthnicity(ids; tab = person)
 end
 
 """
-GetPatientRace(ids, conn; tab::SQLTable = person)
+GetPatientRace(ids, conn; tab = person)
 
 Given a list of person IDs, find their race.
 
@@ -244,7 +294,7 @@ Given a list of person IDs, find their race.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -258,7 +308,7 @@ function GetPatientRace(ids, conn; tab=person)
 end
 
 """
-GetPatientRace(ids; tab::SQLTable = person)
+GetPatientRace(ids; tab = person)
 
 TODO: Add dispatch docstring
 
@@ -269,7 +319,7 @@ TODO: Add dispatch docstring
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -301,7 +351,7 @@ GetPatientAgeGroup(
         [70, 79],
         [80, 89],
     ],
-    tab::SQLTable = person,
+    tab = person,
 )
 
 Finds all individuals in age groups as specified by `age_groupings`.
@@ -319,10 +369,9 @@ Finds all individuals in age groups as specified by `age_groupings`.
 
 - `minuend` - the year that a patient's `year_of_birth` variable is subtracted from; default `:now`. There are three different options that can be set: 
     - `:now` - the year as of the day the code is executed given in UTC time
-    - `:db` - the last year that any record was found in the database using the "observation_period" table (considered by OHDSI experts to have the latest records in a database)
     - any year provided by a user as long as it is an `Integer` (such as 2022, 1998, etc.)
 
-- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -355,7 +404,7 @@ function GetPatientAgeGroup(
         [70, 79],
         [80, 89],
     ],
-    tab::SQLTable=person
+    tab=person
 ) 
 
 df = DBInterface.execute(conn, GetPatientAgeGroup(ids; minuend = minuend, age_groupings = age_groupings, tab = tab)) |> DataFrame
@@ -379,7 +428,7 @@ GetPatientAgeGroup(
         [70, 79],
         [80, 89],
     ],
-    tab::SQLTable = person,
+    tab = person,
 )
 
 TODO: Create dispatch docstring 
@@ -397,10 +446,9 @@ TODO: Create dispatch docstring
 
 - `minuend` - the year that a patient's `year_of_birth` variable is subtracted from; default `:now`. There are three different options that can be set: 
     - `:now` - the year as of the day the code is executed given in UTC time
-    - `:db` - the last year that any record was found in the database using the "observation_period" table (considered by OHDSI experts to have the latest records in a database)
     - any year provided by a user as long as it is an `Integer` (such as 2022, 1998, etc.)
 
-- `tab::SQLTable` - the `SQLTable` representing the Person table; default `person`
+- `tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
@@ -432,14 +480,10 @@ function GetPatientAgeGroup(
         [70, 79],
         [80, 89],
     ],
-    tab::SQLTable=person
+    tab=person
 )
-    # TODO: _determine_calculated_year is not supported in GetPatientAgeGroup
-    # **Description:** This is because `conn` is not passed to this dispatch. Needs fix on the `refactor` branch.
-    # labels: bug 
-    # assignees: thecedarprince
 
-    # minuend = _determine_calculated_year(conn, minuend)
+    minuend = _determine_calculated_year(minuend)
     age_arr = []
 
     for grp in age_groupings
@@ -459,7 +503,7 @@ function GetPatientAgeGroup(
 end
 
 """
-GetPatientVisits(ids, conn; tab::SQLTable = visit_occurrence)
+GetPatientVisits(ids, conn; tab = visit_occurrence)
 
 Given a list of person IDs, find all their visits.
 
@@ -470,7 +514,7 @@ Given a list of person IDs, find all their visits.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Visit Occurrence table; default `visit_occurrence`
+- `tab` - the `SQLTable` representing the Visit Occurrence table; default `visit_occurrence`
 
 # Returns
 
@@ -480,7 +524,7 @@ Given a list of person IDs, find all their visits.
 function GetPatientVisits(
     ids,
     conn;
-    tab::SQLTable=visit_occurrence
+    tab=visit_occurrence
 )
 
 df = DBInterface.execute(conn, GetPatientVisits(ids; tab = tab)) |> DataFrame
@@ -490,7 +534,7 @@ df = DBInterface.execute(conn, GetPatientVisits(ids; tab = tab)) |> DataFrame
 end
 
 """
-GetPatientVisits(ids, conn; tab::SQLTable = visit_occurrence)
+GetPatientVisits(ids, conn; tab = visit_occurrence)
 
 TODO: Add dispatch docstring
 
@@ -501,7 +545,7 @@ TODO: Add dispatch docstring
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Visit Occurrence table; default `visit_occurrence`
+- `tab` - the `SQLTable` representing the Visit Occurrence table; default `visit_occurrence`
 
 # Returns
 
@@ -510,7 +554,7 @@ TODO: Add dispatch docstring
 """
 function GetPatientVisits(
     ids;
-    tab::SQLTable=visit_occurrence
+    tab=visit_occurrence
 )
 
     sql =
@@ -524,7 +568,7 @@ function GetPatientVisits(
 end
 
 """
-GetMostRecentConditions(ids, conn; tab::SQLTable = condition_occurrence)
+GetMostRecentConditions(ids, conn; tab = condition_occurrence)
 
 Given a list of person IDs, find their last recorded conditions.
 
@@ -535,7 +579,7 @@ Given a list of person IDs, find their last recorded conditions.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Condition Occurrence table; default `condition_occurrence`
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `condition_occurrence`
 
 # Returns
 
@@ -544,7 +588,7 @@ Given a list of person IDs, find their last recorded conditions.
 function GetMostRecentConditions(
     ids,
     conn;
-    tab::SQLTable=condition_occurrence
+    tab=condition_occurrence
 )
 
 df = DBInterface.execute(conn, GetMostRecentConditions(ids; tab = tab)) |> DataFrame
@@ -554,7 +598,7 @@ df = DBInterface.execute(conn, GetMostRecentConditions(ids; tab = tab)) |> DataF
 end
 
 """
-GetMostRecentConditions(ids, conn; tab::SQLTable = condition_occurrence)
+GetMostRecentConditions(ids, conn; tab = condition_occurrence)
 
 TODO: Create dispatch docstring
 
@@ -565,7 +609,7 @@ TODO: Create dispatch docstring
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Condition Occurrence table; default `condition_occurrence`
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `condition_occurrence`
 
 # Returns
 
@@ -573,7 +617,7 @@ TODO: Create dispatch docstring
 """
 function GetMostRecentConditions(
     ids;
-    tab::SQLTable=condition_occurrence
+    tab=condition_occurrence
 )
 
     sql =
@@ -597,7 +641,7 @@ function GetMostRecentConditions(
 end
 
 """
-GetMostRecentVisit(ids, conn; tab::SQLTable = visit_occurrence)
+GetMostRecentVisit(ids, conn; tab = visit_occurrence)
 
 Given a list of person IDs, find their last recorded visit.
 
@@ -608,7 +652,7 @@ Given a list of person IDs, find their last recorded visit.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Visit Occurrence table; default `visit_occurrence`
+- `tab` - the `SQLTable` representing the Visit Occurrence table; default `visit_occurrence`
 
 # Returns
 
@@ -617,7 +661,7 @@ Given a list of person IDs, find their last recorded visit.
 function GetMostRecentVisit(
     ids,
     conn;
-    tab::SQLTable=visit_occurrence
+    tab=visit_occurrence
 )
 
 df = DBInterface.execute(conn, GetMostRecentVisit(ids; tab = tab)) |> DataFrame
@@ -626,7 +670,7 @@ df = DBInterface.execute(conn, GetMostRecentVisit(ids; tab = tab)) |> DataFrame
 end
 
 """
-GetMostRecentVisit(ids, conn; tab::SQLTable = visit_occurrence)
+GetMostRecentVisit(ids, conn; tab = visit_occurrence)
 
 TODO: Create dispatch docstring
 
@@ -637,7 +681,7 @@ TODO: Create dispatch docstring
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Visit Occurrence table; default `visit_occurrence`
+- `tab` - the `SQLTable` representing the Visit Occurrence table; default `visit_occurrence`
 
 # Returns
 
@@ -645,7 +689,7 @@ TODO: Create dispatch docstring
 """
 function GetMostRecentVisit(
     ids;
-    tab::SQLTable=visit_occurrence
+    tab=visit_occurrence
 )
 
     sql =
@@ -669,7 +713,7 @@ function GetMostRecentVisit(
 end
 
 """
-GetVisitCondition(visit_ids, conn; tab::SQLTable = visit_occurrence)
+GetVisitCondition(visit_ids, conn; tab = visit_occurrence)
 
 Given a list of visit IDs, find their corresponding conditions.
 
@@ -680,7 +724,7 @@ Given a list of visit IDs, find their corresponding conditions.
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Condition Occurrence table; default `condition_occurrence`
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `condition_occurrence`
 
 # Returns
 
@@ -689,7 +733,7 @@ Given a list of visit IDs, find their corresponding conditions.
 function GetVisitCondition(
     visit_ids,
     conn;
-    tab::SQLTable=condition_occurrence
+    tab=condition_occurrence
 )
 
 df = DBInterface.execute(conn, GetVisitCondition(visit_ids; tab = tab)) |> DataFrame
@@ -699,7 +743,7 @@ df = DBInterface.execute(conn, GetVisitCondition(visit_ids; tab = tab)) |> DataF
 end
 
 """
-GetVisitCondition(visit_ids, conn; tab::SQLTable = visit_occurrence)
+GetVisitCondition(visit_ids, conn; tab = visit_occurrence)
 
 TODO: Add dispatch docstring
 
@@ -710,7 +754,7 @@ TODO: Add dispatch docstring
 
 # Keyword Arguments:
 
-- `tab::SQLTable` - the `SQLTable` representing the Condition Occurrence table; default `condition_occurrence`
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `condition_occurrence`
 
 # Returns
 
@@ -718,7 +762,7 @@ TODO: Add dispatch docstring
 """
 function GetVisitCondition(
     visit_ids;
-    tab::SQLTable=condition_occurrence
+    tab=condition_occurrence
 )
 
     sql =
@@ -731,4 +775,4 @@ function GetVisitCondition(
 
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange
