@@ -20,6 +20,14 @@ labels: tests, moderate
 	@test genders == GetPatientGender(test_ids, sqlite_conn)
 end
 
+@testset "GetPatientEthnicity Tests" begin
+	ethnicities = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id, Get.ethnicity_concept_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+
+	test_ids = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+
+	@test ethnicities == GetPatientEthnicity(test_ids, sqlite_conn)
+end
+
 @testset "GetPatientRace Tests" begin
 	races = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id, Get.race_concept_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 	
