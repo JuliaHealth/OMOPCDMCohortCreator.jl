@@ -5,7 +5,7 @@ Get all unique `person_id`'s from a database.
 
 # Arguments:
 
-`conn` - database connection using DBInterface
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -40,18 +40,16 @@ Get the years for which data is available from a database.
 - `year_range::NamedTuple{(:first_year, :last_year), Tuple{Int64, Int64}}` - a NamedTuple where `first_year` is the first year data from the database was available and `last_year` where the last year data from the database was available
 """
 function GetDatabaseYearRange(conn; tab=observation_period)
-    years = DBInterface.execute(conn, String(GetDatabaseYearRange(tab=tab))) |> DataFrame 
+    years = DBInterface.execute(conn, String(GetDatabaseYearRange(tab=tab))) |> DataFrame
 
-    return (first_year = first(years.first_year), last_year = first(years.last_year))
+    return (first_year=first(years.first_year), last_year=first(years.last_year))
 
 end
 
 """
 GetDatabaseYearRange(; tab = observation_period)
 
-TODO: Add docstring for dispatch
-
-# Arguments:
+Return SQL to find the years for which data is available from a database.
 
 # Keyword Arguments:
 
@@ -62,13 +60,13 @@ TODO: Add docstring for dispatch
 - `year_range::NamedTuple{(:first_year, :last_year), Tuple{Int64, Int64}}` - a NamedTuple where `first_year` is the first year data from the database was available and `last_year` where the last year data from the database was available
 """
 function GetDatabaseYearRange(; tab=observation_period)
-    sql = From(tab) |> 
-    Group() |> 
-    Select(:first_year => Agg.min(Get.observation_period_end_date), 
-           :last_year => Agg.max(Get.observation_period_end_date)) |>
-           q -> render(q, dialect = OMOPCDMCohortCreator.dialect)
+    sql = From(tab) |>
+          Group() |>
+          Select(:first_year => Agg.min(Get.observation_period_end_date),
+              :last_year => Agg.max(Get.observation_period_end_date)) |>
+          q -> render(q, dialect=OMOPCDMCohortCreator.dialect)
 
-    return sql
+    return String(sql)
 
 end
 
@@ -102,12 +100,14 @@ Given a list of person IDs, find their home state.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
 - `tab` - the `SQLTable` representing the Location table; default `location`
+
 - `join_tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
@@ -133,12 +133,14 @@ Return SQL statement where if given a list of person IDs, find their home state.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
 - `tab` - the `SQLTable` representing the Location table; default `location`
+
 - `join_tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
@@ -169,8 +171,9 @@ Given a list of person IDs, find their gender.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -192,14 +195,13 @@ function GetPatientGender(
 end
 
 """
-GetPatientGender(ids, conn; tab = person)
+GetPatientGender(ids; tab = person)
 
-TODO: Add docstring for this dispatch
+Return SQL statement that gets the `gender_concept_id` for a given list of `person_id`'s
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 
 # Keyword Arguments:
 
@@ -230,8 +232,9 @@ Given a list of person IDs, find their ethnicity.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -255,12 +258,11 @@ end
 """
 GetPatientEthnicity(ids, conn; tab = person)
 
-TODO: Add dispatch docstring
+Return SQL statement that gets the `ethnicity_concept_id` for a given list of `person_id`'s
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 
 # Keyword Arguments:
 
@@ -270,13 +272,13 @@ TODO: Add dispatch docstring
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:ethnicity_concept_id`
 """
-function GetPatientEthnicity(ids; tab = person)
+function GetPatientEthnicity(ids; tab=person)
     sql =
         From(tab) |>
         Where(Fun.in(Get.person_id, ids...)) |>
         Select(Get.person_id, Get.ethnicity_concept_id) |>
         q ->
-            render(q, dialect = dialect)
+            render(q, dialect=dialect)
 
     return String(sql)
 
@@ -289,8 +291,9 @@ Given a list of person IDs, find their race.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -301,7 +304,7 @@ Given a list of person IDs, find their race.
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:race_concept_id`
 """
 function GetPatientRace(ids, conn; tab=person)
-    df = DBInterface.execute(conn, GetPatientRace(ids; tab = tab)) |> DataFrame
+    df = DBInterface.execute(conn, GetPatientRace(ids; tab=tab)) |> DataFrame
 
     return df
 
@@ -310,12 +313,11 @@ end
 """
 GetPatientRace(ids; tab = person)
 
-TODO: Add dispatch docstring
+Return SQL statement that gets the `race_concept_id` for a given list of `person_id`'s
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 
 # Keyword Arguments:
 
@@ -332,7 +334,7 @@ function GetPatientRace(ids; tab=person)
         Select(Get.person_id, Get.race_concept_id) |>
         q -> render(q, dialect=dialect)
 
-        return String(sql)
+    return String(sql)
 
 end
 
@@ -358,16 +360,15 @@ Finds all individuals in age groups as specified by `age_groupings`.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-- `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 
-`conn` - database connection using DBInterface
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
 - `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
 
-- `minuend` - the year that a patient's `year_of_birth` variable is subtracted from; default `:now`. There are three different options that can be set: 
+- `minuend` - the year that a patient's `year_of_birth` variable is subtracted from; default `:now`. There are two different options that can be set: 
     - `:now` - the year as of the day the code is executed given in UTC time
     - any year provided by a user as long as it is an `Integer` (such as 2022, 1998, etc.)
 
@@ -405,17 +406,17 @@ function GetPatientAgeGroup(
         [80, 89],
     ],
     tab=person
-) 
+)
 
-df = DBInterface.execute(conn, GetPatientAgeGroup(ids; minuend = minuend, age_groupings = age_groupings, tab = tab)) |> DataFrame
+    df = DBInterface.execute(conn, GetPatientAgeGroup(ids; minuend=minuend, age_groupings=age_groupings, tab=tab)) |> DataFrame
 
-return df
+    return df
 
 end
 
 """
 GetPatientAgeGroup(
-    ids, conn;
+    ids;
     minuend = :now,
     age_groupings = [
         [0, 9],
@@ -431,20 +432,18 @@ GetPatientAgeGroup(
     tab = person,
 )
 
-TODO: Create dispatch docstring 
+Return SQL statement that assigns an age group to each patient in a given patient list. 
+Customized age groupings can be provided as a list.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-- `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
-
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 
 # Keyword Arguments:
 
 - `age_groupings` - a vector of age groups of the form `[[10, 19], [20, 29],]` denoting an age group of 10 - 19 and 20 - 29 respectively; age values must subtype of `Integer`
 
-- `minuend` - the year that a patient's `year_of_birth` variable is subtracted from; default `:now`. There are three different options that can be set: 
+- `minuend` - the year that a patient's `year_of_birth` variable is subtracted from; default `:now`. There are two different options that can be set: 
     - `:now` - the year as of the day the code is executed given in UTC time
     - any year provided by a user as long as it is an `Integer` (such as 2022, 1998, etc.)
 
@@ -492,11 +491,11 @@ function GetPatientAgeGroup(
     end
 
     sql = From(tab) |>
-    Where(Fun.in(Get.person_id, ids...)) |>
-    Select(Get.person_id, :age => minuend .- Get.year_of_birth) |>
-    Define(:age_group => Fun.case(age_arr...)) |>
-    Select(Get.person_id, Get.age_group) |>
-    q -> render(q, dialect=dialect)
+          Where(Fun.in(Get.person_id, ids...)) |>
+          Select(Get.person_id, :age => minuend .- Get.year_of_birth) |>
+          Define(:age_group => Fun.case(age_arr...)) |>
+          Select(Get.person_id, Get.age_group) |>
+          q -> render(q, dialect=dialect)
 
     return String(sql)
 
@@ -509,8 +508,9 @@ Given a list of person IDs, find all their visits.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -527,21 +527,20 @@ function GetPatientVisits(
     tab=visit_occurrence
 )
 
-df = DBInterface.execute(conn, GetPatientVisits(ids; tab = tab)) |> DataFrame
+    df = DBInterface.execute(conn, GetPatientVisits(ids; tab=tab)) |> DataFrame
 
     return df
 
 end
 
 """
-GetPatientVisits(ids, conn; tab = visit_occurrence)
+GetPatientVisits(ids; tab = visit_occurrence)
 
-TODO: Add dispatch docstring
+Return SQL statement that returns all `visit_occurrence_id` for a given patient list
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 
 # Keyword Arguments:
 
@@ -563,7 +562,7 @@ function GetPatientVisits(
         Select(Get.person_id, Get.visit_occurrence_id) |>
         q -> render(q, dialect=dialect)
 
-        return String(sql)
+    return String(sql)
 
 end
 
@@ -574,8 +573,9 @@ Given a list of person IDs, find their last recorded conditions.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -591,21 +591,20 @@ function GetMostRecentConditions(
     tab=condition_occurrence
 )
 
-df = DBInterface.execute(conn, GetMostRecentConditions(ids; tab = tab)) |> DataFrame
+    df = DBInterface.execute(conn, GetMostRecentConditions(ids; tab=tab)) |> DataFrame
 
     return df
 
 end
 
 """
-GetMostRecentConditions(ids, conn; tab = condition_occurrence)
+GetMostRecentConditions(ids; tab = condition_occurrence)
 
-TODO: Create dispatch docstring
+Produces SQL statement that, given a list of person IDs, finds their last recorded conditions.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 
 # Keyword Arguments:
 
@@ -630,13 +629,13 @@ function GetMostRecentConditions(
                 Select(Get.person_id, :last_date => Agg.max(Get.condition_end_date)),
             on=Fun.and(
                 Get.person_id .== Get.date_tab.person_id,
-                Get.condition_end_date .== Fun.cast(Get.date_tab.last_date, "date"),
+                Get.condition_end_date .== Get.date_tab.last_date,
             ),
         ) |>
         Select(Get.person_id, Get.condition_concept_id) |>
         q -> render(q, dialect=dialect)
 
-        return String(sql)
+    return String(sql)
 
 end
 
@@ -647,8 +646,9 @@ Given a list of person IDs, find their last recorded visit.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -664,7 +664,7 @@ function GetMostRecentVisit(
     tab=visit_occurrence
 )
 
-df = DBInterface.execute(conn, GetMostRecentVisit(ids; tab = tab)) |> DataFrame
+    df = DBInterface.execute(conn, GetMostRecentVisit(ids; tab=tab)) |> DataFrame
 
     return df
 end
@@ -672,12 +672,11 @@ end
 """
 GetMostRecentVisit(ids, conn; tab = visit_occurrence)
 
-TODO: Create dispatch docstring
+Produces SQL statement that, given a list of person IDs, finds their last recorded visit.
 
 # Arguments:
 
-`ids` - list of `person_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
 
 # Keyword Arguments:
 
@@ -709,7 +708,7 @@ function GetMostRecentVisit(
         Select(Get.person_id, :visit_occurrence_id => Agg.max(Get.visit_occurrence_id)) |> # ASSUMPTION: IF MULTIPLE VISITS IN ONE DAY, SELECT MOST RECENT visit_occurrence_id
         q -> render(q, dialect=dialect)
 
-        return String(sql)
+    return String(sql)
 end
 
 """
@@ -719,8 +718,9 @@ Given a list of visit IDs, find their corresponding conditions.
 
 # Arguments:
 
-`visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -736,21 +736,20 @@ function GetVisitCondition(
     tab=condition_occurrence
 )
 
-df = DBInterface.execute(conn, GetVisitCondition(visit_ids; tab = tab)) |> DataFrame
+    df = DBInterface.execute(conn, GetVisitCondition(visit_ids; tab=tab)) |> DataFrame
 
     return df
 
 end
 
 """
-GetVisitCondition(visit_ids, conn; tab = visit_occurrence)
+GetVisitCondition(visit_ids; tab = visit_occurrence)
 
-TODO: Add dispatch docstring
+Produces SQL statement that, given a list of `visit_id`'s, finds the conditions diagnosed associated with that visit.
 
 # Arguments:
 
-`visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
-`conn` - database connection using DBInterface
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
 
 # Keyword Arguments:
 
@@ -771,7 +770,7 @@ function GetVisitCondition(
         Select(Get.visit_occurrence_id, Get.condition_concept_id) |>
         q -> render(q, dialect=dialect)
 
-        return String(sql)
+    return String(sql)
 
 end
 

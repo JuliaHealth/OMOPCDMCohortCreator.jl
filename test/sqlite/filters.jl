@@ -1,5 +1,5 @@
 @testset "VisitFilterPersonIDs Tests" begin
-    #9201 was the only visit_concept id?
+    #9201 was the only visit_concept id for Eunomia
     VisitFilterPersonIDs([9201.0], sqlite_conn)
     test_person_ids = [1, 2, 3, 5, 32, 35, 36, 42, 61, 80]
 
