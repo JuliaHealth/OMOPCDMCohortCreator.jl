@@ -27,9 +27,9 @@ GenerateDatabaseDetails(:sqlite, "main")
 GenerateTables(sqlite_conn)
 
 @testset "OMOPCDMCohortCreator" begin
-	#@testset "SQLite Helper Functions" begin
-	#	include("sqlite/helpers.jl")
-	#end
+	@testset "SQLite Helper Functions" begin
+		include("sqlite/helpers.jl")
+	end
 	@testset "SQLite Getter Functions" begin
 		include("sqlite/getters.jl")
 	end
