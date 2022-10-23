@@ -18,7 +18,7 @@ makedocs(;
         "Tutorials" => [
                         "tutorials.md",
                         "tutorials/beginner_tutorial.md",
-                        "tutorials/j_tutorial.md"
+                        "tutorials/r_tutorial.md"
                        ],
         "API" => "api.md"
     ],
