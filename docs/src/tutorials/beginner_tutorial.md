@@ -1,4 +1,4 @@
-# Beginner Tutorial
+# Beginner Tutorial :hatching_chick:
 
 ```@contents
 Pages = ["beginner_tutorial.md"]
@@ -8,7 +8,7 @@ This tutorial presents a step by step guide on using OMOPCDMCohortCreator to run
 You will learn the basics of OMOPCDMCohortCreator and how to use it with fake data that you could then apply to your real data sets.
 Basic knowledge of Julia (such as installing packages into environments and working with the Julia REPL and Julia files) is necessary; you can learn all [that here](https://pkgdocs.julialang.org/v1/getting-started/).
 
-## Environment Set-Up
+## Environment Set-Up :memo:
 
 For this tutorial, you will need to activate an environment; to get into package mode within your Julia REPL, write `]`:
 
@@ -40,7 +40,7 @@ import HealthSampleData: Eunomia
 eunomia = Eunomia()
 ```
 
-## Connecting to the Eunomia Database
+## Connecting to the Eunomia Database :floppy_disk:
 
 After you have finished your set up in the Julia, we need to establish a connection to the Eunomia SQLite database that we will use for the rest of the tutorial: 
 
@@ -75,7 +75,7 @@ As a check to make sure everything was correctly installed and works properly, t
 occ.GetDatabasePersonIDs(conn)
 ```
 
-## Characterizing Patients Who Have Had Strep Throat
+## Characterizing Patients Who Have Had Strep Throat :face_with_thermometer:
 
 ### Background 
 
@@ -191,7 +191,7 @@ We can apply that as follows:
 audited_strep_patient_groups = occ.ExecuteAudit(strep_patient_groups; hitech = true)
 ```
 
-### Conclusion
+## Conclusion :tada:
 
 This mini characterization study that we just conducted on this dataset opens up a whole new avenue for a researcher to pursue.
 For example, we could now calculate prevalence rates across different patient characteristics or compare and contrast multiple conditions at once.
@@ -199,7 +199,7 @@ It should also be apparent that the API is set up in a very particular way: it i
 This gives a lot of flexibility to a user to build together study incrementally using OMOPCDMCohortCreator.
 Congratulations on finishing this tutorial and if there are any issues you encountered, [feel free to open an issue here](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl/issues/new/choose)!
 
-## Appendix
+## Appendix :detective:
 
 ### Packages Used in Analysis
 
