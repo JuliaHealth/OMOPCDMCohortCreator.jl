@@ -1,7 +1,7 @@
 # Using OMOPCDMCohortCreator with R
 
 ```@contents
-Pages = ["rcall_tutorial.md"]
+Pages = ["r_tutorial.md"]
 ```
 
 This tutorial builds on the [Beginner Tutorial](tutorials/beginner_tutorial.md) in creating a characterization study but instead of using Julia, we will use R!
