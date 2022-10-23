@@ -7,7 +7,7 @@ Given a list of visit concept IDs, `visit_codes` return from the database patien
 
 - `visit_codes` - a vector of `visit_concept_id`'s; must be a subtype of `Integer`
 
-`conn` - database connection using DBInterface
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -25,9 +25,9 @@ function VisitFilterPersonIDs(visit_codes, conn; tab = visit_occurrence)
 end
 
 """
-VisitFilterPersonIDs(visit_codes, conn; tab = visit_occurrence)
+VisitFilterPersonIDs(visit_codes; tab = visit_occurrence)
 
-TODO: Add documentation for dispatch
+Generates a SQL statement that, given a list of visit concept IDs, `visit_codes`, return from the database patients matching at least one of the provided visit codes from the Visit Occurrence table.
 
 # Arguments:
 
@@ -41,7 +41,7 @@ TODO: Add documentation for dispatch
 
 # Returns
 
-- `ids::Vector{Int64}` - the list of persons resulting from the filter
+- `sql::String` - the SQL representation that runs this filter
 """
 function VisitFilterPersonIDs(visit_codes; tab = visit_occurrence)
     sql =
@@ -63,7 +63,7 @@ Given a list of condition concept IDs, `condition_codes`, return from the databa
 
 - `condition_codes` - a vector of `condition_concept_id`'s; must be a subtype of `Integer`
 
-`conn` - database connection using DBInterface
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -84,15 +84,13 @@ function ConditionFilterPersonIDs(
 end
 
 """
-ConditionFilterPersonIDs(condition_codes, conn; tab = condition_occurrence)
+ConditionFilterPersonIDs(condition_codes; tab = condition_occurrence)
 
-TODO: Add docstring for dispatch when ready
+Generates a SQL statement that, given a list of condition concept IDs, `condition_codes`, return from the database individuals having at least one entry in the Condition Occurrence table matching at least one of the provided condition types.
 
 # Arguments:
 
 - `condition_codes` - a vector of `condition_concept_id`'s; must be a subtype of `Integer`
-
-`conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -100,7 +98,7 @@ TODO: Add docstring for dispatch when ready
 
 # Returns
 
-- `ids::Vector{Int64}` - the list of persons resulting from the filter
+- `sql::String` - the SQL representation that runs this filter
 """
 function ConditionFilterPersonIDs(
     condition_codes;
@@ -125,7 +123,7 @@ Given a list of condition concept IDs, `race_codes`, return from the database in
 
 - `race_codes` - a vector of `race_concept_id`'s; must be a subtype of `Integer`
 
-`conn` - database connection using DBInterface
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -143,15 +141,13 @@ function RaceFilterPersonIDs(race_codes, conn; tab = person)
 end
 
 """
-RaceFilterPersonIDs(race_codes, conn; tab = person)
+RaceFilterPersonIDs(race_codes; tab = person)
 
-TODO: Add dispatch docstring when ready
+Generates a SQL statement that, given a list of `race_concept_id`'s, return from the database individuals having at least one entry in the Person table matching at least one of the provided race types.
 
 # Arguments:
 
 - `race_codes` - a vector of `race_concept_id`'s; must be a subtype of `Integer`
-
-`conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -159,7 +155,7 @@ TODO: Add dispatch docstring when ready
 
 # Returns
 
-- `ids::Vector{Int64}` - the list of persons resulting from the filter
+- `sql::String` - the SQL representation that runs this filter
 """
 function RaceFilterPersonIDs(race_codes; tab = person)
     sql =
@@ -181,7 +177,7 @@ Given a list of visit concept IDs, `gender_codes` return from the database indiv
 
 - `visit_codes` - a vector of `gender_concept_id`'s; must be a subtype of `Integer`
 
-`conn` - database connection using DBInterface
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -199,15 +195,13 @@ function GenderFilterPersonIDs(gender_codes, conn; tab = person)
 end
 
 """
-GenderFilterPersonIDs(gender_codes, conn; tab = visit_occurrence)
+GenderFilterPersonIDs(gender_codes; tab = visit_occurrence)
 
-TODO: Add dispatch docstring when ready
+Generates a SQL statement that, given a list of visit concept IDs, `gender_codes` return from the database individuals having at least one entry in the Person table matching at least one of the provided gender types.
 
 # Arguments:
 
 - `visit_codes` - a vector of `gender_concept_id`'s; must be a subtype of `Integer`
-
-`conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
@@ -215,7 +209,7 @@ TODO: Add dispatch docstring when ready
 
 # Returns
 
-- `ids::Vector{Int64}` - the list of persons resulting from the filter
+- `sql::String` - the SQL representation that runs this filter
 """
 function GenderFilterPersonIDs(gender_codes; tab = person)
     sql =
@@ -237,11 +231,12 @@ Given a list of states, `states`, return from the database individuals found in 
 
 - `states` - a vector of state abbreviations; must be a subtype of `AbstractString`
 
-`conn` - database connection using DBInterface
+- `conn` - database connection using DBInterface
 
 # Keyword Arguments:
 
 - `tab` - the `SQLTable` representing the Location table; default `location`
+
 - `join_tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
@@ -256,24 +251,23 @@ function StateFilterPersonIDs(states, conn; tab = location, join_tab = person)
 end
 
 """
-StateFilterPersonIDs(states, conn; tab = location, join_tab = person)
+StateFilterPersonIDs(states; tab = location, join_tab = person)
 
-Given a list of states, `states`, return from the database individuals found in the provided state list.
+Generates a SQL statement that, given a list of states, `states`, return from the database individuals found in the provided state list.
 
 # Arguments:
 
 - `states` - a vector of state abbreviations; must be a subtype of `AbstractString`
 
-`conn` - database connection using DBInterface
-
 # Keyword Arguments:
 
 - `tab` - the `SQLTable` representing the Location table; default `location`
+
 - `join_tab` - the `SQLTable` representing the Person table; default `person`
 
 # Returns
 
-- `ids::Vector{Int64}` - the list of persons resulting from the filter
+- `sql::String` - the SQL representation that runs this filter
 """
 function StateFilterPersonIDs(states; tab = location, join_tab = person)
     sql =
@@ -287,4 +281,5 @@ function StateFilterPersonIDs(states; tab = location, join_tab = person)
     return String(sql)
 
 end
+
 export VisitFilterPersonIDs, ConditionFilterPersonIDs, RaceFilterPersonIDs, GenderFilterPersonIDs, StateFilterPersonIDs
