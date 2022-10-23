@@ -1,17 +1,17 @@
-# Contributing to OMOPCDMCohortCreator :smile:
+# Contributing to OMOPCDMCohortCreator 😁
 
 OMOPCDMCohortCreator is currently under heavy development as we push to a primary release version. 
 We follow a workflow pattern that is directly inspired by the [development workflow guide](http://docs.juliaplots.org/latest/contributing/#Development-Workflow-1) found in [`Plots.jl`](https://github.com/JuliaPlots/Plots.jl).
 The general workflow we expect contributors to adhere to is as follows:
 
-## 1. Create an Issue about the Problem :memo:
+## 1. Create an Issue about the Problem 📝
 
 If you want to add functionality or to work on a bug you found, open an issue first.
 That'll save you from doing work that we may not support for OMOPCDMCohortCreator.
 
-## 2. Fork the repo to your account :fork_and_knife:
+## 2. Fork the repo to your account 🍴
 
-## 3. Create a branch based on what you are developing :deciduous_tree:
+## 3. Create a branch based on what you are developing 🌳
 
 Before making a branch, make sure to check that you are even with master via the following commands within your fork:
 
@@ -26,7 +26,7 @@ git merge --ff-only origin/master
 Then, go ahead and create a branch that you could edit with the changes you want to see.
 This is done by going into the root and typing: `git branch -b [name of your branch]`
 
-## 4. Test, code, and commit :pencil:
+## 4. Test, code, and commit ✏️
 
 Once you have a fork, it is useful to make sure the fork was successful.
 To verify that everything is operational, let's test it.
@@ -73,12 +73,12 @@ You may get some questions about it, and possibly suggestions of how to make it 
 If you had test errors or problems, we are happy to help you. 
 Then, if all goes according to plan, it gets merged... **Thanks for the contribution!!** 🎉 🎉 🎉
 
-## Note on Adding Dependencies :books:
+## Note on Adding Dependencies 📚
 
 As a rule, we try to avoid having too many dependencies.
 Therefore, we request that if you have a PR that adds a new dependency, please have opened an issue previously.
 
-### Adding Core Dependencies :ledger:
+### Adding Core Dependencies 📒
 
 If you are working on introducing a new core dependency, make sure to add that dependency to the main `Project.toml` for `OMOPCDMCohortCreator`.
 To do this, follow these steps:
@@ -97,7 +97,7 @@ julia> ]
 (OMOPCDMCohortCreator) pkg> add [NAME OF DEPENDENCY]
 ```
 
-### Adding Test Dependencies :clipboard:
+### Adding Test Dependencies 📋
 
 If you are  introducing a new test dependency, make sure to add that dependency to the `Project.toml` located in the `OMOPCDMCohortCreator` test directory.
 To do this, follow these steps:

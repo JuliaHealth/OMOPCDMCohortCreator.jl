@@ -1,4 +1,4 @@
-# Using OMOPCDMCohortCreator with R :pirate_flag:
+# Using OMOPCDMCohortCreator with R 🏴‍☠️
 
 ```@contents
 Pages = ["r_tutorial.md"]
@@ -8,7 +8,7 @@ This tutorial builds on the [Beginner Tutorial](tutorials/beginner_tutorial.md) 
 This assumes the user has familiarity with R but familiarity with Julia is not required.
 By the end of this tutorial, you will learn how to use OMOPCDMCohortCreator directly within R without having to ever touch Julia.
 
-## Analysis Set-up :memo:
+## Analysis Set-up 📝
 
 ### R and Julia Installation
 
@@ -87,7 +87,7 @@ eunomia <- hsd$Eunomia()
 > **NOTE:** An internet connection will be needed to download this data.
 > After this data is downloaded, internet is no longer required for this tutorial.
 
-## Create Database Connection to Eunomia :floppy_disk:
+## Create Database Connection to Eunomia 💾
 
 After you have finished your set up in R, we need to establish a connection to the Eunomia SQLite database that we will use for the rest of the tutorial: 
 
@@ -119,7 +119,7 @@ As a check to make sure everything was correctly installed and works properly, t
 occ$GetDatabasePersonIDs(conn) 
 ```
 
-## Characterization Analysis :face_with_thermometer:
+## Characterization Analysis 🤒
 
 ### Background for Analysis
 
@@ -207,14 +207,14 @@ rename(count = "n") %>%
 filter(count > 10)
 ```
 
-## Conclusion :tada:
+## Conclusion 🎉 
 
 This mini characterization study that we just conducted on this dataset opens up a whole new avenue for a researcher to pursue.
 For example, we could now calculate prevalence rates across different patient characteristics or compare and contrast multiple conditions at once.
 It should also be apparent that the API is set up in a very particular way: it is functional meaning that each function does one thing only.
 This gives a lot of flexibility to a user to build together a study incrementally using `OMOPCDMCohortCreator`.
 
-## Appendix :detective:
+## Appendix 🕵️
 
 ### Packages Used in Analysis
 
