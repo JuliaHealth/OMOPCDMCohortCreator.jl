@@ -22,11 +22,12 @@ You will need the following packages for this tutorial which you can install in 
 
 ```julia-repl
 TUTORIAL> add OMOPCDMCohortCreator
-TUTORIAL> add OMOPCDMDatabaseConnector
 TUTORIAL> add SQLite
 TUTORIAL> add DataFrames
 TURORIAL> add HealthSampleData
 ```
+
+To learn more about these packages, see the [Appendix](#appendix).
 
 ### Data 
 
@@ -34,7 +35,7 @@ For this tutorial, we will work with data from [Eunomia](https://github.com/OHDS
 To install the data on your machine, execute the following code block and follow the prompts - you will need a stable internet connection for the download to complete: 
 
 ```julia
-using HealthSampleData
+import HealthSampleData: Eunomia
 
 eunomia = Eunomia()
 ```
@@ -44,20 +45,19 @@ eunomia = Eunomia()
 After you have finished your set up in the Julia, we need to establish a connection to the Eunomia SQLite database that we will use for the rest of the tutorial: 
 
 ```julia
-using SQLite
+import SQLite: DB
 
-conn = SQLite.DB(eunomia)
+conn = DB(eunomia)
 ```
 
 With Eunomia, the database's schema is simply called "main".
 We will use this to generate database connection details that will inform `OMOPCDMCohortCreator` about the type of queries we will write (i.e. SQLite) and the name of the database's schema.
-For this step, we will use `OMOPCDMCohortCreator` and `OMOPCDMDatabaseConnector`:
+For this step, we will use `OMOPCDMCohortCreator`:
 
 ```julia
-using OMOPCDMCohortCreator
-using OMOPCDMDatabaseConnector
+import OMOPCDMCohortCreator as occ
 
-GenerateDatabaseDetails(
+occ.GenerateDatabaseDetails(
     :sqlite,
     "main"
 )
@@ -66,13 +66,13 @@ GenerateDatabaseDetails(
 Finally, we will generate internal representations of each table found within Eunomia for OMOPCDMCohortCreator to use:
 
 ```julia
-GenerateTables(conn)
+occ.GenerateTables(conn)
 ```
 
 As a check to make sure everything was correctly installed and works properly, the following block should work and return a list of all person ids in this data:
 
 ```julia
-GetDatabasePersonIDs(conn)
+occ.GetDatabasePersonIDs(conn)
 ```
 
 ## Characterizing Patients Who Have Had Strep Throat
@@ -92,7 +92,7 @@ Using the [API](@ref), find all patients with strep throat.
 Suggested solution:
 
 ```julia
-strep_patients = ConditionFilterPersonIDs(28060, conn)
+strep_patients = occ.ConditionFilterPersonIDs(28060, conn)
 ```
 
 ### Task: Find the Race of Patients with Strep Throat
@@ -102,7 +102,7 @@ For the patients who have strep throat diagnoses, find their race.
 Suggested solution:
 
 ```julia
-strep_patients_race = GetPatientRace(strep_patients, conn)
+strep_patients_race = occ.GetPatientRace(strep_patients, conn)
 ```
 
 ### Task: Find the Gender of Patients with Strep Throat
@@ -112,7 +112,7 @@ For the patients who have strep throat diagnoses, find their gender.
 Suggested solution:
 
 ```julia
-strep_patients_gender = GetPatientGender(strep_patients, conn)
+strep_patients_gender = occ.GetPatientGender(strep_patients, conn)
 ```
 
 ### Task: Create Age Groupings of Patients with Strep Throat
@@ -145,7 +145,7 @@ age_groups = [
 	[90, 94],
 	[95, 99]
 ]
-strep_patients_age_group = GetPatientAgeGroup(strep_patients, conn; age_groupings = age_groups)
+strep_patients_age_group = occ.GetPatientAgeGroup(strep_patients, conn; age_groupings = age_groups)
 ```
 
 ### Task: Characterize Each Person by Gender, Race, and Age Group
@@ -157,9 +157,9 @@ Hint: The DataFrames.jl [documentation section on joins](https://dataframes.juli
 Suggested solution:
 
 ```julia
-using DataFrames
+import DataFrames as DF
 
-strep_patients_characterized = outerjoin(strep_patients_race, strep_patients_gender, strep_patients_age_group; on = :person_id, matchmissing = :equal)
+strep_patients_characterized = DF.outerjoin(strep_patients_race, strep_patients_gender, strep_patients_age_group; on = :person_id, matchmissing = :equal)
 ```
 
 ### Task: Create Patient Groupings
@@ -176,9 +176,19 @@ The $5$ rows would then collapse into $1$ row as unique patient identifiers (the
 Suggested solution:
 
 ```julia
-strep_patients_characterized = strep_patients_characterized[:, Not(:person_id)]
-strep_patient_groups = groupby(strep_patients_characterized, [:race_concept_id, :gender_concept_id, :age_group])
-strep_patient_groups = combine(strep_patient_groups, nrow => :counts)
+strep_patients_characterized = strep_patients_characterized[:, DF.Not(:person_id)]
+strep_patient_groups = DF.groupby(strep_patients_characterized, [:race_concept_id, :gender_concept_id, :age_group])
+strep_patient_groups = DF.combine(strep_patient_groups, DF.nrow => :counts)
+```
+
+### Task: Execute Safety Audit
+
+To ensure the safety of the patients in this table, we can execute an audit.
+One such auditing standard are those put forth by "[HITECH](https://www.hhs.gov/hipaa/for-professionals/special-topics/hitech-act-enforcement-interim-final-rule/index.html)" which, amongst other things, requires researchers to filter out from a table patient counts $< 11$ in subpopulation groups -- the kind of groups we created!
+We can apply that as follows:
+
+```julia
+audited_strep_patient_groups = occ.ExecuteAudit(strep_patient_groups; hitech = true)
 ```
 
 ### Conclusion
@@ -188,3 +198,17 @@ For example, we could now calculate prevalence rates across different patient ch
 It should also be apparent that the API is set up in a very particular way: it is functional meaning that each function does one thing only.
 This gives a lot of flexibility to a user to build together study incrementally using OMOPCDMCohortCreator.
 Congratulations on finishing this tutorial and if there are any issues you encountered, [feel free to open an issue here](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl/issues/new/choose)!
+
+## Appendix
+
+### Packages Used in Analysis
+
+Package descriptions:
+
+- [`DataFrames`](https://github.com/JuliaData/DataFrames.jl) - Julia's dataframe handler for easily manipulating data
+
+- [`OMOPCDMCohortCreator`](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl) - Create cohorts from databases utilizing the OMOP CDM
+
+- [`HealthSampleData`](https://github.com/JuliaHealth/HealthSampleData.jl) - Sample health data for a variety of health formats and use cases
+
+- [`SQLite`](https://github.com/JuliaDatabases/SQLite.jl) - A Julia interface to the SQLite library
