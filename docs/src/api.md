@@ -22,6 +22,7 @@ GetPatientVisits
 GetMostRecentConditions
 GetMostRecentVisit
 GetVisitCondition
+GetDatabaseYearRange
 ```
 
 ## Filters
@@ -42,10 +43,8 @@ AgeGroupFilterPersonIDs
 The generator functions are to set generate initial connections to an OMOP CDM database or to finalize resulting data from queries into various outputs. 
 
 ```@docs
-# GenerateCohorts
 GenerateDatabaseDetails
 GenerateGroupCounts
-# GenerateStudyPopulation 
 GenerateTables
 ```
 
