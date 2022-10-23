@@ -9,7 +9,7 @@ makedocs(;
         prettyurls = get(ENV, "CI", "false") == "true",
         canonical = "https://JuliaHealth.github.io/OMOPCDMCohortCreator.jl",
         assets = String[],
-        edit_link = "main",
+        edit_branch = "main",
 	footer = "Created by [Jacob Zelko](https://jacobzelko.com) & [Georgia Tech Research Institute](https://www.gtri.gatech.edu). [License](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl/blob/main/LICENSE)"
     ),
     pages = [
@@ -22,5 +22,5 @@ makedocs(;
 deploydocs(;
     repo = "github.com/JuliaHealth/OMOPCDMCohortCreator.jl",
     push_preview = true,
-    devbranch = "main",
+    devbranch = "dev",
 )
