@@ -20,7 +20,8 @@ makedocs(;
                         "tutorials/beginner_tutorial.md",
                         "tutorials/r_tutorial.md"
                        ],
-        "API" => "api.md"
+        "API" => "api.md",
+        "Contributing" => "contributing.md"
     ],
 )
 
