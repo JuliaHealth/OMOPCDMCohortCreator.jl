@@ -1,3 +1,4 @@
+using OMOPCDMCohortCreator
 using Documenter
 
 makedocs(;
