@@ -5,7 +5,7 @@
 This package uses a functional approach to query databases in the [OMOP Common Data Model format](https://www.ohdsi.org/data-standardization/the-common-data-model/) whereby you could build rapidly lines of inquiry into the database.
 Furthermore, this package is a companion to those tools found in the [HADES](https://ohdsi.github.io/Hades/) ecosystem.
 To get started, visit the [Tutorials](@ref) section as well as visit the [API](@ref) section to see all the functions available.
-If you want to contribute, please check out our [Contributing](@ref) guide! :smile:
+If you want to contribute, please check out our [Contributing](@ref) guide!
 
 ## Main Features 🔧
 
