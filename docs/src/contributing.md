@@ -61,7 +61,7 @@ The way we do this is in three steps:
 
 3. Finally, let's push these changes to GitHub using `git push --set-upstream origin [name of the branch you made]`
 
-## 5. Submitting your changes to the main project :white_check_mark:
+## 5. Submitting your changes to the main project ✅
 
 Almost done! Go to your fork and there should be a section that asks you to make a pull request (PR) from your branch. This allows the maintainers of OMOPCDMCohortCreator to see if they can add your changes to the main project. If not, you can click the "New pull request" button.
 
