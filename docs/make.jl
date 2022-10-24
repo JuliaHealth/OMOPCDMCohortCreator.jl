@@ -17,8 +17,11 @@ makedocs(;
         "Home" => "index.md",
         "Tutorials" => [
                         "tutorials.md",
-                        "beginner_tutorial.md"],
-        "API" => "api.md"
+                        "tutorials/beginner_tutorial.md",
+                        "tutorials/r_tutorial.md"
+                       ],
+        "API" => "api.md",
+        "Contributing" => "contributing.md"
     ],
 )
 

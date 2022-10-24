@@ -4,6 +4,7 @@ This is a list of documentation associated with every single **exported** functi
 There are a few different sections with a brief explanation of what these sections are followed by relevant functions.
 
 ```@contents
+Pages = ["api.md"]
 ```
 
 
@@ -22,6 +23,7 @@ GetPatientVisits
 GetMostRecentConditions
 GetMostRecentVisit
 GetVisitCondition
+GetDatabaseYearRange
 ```
 
 ## Filters
@@ -42,10 +44,8 @@ AgeGroupFilterPersonIDs
 The generator functions are to set generate initial connections to an OMOP CDM database or to finalize resulting data from queries into various outputs. 
 
 ```@docs
-# GenerateCohorts
 GenerateDatabaseDetails
 GenerateGroupCounts
-# GenerateStudyPopulation 
 GenerateTables
 ```
 
