@@ -1,3 +1,4 @@
+using OMOPCDMCohortCreator
 using Documenter
 
 makedocs(;
@@ -9,13 +10,18 @@ makedocs(;
         prettyurls = get(ENV, "CI", "false") == "true",
         canonical = "https://JuliaHealth.github.io/OMOPCDMCohortCreator.jl",
         assets = String[],
-        edit_link = "main",
+        edit_link = "dev",
 	footer = "Created by [Jacob Zelko](https://jacobzelko.com) & [Georgia Tech Research Institute](https://www.gtri.gatech.edu). [License](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl/blob/main/LICENSE)"
     ),
     pages = [
         "Home" => "index.md",
-        "Tutorials" => "tutorials.md",
-        "API" => "api.md"
+        "Tutorials" => [
+                        "tutorials.md",
+                        "tutorials/beginner_tutorial.md",
+                        "tutorials/r_tutorial.md"
+                       ],
+        "API" => "api.md",
+        "Contributing" => "contributing.md"
     ],
 )
 

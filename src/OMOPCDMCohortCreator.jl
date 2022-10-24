@@ -22,7 +22,6 @@ using FunSQL:
     ID,
     LeftJoin,
     reflect
-using Memoization
 using TimeZones
 
 include("helpers.jl")
