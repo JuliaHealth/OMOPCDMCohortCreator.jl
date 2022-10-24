@@ -7,7 +7,7 @@ Furthermore, this package is a companion to those tools found in the [HADES](htt
 To get started, visit the [Tutorials](@ref) section as well as visit the [API](@ref) section to see all the functions available.
 If you want to contribute, please check out our [Contributing](@ref) guide! :smile:
 
-## Big Features 🔧
+## Main Features 🔧
 
 The biggest features of this package are:
 
@@ -21,9 +21,11 @@ The biggest features of this package are:
   - `sqlite`
   - `redshift`
 - Prepare SQL queries if unable to connect to database via OMOPCDMCohortCreator that could then be run on a given SQL database directly
+- Does not mutate database or require temp tables
 - Interoperable with the R language via [JuliaConnectoR](https://github.com/stefan-m-lenz/JuliaConnectoR) to work directly within R syntax (see [Tutorials](@ref))
 - Readily parallelizable via [Distributed.jl](https://docs.julialang.org/en/v1/manual/distributed-computing/)
 - Complementary to [OHDSI HADES](https://ohdsi.github.io/Hades/) ecosystem tools
+- Extensive [test suite](https://github.com/JuliaHealth/OMOPCDMCohortCreator.jl/tree/main/test) to ensure correctness and compliance with privacy preserving methods (HITECH, etc.)
 
 ## Why? 🤔
 
