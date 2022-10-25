@@ -131,6 +131,7 @@ For this, we will use the `condition_concept_id`, $28060$.
 
 ```r
 strep_patients <- occ$ConditionFilterPersonIDs(28060, conn)
+strep_patients <- strep_patients$person_id
 ```
 
 ### Task: Find the Race of Patients with Strep Throat
