@@ -6,7 +6,7 @@ authors:
     orcid: https://orcid.org/0000-0003-4531-1614
   - family-names: Chinta
     given-names: Varshini
-title: "OMOPCDMCohortCreator 0.2.0"
-version: 0.2.0
+title: "OMOPCDMCohortCreator 0.2.1"
+version: 0.2.1
 doi: 10.5281/zenodo.7052105
-date-released: 2022-10-23
+date-released: 2022-11-05

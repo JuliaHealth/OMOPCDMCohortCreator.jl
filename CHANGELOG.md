@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.1] - November 5th, 2022
+
+Minor patch release that adjusted CI test coverage and fixed some documentation errors.
+
+### Changed
+
+- Lowered Julia compat requirement to support 1.6 (LTS) 
+- CI deployment for Windows
+- CI deployment for OSX
+- CI only runs on Push now
+
+### Fixed 
+
+- Adjusted minor bug in R Tutorial
+
 ## [0.2.0] - October 23rd, 2022
 
 ### Added 
