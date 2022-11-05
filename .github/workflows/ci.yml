@@ -10,10 +10,13 @@ jobs:
       fail-fast: false
       matrix:
         version:
+          - '1.6'
           - '1.7'
           - 'nightly'
         os:
           - ubuntu-latest
+          - macOS-latest
+          - windows-latest
         arch:
           - x64          
     steps:
@@ -55,3 +58,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+
