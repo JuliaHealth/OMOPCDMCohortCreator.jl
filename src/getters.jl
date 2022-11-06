@@ -774,4 +774,81 @@ function GetVisitCondition(
 
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange
+#= TODO: Write tests for GetVisitPlaceOfService
+Only needs one or two tests; may be difficult to test as I do not think Eunomia has anything other than missing
+labels: tests, good first issue
+assignees: VarshC
+=#
+
+"""
+GetVisitPlaceOfService(visit_ids, conn; tab = visit_occurrence, join_tab = care_site)
+
+Given a list of visit IDs, find their place of service 
+
+# Arguments:
+
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `visit_occurrence`
+
+- `join_tab` - the `SQLTable` representing the Person table; default `care_site`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:visit_occurrence_id` and `:condition_concept_id`
+"""
+function GetVisitPlaceOfService(
+    visit_ids,
+    conn;
+    tab=visit_occurrence,
+    join_tab=care_site
+)
+
+    df = DBInterface.execute(conn, GetVisitPlaceOfService(visit_ids; tab=tab, join_tab=join_tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+GetVisitPlaceOfService(visit_ids; tab = visit_occurrence, join_tab = care_site)
+
+Produces SQL statement that, given a list of visit IDs, find their place of service 
+
+# Arguments:
+
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `visit_occurrence`
+
+- `join_tab` - the `SQLTable` representing the Person table; default `care_site`
+
+# Returns
+
+- `sql::String` - Prepared SQL statement as a `String`
+"""
+function GetVisitPlaceOfService(
+    visit_ids;
+    tab=visit_occurrence,
+    join_tab=care_site
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.visit_occurrence_id, visit_ids...)) |>
+        Select(Get.visit_occurrence_id, Get.care_site_id) |>
+        Join(:join => join_tab, Get.care_site_id .== Get.join.care_site_id) |>
+        Select(Get.visit_occurrence_id, Get.join.place_of_service_concept_id) |> 
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService
