@@ -851,4 +851,72 @@ function GetVisitPlaceOfService(
 
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService
+#= TODO: Write tests for GetVisitConcept
+Only needs one or two tests; should have everything that is required in Eunomia to run!
+labels: tests, good first issue
+assignees: VarshC
+=#
+"""
+GetVisitConcept(visit_ids, conn; tab = visit_occurrence)
+
+Given a list of visit IDs, find their corresponding visit_concept_id's.
+
+# Arguments:
+
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `visit_occurrence`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:visit_occurrence_id` and `:visit_concept_id`
+"""
+function GetVisitConcept(
+    visit_ids,
+    conn;
+    tab=visit_occurrence
+)
+
+    df = DBInterface.execute(conn, GetVisitConcept(visit_ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+GetVisitConcept(visit_ids; tab = visit_occurrence)
+
+Produces SQL statement that, given a list of visit IDs, find their corresponding visit_concept_id's.
+
+# Arguments:
+
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `visit_occurrence`
+
+# Returns
+
+- `sql::String` - Prepared SQL statement as a `String`
+"""
+function GetVisitConcept(
+    visit_ids;
+    tab=visit_occurrence
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.visit_occurrence_id, visit_ids...)) |>
+        Select(Get.visit_occurrence_id, Get.visit_concept_id) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept
