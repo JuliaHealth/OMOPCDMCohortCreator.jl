@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.2] - February 28th, 2023
+
+Patch release to add in some new features and fixes 
+
+### Added 
+
+- Added Getter for visit dates 
+- Upated and added tests
+
+### Changed
+
+- Small fix to Julia beginner tutorial
+
 ## [0.2.1] - November 5th, 2022
 
 Minor patch release that adjusted CI test coverage and fixed some documentation errors.
