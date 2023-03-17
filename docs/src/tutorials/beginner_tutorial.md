@@ -145,7 +145,7 @@ age_groups = [
 	[90, 94],
 	[95, 99]
 ]
-strep_patients_age_group = occ.GetPatientAgeGroup(strep_patients.person__id, conn; age_groupings = age_groups)
+strep_patients_age_group = occ.GetPatientAgeGroup(strep_patients.person_id, conn; age_groupings = age_groups)
 ```
 
 ### Task: Characterize Each Person by Gender, Race, and Age Group
