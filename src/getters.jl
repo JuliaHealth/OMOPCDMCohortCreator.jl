@@ -774,4 +774,219 @@ function GetVisitCondition(
 
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange
+#= TODO: Write tests for GetVisitPlaceOfService
+Only needs one or two tests; may be difficult to test as I do not think Eunomia has anything other than missing
+labels: tests, good first issue
+assignees: VarshC
+=#
+
+"""
+GetVisitPlaceOfService(visit_ids, conn; tab = visit_occurrence, join_tab = care_site)
+
+Given a list of visit IDs, find their place of service 
+
+# Arguments:
+
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `visit_occurrence`
+
+- `join_tab` - the `SQLTable` representing the Person table; default `care_site`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:visit_occurrence_id` and `:condition_concept_id`
+"""
+function GetVisitPlaceOfService(
+    visit_ids,
+    conn;
+    tab=visit_occurrence,
+    join_tab=care_site
+)
+
+    df = DBInterface.execute(conn, GetVisitPlaceOfService(visit_ids; tab=tab, join_tab=join_tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+GetVisitPlaceOfService(visit_ids; tab = visit_occurrence, join_tab = care_site)
+
+Produces SQL statement that, given a list of visit IDs, find their place of service 
+
+# Arguments:
+
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `visit_occurrence`
+
+- `join_tab` - the `SQLTable` representing the Person table; default `care_site`
+
+# Returns
+
+- `sql::String` - Prepared SQL statement as a `String`
+"""
+function GetVisitPlaceOfService(
+    visit_ids;
+    tab=visit_occurrence,
+    join_tab=care_site
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.visit_occurrence_id, visit_ids...)) |>
+        Select(Get.visit_occurrence_id, Get.care_site_id) |>
+        Join(:join => join_tab, Get.care_site_id .== Get.join.care_site_id) |>
+        Select(Get.visit_occurrence_id, Get.join.place_of_service_concept_id) |> 
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+#= TODO: Write tests for GetVisitConcept
+Only needs one or two tests; should have everything that is required in Eunomia to run!
+labels: tests, good first issue
+assignees: VarshC
+=#
+"""
+GetVisitConcept(visit_ids, conn; tab = visit_occurrence)
+
+Given a list of visit IDs, find their corresponding visit_concept_id's.
+
+# Arguments:
+
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `visit_occurrence`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:visit_occurrence_id` and `:visit_concept_id`
+"""
+function GetVisitConcept(
+    visit_ids,
+    conn;
+    tab=visit_occurrence
+)
+
+    df = DBInterface.execute(conn, GetVisitConcept(visit_ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+GetVisitConcept(visit_ids; tab = visit_occurrence)
+
+Produces SQL statement that, given a list of visit IDs, find their corresponding visit_concept_id's.
+
+# Arguments:
+
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `visit_occurrence`
+
+# Returns
+
+- `sql::String` - Prepared SQL statement as a `String`
+"""
+function GetVisitConcept(
+    visit_ids;
+    tab=visit_occurrence
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.visit_occurrence_id, visit_ids...)) |>
+        Select(Get.visit_occurrence_id, Get.visit_concept_id) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+"""
+GetVisitDate(visit_occurrence_id; interval::Symbol = :start, tab = visit_occurrence)
+
+This function queries a database for the start or end date of the visit occurrence associated with the given `visit_occurrence_id` or list of `visit_occurrence_id`'s.
+
+# Arguments:
+- `visit_occurrence_id`: A single `visit_occurrence_id` or a vector of `visit_occurrence_id`'s to query for.
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments
+
+- `interval`: A keyword argument that determines whether to query for the visit start date (`interval=:start`) or the visit end date (`interval=:end`). Default value is `interval=:start`.
+
+# Returns:
+A dataframe with two columns: `visit_occurrence_id` and either `visit_start_date` or `visit_end_date`, depending on the value of the `interval` argument.
+"""
+function GetVisitDate(
+    visit_occurrence_ids,
+    conn;
+    interval::Symbol = :start,
+    tab=visit_occurrence
+)
+    df = DBInterface.execute(conn, GetVisitDate(visit_occurrence_ids; interval, tab=tab)) |> DataFrame
+    return df
+end
+
+"""
+GetVisitDate(visit_occurrence_id; interval::Symbol = :start, tab = visit_occurrence)
+
+Produces SQL statement that, given a list of visit IDs, finds the visit start or end date.
+
+# Arguments:
+
+- `visit_occurrence_id`: A single `visit_occurrence_id` or a vector of `visit_occurrence_id`'s to query for.
+
+# Keyword Arguments
+
+- `interval`: A keyword argument that determines whether to query for the visit start date (`interval=:start`) or the visit end date (`interval=:end`). Default value is `interval=:start`.
+
+# Returns:
+
+A dataframe with two columns: `visit_occurrence_id` and either `visit_start_date` or `visit_end_date`, depending on the value of the `interval` argument.
+"""
+function GetVisitDate(
+    visit_occurrence_id;
+    interval::Symbol = :start,
+    tab=visit_occurrence
+)
+    if (interval == :start)
+        sql =
+            From(tab) |>
+            Where(Fun.in(Get.visit_occurrence_id, visit_occurrence_id...)) |>
+            Select(Get.visit_occurrence_id, Get.visit_start_date) |>
+            q -> render(q, dialect=dialect)
+        return String(sql)
+    elseif (interval == :end)
+        sql =
+        From(tab) |>
+        Where(Fun.in(Get.visit_occurrence_id, visit_occurrence_id...)) |>
+        Select(Get.visit_occurrence_id, Get.visit_end_date) |>
+        q -> render(q, dialect=dialect)
+        return String(sql)
+    else
+        return "NA"
+    end
+
+end
+
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate

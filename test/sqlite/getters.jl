@@ -131,6 +131,13 @@ end
     @test recent_visit == evaluated_visit.visit_occurrence_id
 end
 
+@testset "GetVisitConcept Tests" begin
+	test_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.visit_occurrence_id) |> Limit(20) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+    test_concept_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.visit_occurrence_id, Get.visit_concept_id) |> Where(Fun.in(Get.visit_occurrence_id, test_ids...)) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+
+    @test test_concept_ids == GetVisitConcept(test_ids, sqlite_conn)
+end
+
 @testset "GetVisitCondition Tests" begin
 
     #test for 3 visit ids with only 1 condition each
@@ -157,4 +164,21 @@ end
 	test_ids = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
 
 	@test ethnicities == GetPatientEthnicity(test_ids, sqlite_conn)
+end
+
+@testset "GetVisitDate Tests" begin
+
+    #test with interval = start
+    test_visit_ids= [65475.0, 14930.0, 25743.0, 14888.0]
+    test_start_dates = [840585600.0, 575510400.0, 1336953600.0, 1063497600.0]
+    test_df_start = DataFrame(visit_occurrence_id=test_visit_ids, visit_start_date=test_start_dates)
+
+    @test test_df_start == GetVisitDate(test_visit_ids, sqlite_conn, interval=Symbol("start"))
+
+    #test with interval = end
+    test_end_dates = [840672000.0, 575596800.0, 1337040000.0, 1063584000.0]
+    test_df_end = DataFrame(visit_occurrence_id=test_visit_ids, visit_end_date=test_end_dates)
+
+    @test test_df_end == GetVisitDate(test_visit_ids, sqlite_conn, interval=Symbol("end"))
+    
 end
