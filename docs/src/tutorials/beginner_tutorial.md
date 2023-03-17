@@ -118,7 +118,7 @@ strep_patients_gender = occ.GetPatientGender(strep_patients.person_id, conn)
 ### Task: Create Age Groupings of Patients with Strep Throat
 
 For this task, for every single person who has a strep throat diagnosis, assign them an age group.
-The age groupings must follow $5$ year intervals when assigned to a person up to $100$ years of age (e.g. $[0, 4], [5, 9], ... [95, 100]$).
+The age groupings must follow $5$ year intervals when assigned to a person up to $99$ years of age (e.g. $[0, 4], [5, 10], ... [95, 99]$).
 
 Suggested solution:
 
@@ -145,7 +145,7 @@ age_groups = [
 	[90, 94],
 	[95, 99]
 ]
-strep_patients_age_group = occ.GetPatientAgeGroup(strep_patients, conn; age_groupings = age_groups)
+strep_patients_age_group = occ.GetPatientAgeGroup(strep_patients.person__id, conn; age_groupings = age_groups)
 ```
 
 ### Task: Characterize Each Person by Gender, Race, and Age Group
@@ -168,17 +168,17 @@ Often with characterization style studies, it is extremely important to aggregat
 Why?
 To protect the anonymity of patients with perhaps severely sensitive conditions (e.g. mental illnesses, sexually transmitted diseases, etc.) from possible repercussions from accidental disclosure of this patient information.
 
-For this task, add to the table you created in the previous task a new column called `counts` and remove the `person_id` column.
-The `counts` column should represent the total number of patients belonging to a group's gender, race, and age group.
-Here is an example on how to calculate `counts`: if there are $5$ rows in your table that have patients who are between the ages of $20 - 24$, are African American, and are female, the value for that age, race, and gender group is $5$.
-The $5$ rows would then collapse into $1$ row as unique patient identifiers (the `person_id` column) would be removed. Hint: removing the `person_id` column first may make things easier; also, look at the [DataFrames.jl documentation on the Split-Apply-Combine](https://dataframes.juliadata.org/stable/man/split_apply_combine/) approach to generate the `counts` column.
+For this task, add to the table you created in the previous task a new column called `count` and remove the `person_id` column.
+The `count` column should represent the total number of patients belonging to a group's gender, race, and age group.
+Here is an example on how to calculate `count`: if there are $5$ rows in your table that have patients who are between the ages of $20 - 24$, are African American, and are female, the value for that age, race, and gender group is $5$.
+The $5$ rows would then collapse into $1$ row as unique patient identifiers (the `person_id` column) would be removed. Hint: removing the `person_id` column first may make things easier; also, look at the [DataFrames.jl documentation on the Split-Apply-Combine](https://dataframes.juliadata.org/stable/man/split_apply_combine/) approach to generate the `count` column.
 
 Suggested solution:
 
 ```julia
 strep_patients_characterized = strep_patients_characterized[:, DF.Not(:person_id)]
 strep_patient_groups = DF.groupby(strep_patients_characterized, [:race_concept_id, :gender_concept_id, :age_group])
-strep_patient_groups = DF.combine(strep_patient_groups, DF.nrow => :counts)
+strep_patient_groups = DF.combine(strep_patient_groups, DF.nrow => :count)
 ```
 
 ### Task: Execute Safety Audit
