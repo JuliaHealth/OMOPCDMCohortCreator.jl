@@ -13,6 +13,8 @@ labels: tests, moderate
 # 
 # end
 
+
+
 @testset "GetDatabaseYearRange Tests" begin
     # Test to see if correct years are reported for Eunomia
     first_year = 1922
@@ -181,4 +183,28 @@ end
 
     @test test_df_end == GetVisitDate(test_visit_ids, sqlite_conn, interval=Symbol("end"))
     
+end
+
+@testset "GetDrugExposures Tests" begin
+	Drug_exposure = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.person_id, Get.drug_exposure_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+
+	test_ids = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+
+	@test Drug_exposure == GetDrugExposures(test_ids, sqlite_conn)
+end
+
+@testset "GetDrugConceptIDs Tests" begin
+	drug_concept_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id, Get.drug_concept_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+
+	drug_exposure_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+
+	@test drug_concept_ids == GetDrugExposures(drug_exposure_ids, sqlite_conn)
+end
+
+@testset "GetDrugConceptIDs Tests" begin
+	drug_amounts = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_concept_id, Get.amount_value) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+
+	drug_concept_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_concept_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+
+	@test drug_amounts == GetDrugExposures(drug_concept_ids, sqlite_conn)
 end

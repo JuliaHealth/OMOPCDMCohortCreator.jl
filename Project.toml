@@ -4,10 +4,13 @@ authors = ["Jacob Zelko <jacobszelko@gmail.com>"]
 version = "0.2.2"
 
 [deps]
+Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
 DBInterface = "a10d1c49-ce27-4219-8d33-6db1a4562965"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 FunSQL = "cf6cc811-59f4-4a10-b258-a8547a8f6407"
+HealthSampleData = "b8464e9a-ae38-46a4-977b-86f00930f698"
+SQLite = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
 TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 
 [compat]

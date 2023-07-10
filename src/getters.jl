@@ -126,6 +126,17 @@ function GetPatientState(
 
 end
 
+function GetPatientState(
+    mds::DataFrame,
+    conn;tab=location,
+    join_tab=person
+    )
+
+    df_ids= mds[:,"person_id"]
+    
+
+    return outerjoin(GetPatientState(df_ids,conn, ; tab=tab, join_tab=join_tab), mds, on = :person_id)
+end
 """
 GetPatientState(ids; tab = location, join_tab = person)
 
@@ -194,6 +205,17 @@ function GetPatientGender(
 
 end
 
+function GetPatientGender(
+    mds::DataFrame,
+    conn;tab=person
+    )
+
+    df_ids= mds[:,"person_id"]
+    
+
+    return outerjoin(GetPatientGender(df_ids, conn; tab=tab), mds, on = :person_id)
+end
+
 """
 GetPatientGender(ids; tab = person)
 
@@ -255,6 +277,19 @@ function GetPatientEthnicity(
 
 end
 
+function GetPatientEthnicity(
+    mds::DataFrame,
+    conn;
+    tab=person
+    )
+
+    df_ids= mds[:,"person_id"]
+    
+
+    return outerjoin(GetPatientEthnicity(df_ids, conn; tab=tab), mds, on = :person_id)
+end
+
+
 """
 GetPatientEthnicity(ids, conn; tab = person)
 
@@ -310,6 +345,17 @@ function GetPatientRace(ids, conn; tab=person)
 
 end
 
+function GetPatientRace(
+    mds::DataFrame,
+    conn;
+    tab=person
+    )
+
+    df_ids= mds[:,"person_id"]
+    
+
+    return outerjoin(GetPatientRace(df_ids, conn; tab=tab), mds, on = :person_id)
+end
 """
 GetPatientRace(ids; tab = person)
 
@@ -412,6 +458,18 @@ function GetPatientAgeGroup(
 
     return df
 
+end
+
+function GetPatientAgeGroup(
+    mds::DataFrame,
+    conn;
+    minuend=:now
+    )
+
+    df_ids= mds[:,"person_id"]
+    
+
+    return outerjoin(GetPatientAgeGroup(df_ids, conn; minuend=minuend, tab=tab), mds, on = :person_id)
 end
 
 """
@@ -533,6 +591,17 @@ function GetPatientVisits(
 
 end
 
+function GetPatientVisits(
+    mds::DataFrame,
+    conn;
+    tab=visit_occurrence
+)
+
+    df_ids= mds[:,"person_id"]
+    
+    return outerjoin(GetPatientVisits(df_ids, conn; tab=tab), mds, on = :person_id)
+
+end
 """
 GetPatientVisits(ids; tab = visit_occurrence)
 
@@ -594,6 +663,18 @@ function GetMostRecentConditions(
     df = DBInterface.execute(conn, GetMostRecentConditions(ids; tab=tab)) |> DataFrame
 
     return df
+
+end
+
+function GetMostRecentConditions(
+    mds::DataFrame,
+    conn;
+    tab=condition_occurrence
+)
+
+    df_ids= mds[:,"person_id"]
+    
+    return outerjoin(GetMostRecentConditions(df_ids, conn; tab=tab), mds, on = :person_id)
 
 end
 
@@ -669,6 +750,17 @@ function GetMostRecentVisit(
     return df
 end
 
+function GetMostRecentVisit(
+    mds::DataFrame,
+    conn;
+    tab=visit_occurrence
+)
+
+    df_ids= mds[:,"person_id"]
+    
+    return outerjoin(GetMostRecentVisit(df_ids, conn; tab=tab), mds, on = :person_id)
+
+end
 """
 GetMostRecentVisit(ids, conn; tab = visit_occurrence)
 
@@ -742,6 +834,18 @@ function GetVisitCondition(
 
 end
 
+
+function GetVisitCondition(
+    mds::DataFrame,
+    conn;
+    tab=condition_occurrence
+)
+
+    df_ids= mds[:,"visit_id"]
+    
+    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab), mds, on = :visit_id)
+
+end
 """
 GetVisitCondition(visit_ids; tab = visit_occurrence)
 
@@ -811,6 +915,19 @@ function GetVisitPlaceOfService(
     df = DBInterface.execute(conn, GetVisitPlaceOfService(visit_ids; tab=tab, join_tab=join_tab)) |> DataFrame
 
     return df
+
+end
+
+function GetVisitPlaceOfService(
+    mds::DataFrame,
+    conn;
+    tab=visit_occurrence,
+    join_tab=care_site
+)
+
+    df_ids= mds[:,"visit_id"]
+    
+    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab, join_tab=join_tab ), mds, on = :visit_id)
 
 end
 
@@ -887,6 +1004,18 @@ function GetVisitConcept(
 
 end
 
+function GetVisitConcept(
+    mds::DataFrame,
+    conn;
+    tab=visit_occurrence,
+    )
+
+    df_ids= mds[:,"visit_id"]
+    
+    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab ), mds, on = :visit_id)
+
+end
+
 """
 GetVisitConcept(visit_ids; tab = visit_occurrence)
 
@@ -946,6 +1075,19 @@ function GetVisitDate(
     return df
 end
 
+function GetVisitDate(
+    mds::DataFrame,
+    conn;
+    interval::Symbol = :start,
+    tab=visit_occurrence,
+    )
+
+    df_ids= mds[:,"visit_occurrence_id"]
+    
+    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab ), mds, on = :visit_occurrence_id)
+
+end
+
 """
 GetVisitDate(visit_occurrence_id; interval::Symbol = :start, tab = visit_occurrence)
 
@@ -988,5 +1130,222 @@ function GetVisitDate(
 
 end
 
+"""
+GetDrugExposures(ids, conn; tab = drug_exposure)
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate
+Given a list of person IDs, find their drug exposure.
+
+# Arguments:
+
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the the drug_exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:drug_exposure_id`
+"""
+function GetDrugExposures(
+    ids,
+    conn;
+    tab=drug_exposure
+)
+    df = DBInterface.execute(conn, GetDrugExposures(ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+function GetDrugExposures(
+    mds::DataFrame,
+    conn;
+    tab=drug_exposure
+    )
+
+    df_ids= mds[:,"person_id"]
+    
+
+    return outerjoin(GetDrugExposures(df_ids, conn; tab=tab), mds, on = :person_id)
+end
+
+"""
+GetDrugExposures(ids; tab = drug_exposure)
+
+Return SQL statement that gets the `drug_exposure_id` for a given list of `person_id`'s
+
+# Arguments:
+
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the drug_exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:drug_exposure_id`
+"""
+
+function GetDrugExposures(
+    ids;
+    tab=drug_exposure
+)
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.person_id, ids...)) |>
+        Select(Get.person_id, Get.drug_exposure_id) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+"""
+GetDrugConcepts(drug_exposure_ids; tab = drug_exposure)
+
+Given a list of drug Exposure IDs, find their drug_concept_id.
+
+# Arguments:
+
+- `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the drug_exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_exposure_id` and `:drug_concept_id`
+"""
+function GetDrugConceptIDs(
+    drug_exposure_ids,
+    conn;
+    tab=drug_exposure
+)
+    df = DBInterface.execute(conn, GetDrugConceptIDs(drug_exposure_ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+function GetDrugConceptIDs(
+    mds::DataFrame,
+    conn;
+    tab=drug_exposure
+    )
+
+    df_ids= mds[:,"drug_exposure_id"]
+    
+
+    return outerjoin(GetDrugConceptIDs(df_ids, conn; tab=tab), mds, on = :drug_exposure_id)
+end
+"""
+GetDrugConcepts(drug_exposure_ids; tab = drug_exposure)
+
+Return SQL statement that gets the `drug_concept_id` for a given list of `drug_exposure_id`'s
+
+# Arguments:
+
+- `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the drug_exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_exposure_id` and `:drug_concept_id`
+"""
+function GetDrugConceptIDs(
+    drug_exposure_ids;
+    tab=drug_exposure
+)
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.drug_exposure_id, drug_exposure_ids...)) |>
+        Select(Get.drug_exposure_id, Get.drug_concept_id) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+"""
+GetDrugAmounts(drug_concept_ids, conn; tab = drug_strength)
+
+Given a list of drgug concept IDs, find their amount.
+
+# Arguments:
+
+- `drug_concept_ids` - list of `drug_concept_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the drug_strength table; default `drug_strength`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_concept_id` and `:amount_value`
+"""
+function GetDrugAmounts(
+    drug_concept_ids,
+    conn;
+    tab=drug_strength
+)
+    df = DBInterface.execute(conn, GetDrugAmounts(drug_concept_ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+function GetDrugAmounts(
+    mds::DataFrame,
+    conn;
+    tab=drug_strength
+    )
+
+    df_ids= mds[:,"drug_concept_id"]
+    
+
+    return outerjoin(GetDrugAmounts(df_ids, conn; tab=tab), mds, on = :drug_concept_id)
+end
+"""
+GetDrugAmounts(drug_concept_ids; tab = drug_strength)
+
+Return SQL statement that gets the `amount_value` for a given list of `drug_concept_id`'s
+
+# Arguments:
+
+- `drug_concept_ids` - list of `drug_concept_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the drug_strength table; default `drug_strength`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_concept_id` and `:amount_value`
+"""
+function GetDrugAmounts(
+    drug_concept_ids;
+    tab=drug_strength
+)
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.drug_concept_id, drug_concept_ids...)) |>
+        Select(Get.drug_concept_id, Get.amount_value) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts
