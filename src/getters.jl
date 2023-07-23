@@ -127,15 +127,15 @@ function GetPatientState(
 end
 
 function GetPatientState(
-    mds::DataFrame,
+    df::DataFrame,
     conn;tab=location,
     join_tab=person
     )
 
-    df_ids= mds[:,"person_id"]
+    df_ids= df[:,"person_id"]
     
 
-    return outerjoin(GetPatientState(df_ids,conn, ; tab=tab, join_tab=join_tab), mds, on = :person_id)
+    return outerjoin(GetPatientState(df_ids,conn, ; tab=tab, join_tab=join_tab), df, on = :person_id)
 end
 """
 GetPatientState(ids; tab = location, join_tab = person)
@@ -204,16 +204,22 @@ function GetPatientGender(
     return df
 
 end
+"""
+GetPatientGender(df:DataFrame, conn; tab = person)
 
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:gender_concept_id` for each person in the `DataFrame`
+
+Accepts all other arguments like in `GetPatientGender(ids, conn; tab = person)`
+"""
 function GetPatientGender(
-    mds::DataFrame,
+    df::DataFrame,
     conn;tab=person
     )
 
-    df_ids= mds[:,"person_id"]
+    df_ids= df[:,"person_id"]
     
 
-    return outerjoin(GetPatientGender(df_ids, conn; tab=tab), mds, on = :person_id)
+    return outerjoin(GetPatientGender(df_ids, conn; tab=tab), df, on = :person_id)
 end
 
 """
@@ -278,15 +284,15 @@ function GetPatientEthnicity(
 end
 
 function GetPatientEthnicity(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=person
     )
 
-    df_ids= mds[:,"person_id"]
+    df_ids= df[:,"person_id"]
     
 
-    return outerjoin(GetPatientEthnicity(df_ids, conn; tab=tab), mds, on = :person_id)
+    return outerjoin(GetPatientEthnicity(df_ids, conn; tab=tab), df, on = :person_id)
 end
 
 
@@ -346,15 +352,15 @@ function GetPatientRace(ids, conn; tab=person)
 end
 
 function GetPatientRace(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=person
     )
 
-    df_ids= mds[:,"person_id"]
+    df_ids= df[:,"person_id"]
     
 
-    return outerjoin(GetPatientRace(df_ids, conn; tab=tab), mds, on = :person_id)
+    return outerjoin(GetPatientRace(df_ids, conn; tab=tab), df, on = :person_id)
 end
 """
 GetPatientRace(ids; tab = person)
@@ -461,15 +467,15 @@ function GetPatientAgeGroup(
 end
 
 function GetPatientAgeGroup(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     minuend=:now
     )
 
-    df_ids= mds[:,"person_id"]
+    df_ids= df[:,"person_id"]
     
 
-    return outerjoin(GetPatientAgeGroup(df_ids, conn; minuend=minuend, tab=tab), mds, on = :person_id)
+    return outerjoin(GetPatientAgeGroup(df_ids, conn; minuend=minuend, tab=tab), df, on = :person_id)
 end
 
 """
@@ -592,14 +598,14 @@ function GetPatientVisits(
 end
 
 function GetPatientVisits(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=visit_occurrence
 )
 
-    df_ids= mds[:,"person_id"]
+    df_ids= df[:,"person_id"]
     
-    return outerjoin(GetPatientVisits(df_ids, conn; tab=tab), mds, on = :person_id)
+    return outerjoin(GetPatientVisits(df_ids, conn; tab=tab), df, on = :person_id)
 
 end
 """
@@ -667,14 +673,14 @@ function GetMostRecentConditions(
 end
 
 function GetMostRecentConditions(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=condition_occurrence
 )
 
-    df_ids= mds[:,"person_id"]
+    df_ids= df[:,"person_id"]
     
-    return outerjoin(GetMostRecentConditions(df_ids, conn; tab=tab), mds, on = :person_id)
+    return outerjoin(GetMostRecentConditions(df_ids, conn; tab=tab), df, on = :person_id)
 
 end
 
@@ -751,14 +757,14 @@ function GetMostRecentVisit(
 end
 
 function GetMostRecentVisit(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=visit_occurrence
 )
 
-    df_ids= mds[:,"person_id"]
+    df_ids= df[:,"person_id"]
     
-    return outerjoin(GetMostRecentVisit(df_ids, conn; tab=tab), mds, on = :person_id)
+    return outerjoin(GetMostRecentVisit(df_ids, conn; tab=tab), df, on = :person_id)
 
 end
 """
@@ -836,14 +842,14 @@ end
 
 
 function GetVisitCondition(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=condition_occurrence
 )
 
-    df_ids= mds[:,"visit_id"]
+    df_ids= df[:,"visit_id"]
     
-    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab), mds, on = :visit_id)
+    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab), df, on = :visit_id)
 
 end
 """
@@ -919,15 +925,15 @@ function GetVisitPlaceOfService(
 end
 
 function GetVisitPlaceOfService(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=visit_occurrence,
     join_tab=care_site
 )
 
-    df_ids= mds[:,"visit_id"]
+    df_ids= df[:,"visit_id"]
     
-    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab, join_tab=join_tab ), mds, on = :visit_id)
+    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab, join_tab=join_tab ), df, on = :visit_id)
 
 end
 
@@ -1005,14 +1011,14 @@ function GetVisitConcept(
 end
 
 function GetVisitConcept(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=visit_occurrence,
     )
 
-    df_ids= mds[:,"visit_id"]
+    df_ids= df[:,"visit_id"]
     
-    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab ), mds, on = :visit_id)
+    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab ), df, on = :visit_id)
 
 end
 
@@ -1076,15 +1082,15 @@ function GetVisitDate(
 end
 
 function GetVisitDate(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     interval::Symbol = :start,
     tab=visit_occurrence,
     )
 
-    df_ids= mds[:,"visit_occurrence_id"]
+    df_ids= df[:,"visit_occurrence_id"]
     
-    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab ), mds, on = :visit_occurrence_id)
+    return outerjoin(GetVisitCondition(df_ids, conn; interval, tab=tab ), df, on = :visit_occurrence_id)
 
 end
 
@@ -1161,15 +1167,15 @@ function GetDrugExposures(
 end
 
 function GetDrugExposures(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=drug_exposure
     )
 
-    df_ids= mds[:,"person_id"]
+    df_ids= df[:,"person_id"]
     
 
-    return outerjoin(GetDrugExposures(df_ids, conn; tab=tab), mds, on = :person_id)
+    return outerjoin(GetDrugExposures(df_ids, conn; tab=tab), df, on = :person_id)
 end
 
 """
@@ -1235,15 +1241,15 @@ function GetDrugConceptIDs(
 end
 
 function GetDrugConceptIDs(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=drug_exposure
     )
 
-    df_ids= mds[:,"drug_exposure_id"]
+    df_ids= df[:,"drug_exposure_id"]
     
 
-    return outerjoin(GetDrugConceptIDs(df_ids, conn; tab=tab), mds, on = :drug_exposure_id)
+    return outerjoin(GetDrugConceptIDs(df_ids, conn; tab=tab), df, on = :drug_exposure_id)
 end
 """
 GetDrugConcepts(drug_exposure_ids; tab = drug_exposure)
@@ -1307,15 +1313,15 @@ function GetDrugAmounts(
 end
 
 function GetDrugAmounts(
-    mds::DataFrame,
+    df::DataFrame,
     conn;
     tab=drug_strength
     )
 
-    df_ids= mds[:,"drug_concept_id"]
+    df_ids= df[:,"drug_concept_id"]
     
 
-    return outerjoin(GetDrugAmounts(df_ids, conn; tab=tab), mds, on = :drug_concept_id)
+    return outerjoin(GetDrugAmounts(df_ids, conn; tab=tab), df, on = :drug_concept_id)
 end
 """
 GetDrugAmounts(drug_concept_ids; tab = drug_strength)
