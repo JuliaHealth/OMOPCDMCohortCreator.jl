@@ -126,6 +126,14 @@ function GetPatientState(
 
 end
 
+"""
+GetPatientState(df:DataFrame, conn; tab = location)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:state` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientState(ids, conn; tab = location)`
+"""
+
 function GetPatientState(
     df::DataFrame,
     conn;tab=location,
@@ -204,13 +212,15 @@ function GetPatientGender(
     return df
 
 end
+
 """
 GetPatientGender(df:DataFrame, conn; tab = person)
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:gender_concept_id` for each person in the `DataFrame`
 
-Accepts all other arguments like in `GetPatientGender(ids, conn; tab = person)`
+Multiple dispatch that accepts all other arguments like in `GetPatientGender(ids, conn; tab = person)`
 """
+
 function GetPatientGender(
     df::DataFrame,
     conn;tab=person
@@ -283,6 +293,14 @@ function GetPatientEthnicity(
 
 end
 
+"""
+GetPatientEthnicity(df:DataFrame, conn; tab = person)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:ethnicity` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientEthnicity(ids, conn; tab = person)`
+"""
+
 function GetPatientEthnicity(
     df::DataFrame,
     conn;
@@ -350,6 +368,14 @@ function GetPatientRace(ids, conn; tab=person)
     return df
 
 end
+
+"""
+GetPatientRace(df:DataFrame, conn; tab = person)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:race` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientRace(ids, conn; tab = person)`
+"""
 
 function GetPatientRace(
     df::DataFrame,
@@ -465,6 +491,25 @@ function GetPatientAgeGroup(
     return df
 
 end
+
+"""
+GetPatientAgeGroup(df:DataFrame, conn; minuend=:now,
+age_groupings=[
+    [0, 9],
+    [10, 19],
+    [20, 29],
+    [30, 39],
+    [40, 49],
+    [50, 59],
+    [60, 69],
+    [70, 79],
+    [80, 89],
+], tab = person)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:ageGroup` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientAgeGroup(ids, conn; tab = person)`
+"""
 
 function GetPatientAgeGroup(
     df::DataFrame,
@@ -597,6 +642,14 @@ function GetPatientVisits(
 
 end
 
+"""
+GetPatientVisits(df:DataFrame, conn; tab = visit_occurrence)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:visit_occurrence_id` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientVisits(ids, conn; tab = visit_occurrence)`
+"""
+
 function GetPatientVisits(
     df::DataFrame,
     conn;
@@ -671,6 +724,14 @@ function GetMostRecentConditions(
     return df
 
 end
+
+"""
+GetMostRecentConditions(df:DataFrame, conn; tab = condition_occurrence)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:condition_concept_id` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetMostRecentConditions(ids, conn; tab = condition_occurrence)`
+"""
 
 function GetMostRecentConditions(
     df::DataFrame,
@@ -756,6 +817,14 @@ function GetMostRecentVisit(
     return df
 end
 
+"""
+function GetMostRecentVisit(df:DataFrame, conn; tab = visit_occurrence)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:visit_occurrence_id` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetMostRecentVisit(ids, conn; tab = visit_occurrence)`
+"""
+
 function GetMostRecentVisit(
     df::DataFrame,
     conn;
@@ -840,6 +909,13 @@ function GetVisitCondition(
 
 end
 
+"""
+function GetVisitCondition(df:DataFrame, conn; tab = condition_occurrence)
+
+Given a `DataFrame` with a `:visit_occurrence_id` column, return the `DataFrame` with an associated `:condition_concept_id` for each `visit_occurrence_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetVisitCondition(ids, conn; tab = condition_occurrence)`
+"""
 
 function GetVisitCondition(
     df::DataFrame,
@@ -923,6 +999,14 @@ function GetVisitPlaceOfService(
     return df
 
 end
+
+"""
+function GetVisitPlaceOfService(df:DataFrame, conn; tab = visit_occurrence, join_tab=care_site)
+
+Given a `DataFrame` with a `:visit_ids` column, return the `DataFrame` with an associated `:visit_occurrence_id` and `:condition_concept_id` for each `visit_id` in the `DataFrame` joined by `care_site` table.
+
+Multiple dispatch that accepts all other arguments like in `GetVisitPlaceOfService(ids, conn; tab = visit_occurrence, join_tab=care_site)`
+"""
 
 function GetVisitPlaceOfService(
     df::DataFrame,
@@ -1010,6 +1094,14 @@ function GetVisitConcept(
 
 end
 
+"""
+function GetVisitConcept(df:DataFrame, conn; tab = visit_occurrence)
+
+Given a `DataFrame` with a `:visit_occurrence_id` column, return the `DataFrame` with an associated `:visit_occurrence_id` and `:visit_concept_id` for each `visit_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetVisitConcept(ids, conn; tab = visit_occurrence)`
+"""
+
 function GetVisitConcept(
     df::DataFrame,
     conn;
@@ -1080,6 +1172,14 @@ function GetVisitDate(
     df = DBInterface.execute(conn, GetVisitDate(visit_occurrence_ids; interval, tab=tab)) |> DataFrame
     return df
 end
+
+"""
+function function GetVisitDate(df:DataFrame, conn; interval::Symbol = :start, tab = visit_occurrence)
+
+Given a `DataFrame` with a `:visit_occurrence_id` column, return the `visit_occurrence_id` and either `visit_start_date` or `visit_end_date`, depending on the value of the `interval` for each `visit_occurrence_id` 
+
+Multiple dispatch that accepts all other arguments like in `GetVisitDate(ids, conn; interval, tab = visit_occurrence)`
+"""
 
 function GetVisitDate(
     df::DataFrame,
@@ -1166,6 +1266,14 @@ function GetDrugExposures(
 
 end
 
+"""
+function GetDrugExposures(df:DataFrame, conn; tab = drug_exposure)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:drug_exposure_id`for each `person_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetDrugExposures(ids, conn; tab = drug_exposure)`
+"""
+
 function GetDrugExposures(
     df::DataFrame,
     conn;
@@ -1240,6 +1348,15 @@ function GetDrugConceptIDs(
 
 end
 
+"""
+function GetDrugConceptIDs(df:DataFrame, conn; tab = drug_exposure)
+
+Given a `DataFrame` with a `:drug_exposure_id` column, return the `DataFrame` with an associated `:drug_concept_id`for each `drug_exposure_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetDrugConceptIDs(ids, conn; tab = drug_exposure)`
+"""
+
+
 function GetDrugConceptIDs(
     df::DataFrame,
     conn;
@@ -1311,6 +1428,15 @@ function GetDrugAmounts(
     return df
 
 end
+
+"""
+function GetDrugAmounts(df:DataFrame, conn; tab = drug_strength)
+
+Given a `DataFrame` with a `:drug_concept_id` column, return the `DataFrame` with an associated `:amount_value`for each `drug_concept_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetDrugAmounts(ids, conn; tab = drug_exposure)`
+"""
+
 
 function GetDrugAmounts(
     df::DataFrame,
