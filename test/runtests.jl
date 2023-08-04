@@ -10,7 +10,8 @@ using FunSQL:
 	Limit,
 	Select,
 	render, 
-	Agg
+	Agg,
+	LeftJoin
 using HealthSampleData
 using OMOPCDMCohortCreator
 using SQLite

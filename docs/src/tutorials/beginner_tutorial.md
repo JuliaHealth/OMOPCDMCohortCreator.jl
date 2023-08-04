@@ -102,7 +102,7 @@ For the patients who have strep throat diagnoses, find their race.
 Suggested solution:
 
 ```julia
-strep_patients_race = occ.GetPatientRace(strep_patients.person_id, conn)
+strep_patients_race = occ.GetPatientRace(strep_patients, conn)
 ```
 
 ### Task: Find the Gender of Patients with Strep Throat
@@ -179,6 +179,21 @@ Suggested solution:
 strep_patients_characterized = strep_patients_characterized[:, DF.Not(:person_id)]
 strep_patient_groups = DF.groupby(strep_patients_characterized, [:race_concept_id, :gender_concept_id, :age_group])
 strep_patient_groups = DF.combine(strep_patient_groups, DF.nrow => :counts)
+```
+
+### Task: Get Gender, Ethnicity, Race and drug exposure for each patient
+
+This tutorial produces a dataframe of each person id to their corresponding gender, race, ethnicity and drug exposure.
+
+```julia
+#Getting person_ids
+ids = occ.GetDatabasePersonIDs(conn)
+#Generating Partially applied functions
+FGetPatientRace = Base.Fix2(occ.GetPatientRace,conn)
+FGetPatientGender = Base.Fix2(occ.GetPatientGender,conn)
+FGetPatientEthnicity = Base.Fix2(occ.GetPatientEthnicity,conn)
+#Chaining functions to characterize patients
+occ.GetDrugExposure(ids,conn) |> FGetPatientGender |> FGetPatientRace |> FGetPatientEthnicity
 ```
 
 ### Task: Execute Safety Audit

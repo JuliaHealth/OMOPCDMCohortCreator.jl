@@ -15,7 +15,7 @@ Get all unique `person_id`'s from a database.
 
 - `ids::Vector{Int64}` - the list of persons
 """
-function GetDatabasePersonIDs(conn; tab=person)
+function GetDatabasePersonIDs(conn; tab= person)
     ids = DBInterface.execute(conn, String(GetDatabasePersonIDs(tab=tab))) |> DataFrame
 
     return convert(Vector{Int}, ids.person_id)
@@ -514,7 +514,8 @@ Multiple dispatch that accepts all other arguments like in `GetPatientAgeGroup(i
 function GetPatientAgeGroup(
     df::DataFrame,
     conn;
-    minuend=:now
+    minuend=:now,
+    tab=person
     )
 
     df_ids= df[:,"person_id"]
