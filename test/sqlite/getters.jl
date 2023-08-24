@@ -186,29 +186,46 @@ end
 end
 
 @testset "GetDrugExposures Tests" begin
-	Drug_exposure = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.person_id, Get.drug_exposure_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-	test_ids = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+    test_ids = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(10) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-	@test Drug_exposure == GetDrugExposures(test_ids, sqlite_conn)
+    test_query = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(10)
+    drug_exposures = From(OMOPCDMCohortCreator.drug_exposure)
+    Drug_exposure_ids = test_query |> LeftJoin(drug_exposures, on =  test_query.person_id.== drug_exposures.person_id) |>
+    Select(test_query.person_id, drug_exposures.drug_exposure_id)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+    Drug_exposure_ids = sort( Drug_exposure_ids, :person_id)
+    df = GetDrugExposures(test_ids, sqlite_conn)
+
+	@test Drug_exposure_ids == sort(df, :person_id)
 end
 
 @testset "GetDrugConceptIDs Tests" begin
-	drug_concept_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id, Get.drug_concept_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-	drug_exposure_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+	test_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id) |> Limit(10) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+	Drug_concept_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id ,Get.drug_concept_id) |> Where(Fun.in(Get.drug_exposure_id, test_ids...))|> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame 
+    Drug_concept_ids = sort( Drug_concept_ids, :drug_exposure_id)
+    df = GetDrugConceptIDs(test_ids, sqlite_conn)
 
-	@test drug_concept_ids == GetDrugExposures(drug_exposure_ids, sqlite_conn)
+	@test Drug_concept_ids == sort(df, :drug_exposure_id)
 end
 
-@testset "GetDrugConceptIDs Tests" begin
-	drug_amounts = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_concept_id, Get.amount_value) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+"""
+This testset will work once amount_value is added to the eunomia database
 
-	drug_concept_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_concept_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
 
-	@test drug_amounts == GetDrugExposures(drug_concept_ids, sqlite_conn)
+@testset "GetDrugAmounts Tests" begin
+
+	test_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_concept_id) |> Limit(10) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+
+	drug_amounts = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_concept_id, Get.amount_value) |>  Where(Fun.in(Get.drug_concept_id, test_ids...)) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+    drug_amounts = sort(drug_amounts, :Drug_concept_id)
+    df = GetDrugAmounts(test_ids, sqlite_conn)
+	#drug_concept_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_concept_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+
+	@test drug_amounts == sort(df, :drug_exposure_id)
 end
 
+"""
 ################################################
 ########## Multiple Dispatch Tests #############
 ################################################

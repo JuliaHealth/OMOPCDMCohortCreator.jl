@@ -1403,7 +1403,7 @@ end
 """
 GetDrugAmounts(drug_concept_ids, conn; tab = drug_strength)
 
-Given a list of drgug concept IDs, find their amount.
+Given a list of drugs concept IDs, find their amount.
 
 # Arguments:
 

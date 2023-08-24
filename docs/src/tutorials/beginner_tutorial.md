@@ -187,21 +187,6 @@ strep_patient_groups = DF.groupby(strep_patients_characterized, [:race_concept_i
 strep_patient_groups = DF.combine(strep_patient_groups, DF.nrow => :counts)
 ```
 
-### Task: Get Gender, Ethnicity, Race and drug exposure for each patient
-
-This tutorial produces a dataframe of each person id to their corresponding gender, race, ethnicity and drug exposure.
-
-```julia
-#Getting person_ids
-ids = occ.GetDatabasePersonIDs(conn)
-#Generating Partially applied functions
-FGetPatientRace = Base.Fix2(occ.GetPatientRace,conn)
-FGetPatientGender = Base.Fix2(occ.GetPatientGender,conn)
-FGetPatientEthnicity = Base.Fix2(occ.GetPatientEthnicity,conn)
-#Chaining functions to characterize patients
-occ.GetDrugExposure(ids,conn) |> FGetPatientGender |> FGetPatientRace |> FGetPatientEthnicity
-```
-
 ### Task: Execute Safety Audit
 
 To ensure the safety of the patients in this table, we can execute an audit.
