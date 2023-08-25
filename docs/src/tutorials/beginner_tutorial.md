@@ -94,6 +94,12 @@ Suggested solution:
 ```julia
 strep_patients = occ.ConditionFilterPersonIDs(28060, conn)
 ```
+Note: This function can accept more than one condition_concept_id. 
+Example:
+```
+concept_ids = [28060, 433037, 372654, 443599, 436519]
+patients = occ.ConditionFilterPersonIDs(concept_ids, conn)
+```
 
 ### Task: Find the Race of Patients with Strep Throat
 
@@ -102,7 +108,7 @@ For the patients who have strep throat diagnoses, find their race.
 Suggested solution:
 
 ```julia
-strep_patients_race = occ.GetPatientRace(strep_patients.person_id, conn)
+strep_patients_race = occ.GetPatientRace(strep_patients, conn)
 ```
 
 ### Task: Find the Gender of Patients with Strep Throat
