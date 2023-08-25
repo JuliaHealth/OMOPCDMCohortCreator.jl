@@ -111,7 +111,6 @@ end
         @test test_df == GetMostRecentConditions(test_ids, sqlite_conn)
 end
 
-#tests for GetMostRecentVisit
 @testset "GetMostRecentVisit Tests" begin
     test_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
     data_table = From(OMOPCDMCohortCreator.visit_occurrence) |> Group(Get.person_id) |> Select(:id => Get.person_id, :count => Agg.count()) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
@@ -169,6 +168,7 @@ There is no data currently in the Eunomia database to be tested
 
 end
 """
+
 @testset "GetPatientEthnicity Tests" begin
 	ethnicities = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id, Get.ethnicity_concept_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
