@@ -160,6 +160,15 @@ end
 
 end
 
+"""
+There is no data currently in the Eunomia database to be tested
+
+@testset "GetVisitPlaceOfService Tests" begin
+
+
+
+end
+"""
 @testset "GetPatientEthnicity Tests" begin
 	ethnicities = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id, Get.ethnicity_concept_id) |> Limit(20) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
@@ -307,6 +316,7 @@ end
 
 #tests for GetMostRecentVisit
 @testset "GetMostRecentVisit multiple dispatch Tests" begin
+
     test_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(20) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
     data_table = From(OMOPCDMCohortCreator.visit_occurrence) |> Group(Get.person_id) |> Select(:id => Get.person_id, :count => Agg.count()) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
     test_visits = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Where(Fun.in(Get.person_id, test_ids...)) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
@@ -316,42 +326,32 @@ end
     result = DBInterface.execute(sqlite_conn, sql) |> DataFrame
     result.Date = Dates.unix2datetime.(result.visit_end_date)
     max_index = argmax(result.Date)
-    most_recent_visit = result.visit_occurrence_id[max_index]
-    evaluated_visit = (GetMostRecentVisit(222, sqlite_conn)).visit_occurrence_id
-    @test most_recent_visit == evaluated_visit[1]
+    most_recent_visit = DataFrame(person_id = [222], visit_occurrence_id = result.visit_occurrence_id[max_index], gender_concept_id = [8532] )
+    test_set = DataFrame(person_id = [222], gender_concept_id = [8532])
+    @test most_recent_visit == (GetMostRecentVisit(test_set, sqlite_conn))
 
-    #id with 1 visits = 986
-    recent_visit = test_visits[in([986]).(test_visits.person_id), :].visit_occurrence_id
-    evaluated_visit = (GetMostRecentVisit(986, sqlite_conn))
-    evaluated_visit.visit_occurrence_id
-    @test recent_visit == evaluated_visit.visit_occurrence_id
 end
 
 @testset "GetVisitConcept multiple dispatch Tests" begin
-	test_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.visit_occurrence_id) |> Limit(20) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
-    test_concept_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.visit_occurrence_id, Get.visit_concept_id) |> Where(Fun.in(Get.visit_occurrence_id, test_ids...)) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+	visit_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.visit_occurrence_id, Get.person_id) |> Limit(20) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame 
+    test_ids = visit_ids.visit_occurrence_id
+    test_concept_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.visit_occurrence_id, Get.visit_concept_id, Get.person_id) |> Where(Fun.in(Get.visit_occurrence_id, test_ids...)) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-    @test test_concept_ids == GetVisitConcept(test_ids, sqlite_conn)
+    @test test_concept_ids == GetVisitConcept(visit_ids, sqlite_conn)
 end
 
 @testset "GetVisitCondition multiple dispatch Tests" begin
 
     #test for 3 visit ids with only 1 condition each
-    visit_codes_single = [17479.0, 18192.0, 18859.0]
-    test_condition_ids = [4.112343e6, 192671.0, 28060.0]
-    test_df_single = DataFrame(visit_occurrence_id=[17479.0, 18192.0, 18859.0], condition_concept_id=[4.112343e6, 192671.0, 28060.0])
+    visit_patient_ids = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Limit(3) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+    visit_ids = visit_patient_ids.visit_occurrence_id
+    test_condition_ids = From(OMOPCDMCohortCreator.condition_occurrence)|>
+           Where(Fun.in(Get.visit_occurrence_id, visit_ids...)) |>
+           Select(Get.visit_occurrence_id, Get.condition_concept_id, Get.person_id) |>
+           q -> render(q, dialect=OMOPCDMCohortCreator.dialect)|> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-    evaluated_result_single = GetVisitCondition(visit_codes_single, sqlite_conn)
-    @test test_df_single == evaluated_result_single
-
-    #test for person with multiple visits
-    visit_codes_multiple = [3.0]
-    test_condition_ids_multiple = [372328.0, 81893.0]
-    test_df_multiple = DataFrame(visit_occurrence_id=[3.0, 3.0], condition_concept_id=[372328.0, 81893.0])
-
-    evaluated_result_multiple = GetVisitCondition(visit_codes_multiple, sqlite_conn)
-    @test test_df_multiple == evaluated_result_multiple
-
+    @test test_condition_ids == sort(GetVisitCondition(visit_patient_ids, sqlite_conn),:person_id)
+  
 end
 
 @testset "GetPatientEthnicity multiple dispatch Tests" begin
@@ -366,16 +366,18 @@ end
 
     #test with interval = start
     test_visit_ids= [65475.0, 14930.0, 25743.0, 14888.0]
+    patient_ids = [986.0, 222.0, 392.0, 222.0]
+    test_visit_patients = DataFrame(visit_occurrence_id = test_visit_ids, person_id = patient_ids)
     test_start_dates = [840585600.0, 575510400.0, 1336953600.0, 1063497600.0]
-    test_df_start = DataFrame(visit_occurrence_id=test_visit_ids, visit_start_date=test_start_dates)
+    test_df_start = DataFrame(visit_occurrence_id = test_visit_ids, visit_start_date = test_start_dates, person_id = patient_ids)
 
-    @test test_df_start == GetVisitDate(test_visit_ids, sqlite_conn, interval=Symbol("start"))
+    @test test_df_start == GetVisitDate(test_visit_patients, sqlite_conn, interval=Symbol("start"))
 
     #test with interval = end
     test_end_dates = [840672000.0, 575596800.0, 1337040000.0, 1063584000.0]
-    test_df_end = DataFrame(visit_occurrence_id=test_visit_ids, visit_end_date=test_end_dates)
+    test_df_end = DataFrame(visit_occurrence_id=test_visit_ids, visit_end_date=test_end_dates, person_id = patient_ids)
 
-    @test test_df_end == GetVisitDate(test_visit_ids, sqlite_conn, interval=Symbol("end"))
+    @test test_df_end == GetVisitDate(test_visit_patients, sqlite_conn, interval=Symbol("end"))
     
 end
 

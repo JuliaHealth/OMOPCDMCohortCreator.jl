@@ -924,9 +924,9 @@ function GetVisitCondition(
     tab=condition_occurrence
 )
 
-    df_ids= df[:,"visit_id"]
+    df_ids= df[:,"visit_occurrence_id"]
     
-    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab), df, on = :visit_id)
+    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab), df, on = :visit_occurrence_id)
 
 end
 """
@@ -1004,7 +1004,7 @@ end
 """
 function GetVisitPlaceOfService(df:DataFrame, conn; tab = visit_occurrence, join_tab=care_site)
 
-Given a `DataFrame` with a `:visit_ids` column, return the `DataFrame` with an associated `:visit_occurrence_id` and `:condition_concept_id` for each `visit_id` in the `DataFrame` joined by `care_site` table.
+Given a `DataFrame` with a `:visit_occurrence_ids` column, return the `DataFrame` with an associated `:visit_occurrence_id` and `:condition_concept_id` for each `visit_id` in the `DataFrame` joined by `care_site` table.
 
 Multiple dispatch that accepts all other arguments like in `GetVisitPlaceOfService(ids, conn; tab = visit_occurrence, join_tab=care_site)`
 """
@@ -1016,9 +1016,9 @@ function GetVisitPlaceOfService(
     join_tab=care_site
 )
 
-    df_ids= df[:,"visit_id"]
+    df_ids= df[:,"visit_occurrence_id"]
     
-    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab, join_tab=join_tab ), df, on = :visit_id)
+    return outerjoin(GetVisitPlaceOfService(df_ids, conn; tab=tab, join_tab=join_tab ), df, on = :visit_occurrence_id)
 
 end
 
@@ -1109,9 +1109,9 @@ function GetVisitConcept(
     tab=visit_occurrence,
     )
 
-    df_ids= df[:,"visit_id"]
+    df_ids= df[:,"visit_occurrence_id"]
     
-    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab ), df, on = :visit_id)
+    return outerjoin(GetVisitConcept(df_ids, conn; tab=tab ), df, on = :visit_occurrence_id)
 
 end
 
@@ -1191,7 +1191,7 @@ function GetVisitDate(
 
     df_ids= df[:,"visit_occurrence_id"]
     
-    return outerjoin(GetVisitCondition(df_ids, conn; interval, tab=tab ), df, on = :visit_occurrence_id)
+    return outerjoin(GetVisitDate(df_ids, conn; interval, tab=tab ), df, on = :visit_occurrence_id)
 
 end
 
