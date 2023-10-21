@@ -1,3 +1,5 @@
+export VisitFilterPersonIDs, ConditionFilterPersonIDs, RaceFilterPersonIDs, GenderFilterPersonIDs, GetVisitProcedure, StateFilterPersonIDs
+
 """
 VisitFilterPersonIDs(visit_codes, conn; tab = visit_occurrence)
 
@@ -223,6 +225,89 @@ function GenderFilterPersonIDs(gender_codes; tab = person)
 end
 
 """
+GetVisitProcedure(visit_ids, conn; tab = procedure_occurrence)
+
+Given a list of visit IDs, find their corresponding procedures.
+
+# Arguments:
+
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Condition Occurrence table; default `procedure_occurrence`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:visit_occurrence_id` and `:procedure_concept_id`
+"""
+function GetVisitProcedure(
+    visit_ids,
+    conn;
+    tab=procedure_occurrence
+)
+
+    df = DBInterface.execute(conn, GetVisitProcedure(visit_ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+function GetVisitProcedure(df:DataFrame, conn; tab = procedure_occurrence)
+
+Given a `DataFrame` with a `:visit_occurrence_id` column, return the `DataFrame` with an associated `:procedure_concept_id` for each `visit_occurrence_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetVisitProcedure(ids, conn; tab = procedure_occurrence)`
+"""
+
+function GetVisitProcedure(
+    df::DataFrame,
+    conn;
+    tab=procedure_occurrence
+)
+
+    df_ids= df[:,"procedure_occurrence_id"]
+    
+    return outerjoin(GetVisitProcedure(df_ids, conn; tab=tab), df, on = :procedure_occurrence_id)
+
+end
+
+"""
+GetVisitProcedure(visit_ids; tab = procedure_occurrence)
+
+Produces SQL statement that, given a list of `visit_id`'s, finds the procedures associated with that visit.
+
+# Arguments:
+
+- `visit_ids` - list of `visit_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Procedure Occurrence table; default `procedure_occurrence`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:visit_occurrence_id` and `:procedure_concept_id`
+"""
+function GetVisitProcedure(
+    visit_ids;
+    tab=procedure_occurrence
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.visit_occurrence_id, visit_ids...)) |>
+        Select(Get.visit_occurrence_id, Get.procedure_concept_id) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+"""
 StateFilterPersonIDs(states, conn; tab = location, join_tab = person)
 
 Given a list of states, `states`, return from the database individuals found in the provided state list.
@@ -281,5 +366,3 @@ function StateFilterPersonIDs(states; tab = location, join_tab = person)
     return String(sql)
 
 end
-
-export VisitFilterPersonIDs, ConditionFilterPersonIDs, RaceFilterPersonIDs, GenderFilterPersonIDs, StateFilterPersonIDs
