@@ -1,5 +1,3 @@
-export VisitFilterPersonIDs, ConditionFilterPersonIDs, RaceFilterPersonIDs, GenderFilterPersonIDs, StateFilterPersonIDs
-
 """
 VisitFilterPersonIDs(visit_codes, conn; tab = visit_occurrence)
 
@@ -283,3 +281,5 @@ function StateFilterPersonIDs(states; tab = location, join_tab = person)
     return String(sql)
 
 end
+
+export VisitFilterPersonIDs, ConditionFilterPersonIDs, RaceFilterPersonIDs, GenderFilterPersonIDs, StateFilterPersonIDs
