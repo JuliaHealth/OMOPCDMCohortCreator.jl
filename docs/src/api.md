@@ -40,6 +40,7 @@ RaceFilterPersonIDs
 GenderFilterPersonIDs
 StateFilterPersonIDs
 AgeGroupFilterPersonIDs
+GetVisitProcedure
 ```
 
 ## Generators
