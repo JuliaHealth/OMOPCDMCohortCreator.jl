@@ -27,6 +27,7 @@ GetDatabaseYearRange
 GetDrugExposure
 GetDrugConceptIDs
 GetDrugAmounts
+GetVisitProcedure
 ```
 
 ## Filters
@@ -40,7 +41,6 @@ RaceFilterPersonIDs
 GenderFilterPersonIDs
 StateFilterPersonIDs
 AgeGroupFilterPersonIDs
-GetVisitProcedure
 ```
 
 ## Generators

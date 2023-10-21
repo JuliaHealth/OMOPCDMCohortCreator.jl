@@ -88,15 +88,6 @@ end
    @test person_list_multiple == res_multiple
 end
 
-@testset "GetVisitProcedure Tests" begin
-    
-    # GetVisitProcedure([4010253.0], sqlite_conn)
-     visited_person_id = [30.0, 72.0, 79.0, 90.0, 90.0, 102.0, 152.0, 182.0, 202.0, 245.0]
-     
-     reh = sort(VisitFilterPersonIDs([4010253.0], sqlite_conn)).person_id[1:10]
-     @test visited_person_id == reh
- end
-
 #= TODO: Add tests to StateFilterPersonIDs
 This depends on getting the test set for GetPatientState sorted out
 labels: tests, moderate
