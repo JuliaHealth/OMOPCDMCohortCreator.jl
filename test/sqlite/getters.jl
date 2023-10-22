@@ -402,14 +402,15 @@ end
 	@test GetDrugConceptIDs(drug_exposure_ids, sqlite_conn) == GetDrugConceptIDs(GetDrugExposures(test_ids, sqlite_conn), sqlite_conn)
 end
 
+
 @testset "GetVisitProcedure Tests" begin
-    
-    # GetVisitProcedure([4010253.0], sqlite_conn)
-     visited_person_id = [30.0, 72.0, 79.0, 90.0, 90.0, 102.0, 152.0, 182.0, 202.0, 245.0]
-     
-     reh = sort(VisitFilterPersonIDs([4010253.0], sqlite_conn)).person_id[1:10]
-     @test visited_person_id == reh
- end
+    procedure = From(OMOPCDMCohortCreator.procedure_occurrence) |> Select(Get.visit_occurrence_id, Get.procedure_concept_id) |> Limit(1) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+
+    test_ids = From(OMOPCDMCohortCreator.procedure_occurrence) |> Select(Get.visit_occurrence_id) |> Limit(1) |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array
+
+    @test procedure == GetVisitProcedure(test_ids, sqlite_conn)
+end
+
 
 """
 
