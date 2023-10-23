@@ -1523,12 +1523,12 @@ Multiple dispatch that accepts all other arguments like in `GetVisitProcedure(id
 function GetVisitProcedure(
     df::DataFrame,
     conn;
-    tab=procedure_occurrence
+    tab=visit_occurrence_id
 )
 
-    df_ids= df[:,"procedure_occurrence_id"]
+    df_ids= df[:,"visit_occurrence_id"]
     
-    return outerjoin(GetVisitProcedure(df_ids, conn; tab=tab), df, on = :procedure_occurrence_id)
+    return outerjoin(GetVisitProcedure(df_ids, conn; tab=tab), df, on = :visit_occurrence_id)
 
 end
 
