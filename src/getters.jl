@@ -1523,7 +1523,7 @@ Multiple dispatch that accepts all other arguments like in `GetVisitProcedure(id
 function GetVisitProcedure(
     df::DataFrame,
     conn;
-    tab=visit_occurrence_id
+    tab=procedure_occurrence
 )
 
     df_ids= df[:,"visit_occurrence_id"]
