@@ -414,6 +414,7 @@ end
 
     @test test_df == GetVisitProcedure(test_ids, sqlite_conn)
     @test isa(GetVisitProcedure(test_ids, sqlite_conn), DataFrame)
+    @test GetVisitProcedure(test_df, sqlite_conn)
 
 end
 
