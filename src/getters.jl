@@ -15,7 +15,7 @@ Get all unique `person_id`'s from a database.
 
 - `ids::Vector{Int64}` - the list of persons
 """
-function GetDatabasePersonIDs(conn; tab=person)
+function GetDatabasePersonIDs(conn; tab= person)
     ids = DBInterface.execute(conn, String(GetDatabasePersonIDs(tab=tab))) |> DataFrame
 
     return convert(Vector{Int}, ids.person_id)
@@ -127,6 +127,25 @@ function GetPatientState(
 end
 
 """
+GetPatientState(df:DataFrame, conn; tab = location)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:state` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientState(ids, conn; tab = location)`
+"""
+
+function GetPatientState(
+    df::DataFrame,
+    conn;tab=location,
+    join_tab=person
+    )
+
+    df_ids= df[:,"person_id"]
+    
+
+    return outerjoin(GetPatientState(df_ids,conn, ; tab=tab, join_tab=join_tab), df, on = :person_id)
+end
+"""
 GetPatientState(ids; tab = location, join_tab = person)
 
 Return SQL statement where if given a list of person IDs, find their home state.
@@ -195,6 +214,25 @@ function GetPatientGender(
 end
 
 """
+GetPatientGender(df:DataFrame, conn; tab = person)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:gender_concept_id` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientGender(ids, conn; tab = person)`
+"""
+
+function GetPatientGender(
+    df::DataFrame,
+    conn;tab=person
+    )
+
+    df_ids= df[:,"person_id"]
+    
+
+    return outerjoin(GetPatientGender(df_ids, conn; tab=tab), df, on = :person_id)
+end
+
+"""
 GetPatientGender(ids; tab = person)
 
 Return SQL statement that gets the `gender_concept_id` for a given list of `person_id`'s
@@ -256,6 +294,27 @@ function GetPatientEthnicity(
 end
 
 """
+GetPatientEthnicity(df:DataFrame, conn; tab = person)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:ethnicity` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientEthnicity(ids, conn; tab = person)`
+"""
+
+function GetPatientEthnicity(
+    df::DataFrame,
+    conn;
+    tab=person
+    )
+
+    df_ids= df[:,"person_id"]
+    
+
+    return outerjoin(GetPatientEthnicity(df_ids, conn; tab=tab), df, on = :person_id)
+end
+
+
+"""
 GetPatientEthnicity(ids, conn; tab = person)
 
 Return SQL statement that gets the `ethnicity_concept_id` for a given list of `person_id`'s
@@ -310,6 +369,25 @@ function GetPatientRace(ids, conn; tab=person)
 
 end
 
+"""
+GetPatientRace(df:DataFrame, conn; tab = person)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:race` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientRace(ids, conn; tab = person)`
+"""
+
+function GetPatientRace(
+    df::DataFrame,
+    conn;
+    tab=person
+    )
+
+    df_ids= df[:,"person_id"]
+    
+
+    return outerjoin(GetPatientRace(df_ids, conn; tab=tab), df, on = :person_id)
+end
 """
 GetPatientRace(ids; tab = person)
 
@@ -412,6 +490,38 @@ function GetPatientAgeGroup(
 
     return df
 
+end
+
+"""
+GetPatientAgeGroup(df:DataFrame, conn; minuend=:now,
+age_groupings=[
+    [0, 9],
+    [10, 19],
+    [20, 29],
+    [30, 39],
+    [40, 49],
+    [50, 59],
+    [60, 69],
+    [70, 79],
+    [80, 89],
+], tab = person)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:ageGroup` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientAgeGroup(ids, conn; tab = person)`
+"""
+
+function GetPatientAgeGroup(
+    df::DataFrame,
+    conn;
+    minuend=:now,
+    tab=person
+    )
+
+    df_ids= df[:,"person_id"]
+    
+
+    return outerjoin(GetPatientAgeGroup(df_ids, conn; minuend=minuend, tab=tab), df, on = :person_id)
 end
 
 """
@@ -534,6 +644,25 @@ function GetPatientVisits(
 end
 
 """
+GetPatientVisits(df:DataFrame, conn; tab = visit_occurrence)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:visit_occurrence_id` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientVisits(ids, conn; tab = visit_occurrence)`
+"""
+
+function GetPatientVisits(
+    df::DataFrame,
+    conn;
+    tab=visit_occurrence
+)
+
+    df_ids= df[:,"person_id"]
+    
+    return outerjoin(GetPatientVisits(df_ids, conn; tab=tab), df, on = :person_id)
+
+end
+"""
 GetPatientVisits(ids; tab = visit_occurrence)
 
 Return SQL statement that returns all `visit_occurrence_id` for a given patient list
@@ -594,6 +723,26 @@ function GetMostRecentConditions(
     df = DBInterface.execute(conn, GetMostRecentConditions(ids; tab=tab)) |> DataFrame
 
     return df
+
+end
+
+"""
+GetMostRecentConditions(df:DataFrame, conn; tab = condition_occurrence)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:condition_concept_id` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetMostRecentConditions(ids, conn; tab = condition_occurrence)`
+"""
+
+function GetMostRecentConditions(
+    df::DataFrame,
+    conn;
+    tab=condition_occurrence
+)
+
+    df_ids= df[:,"person_id"]
+    
+    return outerjoin(GetMostRecentConditions(df_ids, conn; tab=tab), df, on = :person_id)
 
 end
 
@@ -670,6 +819,25 @@ function GetMostRecentVisit(
 end
 
 """
+function GetMostRecentVisit(df:DataFrame, conn; tab = visit_occurrence)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:visit_occurrence_id` for each person in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetMostRecentVisit(ids, conn; tab = visit_occurrence)`
+"""
+
+function GetMostRecentVisit(
+    df::DataFrame,
+    conn;
+    tab=visit_occurrence
+)
+
+    df_ids= df[:,"person_id"]
+    
+    return outerjoin(GetMostRecentVisit(df_ids, conn; tab=tab), df, on = :person_id)
+
+end
+"""
 GetMostRecentVisit(ids, conn; tab = visit_occurrence)
 
 Produces SQL statement that, given a list of person IDs, finds their last recorded visit.
@@ -743,6 +911,25 @@ function GetVisitCondition(
 end
 
 """
+function GetVisitCondition(df:DataFrame, conn; tab = condition_occurrence)
+
+Given a `DataFrame` with a `:visit_occurrence_id` column, return the `DataFrame` with an associated `:condition_concept_id` for each `visit_occurrence_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetVisitCondition(ids, conn; tab = condition_occurrence)`
+"""
+
+function GetVisitCondition(
+    df::DataFrame,
+    conn;
+    tab=condition_occurrence
+)
+
+    df_ids= df[:,"visit_occurrence_id"]
+    
+    return outerjoin(GetVisitCondition(df_ids, conn; tab=tab), df, on = :visit_occurrence_id)
+
+end
+"""
 GetVisitCondition(visit_ids; tab = visit_occurrence)
 
 Produces SQL statement that, given a list of `visit_id`'s, finds the conditions diagnosed associated with that visit.
@@ -811,6 +998,27 @@ function GetVisitPlaceOfService(
     df = DBInterface.execute(conn, GetVisitPlaceOfService(visit_ids; tab=tab, join_tab=join_tab)) |> DataFrame
 
     return df
+
+end
+
+"""
+function GetVisitPlaceOfService(df:DataFrame, conn; tab = visit_occurrence, join_tab=care_site)
+
+Given a `DataFrame` with a `:visit_occurrence_ids` column, return the `DataFrame` with an associated `:visit_occurrence_id` and `:condition_concept_id` for each `visit_id` in the `DataFrame` joined by `care_site` table.
+
+Multiple dispatch that accepts all other arguments like in `GetVisitPlaceOfService(ids, conn; tab = visit_occurrence, join_tab=care_site)`
+"""
+
+function GetVisitPlaceOfService(
+    df::DataFrame,
+    conn;
+    tab=visit_occurrence,
+    join_tab=care_site
+)
+
+    df_ids= df[:,"visit_occurrence_id"]
+    
+    return outerjoin(GetVisitPlaceOfService(df_ids, conn; tab=tab, join_tab=join_tab ), df, on = :visit_occurrence_id)
 
 end
 
@@ -888,6 +1096,26 @@ function GetVisitConcept(
 end
 
 """
+function GetVisitConcept(df:DataFrame, conn; tab = visit_occurrence)
+
+Given a `DataFrame` with a `:visit_occurrence_id` column, return the `DataFrame` with an associated `:visit_occurrence_id` and `:visit_concept_id` for each `visit_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetVisitConcept(ids, conn; tab = visit_occurrence)`
+"""
+
+function GetVisitConcept(
+    df::DataFrame,
+    conn;
+    tab=visit_occurrence,
+    )
+
+    df_ids= df[:,"visit_occurrence_id"]
+    
+    return outerjoin(GetVisitConcept(df_ids, conn; tab=tab ), df, on = :visit_occurrence_id)
+
+end
+
+"""
 GetVisitConcept(visit_ids; tab = visit_occurrence)
 
 Produces SQL statement that, given a list of visit IDs, find their corresponding visit_concept_id's.
@@ -947,6 +1175,27 @@ function GetVisitDate(
 end
 
 """
+function GetVisitDate(df:DataFrame, conn; interval::Symbol = :start, tab = visit_occurrence)
+
+Given a `DataFrame` with a `:visit_occurrence_id` column, return the `visit_occurrence_id` and either `visit_start_date` or `visit_end_date`, depending on the value of the `interval` for each `visit_occurrence_id` 
+
+Multiple dispatch that accepts all other arguments like in `GetVisitDate(ids, conn; interval, tab = visit_occurrence)`
+"""
+
+function GetVisitDate(
+    df::DataFrame,
+    conn;
+    interval::Symbol = :start,
+    tab=visit_occurrence,
+    )
+
+    df_ids= df[:,"visit_occurrence_id"]
+    
+    return outerjoin(GetVisitDate(df_ids, conn; interval, tab=tab ), df, on = :visit_occurrence_id)
+
+end
+
+"""
 GetVisitDate(visit_occurrence_id; interval::Symbol = :start, tab = visit_occurrence)
 
 Produces SQL statement that, given a list of visit IDs, finds the visit start or end date.
@@ -988,5 +1237,248 @@ function GetVisitDate(
 
 end
 
+"""
+GetDrugExposures(ids, conn; tab = drug_exposure)
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate
+Given a list of person IDs, find their drug exposure.
+
+# Arguments:
+
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the the drug_exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:drug_exposure_id`
+"""
+function GetDrugExposures(
+    ids,
+    conn;
+    tab=drug_exposure
+)
+    df = DBInterface.execute(conn, GetDrugExposures(ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+function GetDrugExposures(df:DataFrame, conn; tab = drug_exposure)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:drug_exposure_id`for each `person_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetDrugExposures(ids, conn; tab = drug_exposure)`
+"""
+
+function GetDrugExposures(
+    df::DataFrame,
+    conn;
+    tab=drug_exposure
+    )
+
+    df_ids= df[:,"person_id"]
+    
+
+    return outerjoin(GetDrugExposures(df_ids, conn; tab=tab), df, on = :person_id)
+end
+
+"""
+GetDrugExposures(ids; tab = drug_exposure)
+
+Return SQL statement that gets the `drug_exposure_id` for a given list of `person_id`'s
+
+# Arguments:
+
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the drug_exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:drug_exposure_id`
+"""
+
+function GetDrugExposures(
+    ids;
+    tab=drug_exposure
+)
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.person_id, ids...)) |>
+        Select(Get.person_id, Get.drug_exposure_id) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+"""
+GetDrugConcepts(drug_exposure_ids; tab = drug_exposure)
+
+Given a list of drug Exposure IDs, find their drug_concept_id.
+
+# Arguments:
+
+- `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the drug_exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_exposure_id` and `:drug_concept_id`
+"""
+function GetDrugConceptIDs(
+    drug_exposure_ids,
+    conn;
+    tab=drug_exposure
+)
+    df = DBInterface.execute(conn, GetDrugConceptIDs(drug_exposure_ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+function GetDrugConceptIDs(df:DataFrame, conn; tab = drug_exposure)
+
+Given a `DataFrame` with a `:drug_exposure_id` column, return the `DataFrame` with an associated `:drug_concept_id`for each `drug_exposure_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetDrugConceptIDs(ids, conn; tab = drug_exposure)`
+"""
+
+
+function GetDrugConceptIDs(
+    df::DataFrame,
+    conn;
+    tab=drug_exposure
+    )
+
+    df_ids= df[:,"drug_exposure_id"]
+    
+
+    return outerjoin(GetDrugConceptIDs(df_ids, conn; tab=tab), df, on = :drug_exposure_id)
+end
+"""
+GetDrugConcepts(drug_exposure_ids; tab = drug_exposure)
+
+Return SQL statement that gets the `drug_concept_id` for a given list of `drug_exposure_id`'s
+
+# Arguments:
+
+- `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the drug_exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_exposure_id` and `:drug_concept_id`
+"""
+function GetDrugConceptIDs(
+    drug_exposure_ids;
+    tab=drug_exposure
+)
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.drug_exposure_id, drug_exposure_ids...)) |>
+        Select(Get.drug_exposure_id, Get.drug_concept_id) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+"""
+GetDrugAmounts(drug_concept_ids, conn; tab = drug_strength)
+
+Given a list of drugs concept IDs, find their amount.
+
+# Arguments:
+
+- `drug_concept_ids` - list of `drug_concept_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the drug_strength table; default `drug_strength`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_concept_id` and `:amount_value`
+"""
+function GetDrugAmounts(
+    drug_concept_ids,
+    conn;
+    tab=drug_strength
+)
+    df = DBInterface.execute(conn, GetDrugAmounts(drug_concept_ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+function GetDrugAmounts(df:DataFrame, conn; tab = drug_strength)
+
+Given a `DataFrame` with a `:drug_concept_id` column, return the `DataFrame` with an associated `:amount_value`for each `drug_concept_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetDrugAmounts(ids, conn; tab = drug_exposure)`
+"""
+
+
+function GetDrugAmounts(
+    df::DataFrame,
+    conn;
+    tab=drug_strength
+    )
+
+    df_ids= df[:,"drug_concept_id"]
+    
+
+    return outerjoin(GetDrugAmounts(df_ids, conn; tab=tab), df, on = :drug_concept_id)
+end
+"""
+GetDrugAmounts(drug_concept_ids; tab = drug_strength)
+
+Return SQL statement that gets the `amount_value` for a given list of `drug_concept_id`'s
+
+# Arguments:
+
+- `drug_concept_ids` - list of `drug_concept_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the drug_strength table; default `drug_strength`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_concept_id` and `:amount_value`
+"""
+function GetDrugAmounts(
+    drug_concept_ids;
+    tab=drug_strength
+)
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.drug_concept_id, drug_concept_ids...)) |>
+        Select(Get.drug_concept_id, Get.amount_value) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts

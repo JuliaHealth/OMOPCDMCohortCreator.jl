@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.0] - August 25th, 2023
+
+New minor release to introduce some new functionalities and novel extensions of the API
+
+### Added
+
+- Update Implicit Function APIs to Accept and/or Mutate a DataFrame 
+
+  * Nearly every function can now accept DataFrames as a given input
+
+- New functions for drug queries:
+
+  * GetDrugExposures
+
+  * GetDrugConceptIDs
+
+  * GetDrugAmounts
+
+- Extensive test suite for new features
+
+### Changed
+
+- Updated beginner tutorials
+
+### Fixed
+
+- Increased CodeCov across package
+
 ## [0.2.2] - February 28th, 2023
 
 Patch release to add in some new features and fixes 
