@@ -7,6 +7,8 @@ Function that executes an audit on a dataframe that must contain a `count` colum
 
 - `data::DataFrame` - the data to audit that must be in a `DataFrame` and contain a column called `count`
 
+- `target_column::Symbol` - the name of the column to target for auditing (default set to :count).
+
 # Keyword Arguments:
 
 - `hitech::Bool` - a boolean that enforces HITECH standards for privacy preserving methods.
@@ -15,7 +17,7 @@ Function that executes an audit on a dataframe that must contain a `count` colum
 
 - `df` - a `DataFrame` that is appropriately audited per a given standard
 """
-function ExecuteAudit(data::DataFrame; hitech = true)
+function ExecuteAudit(data::DataFrame; hitech = true, target_column = :count)
     df = hitech && filter(row -> row.count >= 11, data)
 
     return df
