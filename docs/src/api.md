@@ -27,6 +27,7 @@ GetDatabaseYearRange
 GetDrugExposure
 GetDrugConceptIDs
 GetDrugAmounts
+GetVisitProcedure
 ```
 
 ## Filters
