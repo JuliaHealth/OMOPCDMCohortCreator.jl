@@ -1481,4 +1481,87 @@ function GetDrugAmounts(
 
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts
+"""
+GetCohortSubjects(cohort_ids, conn; tab = cohort_attribute)
+
+Given a list of cohort IDs, find their corresponding subjects.
+
+# Arguments:
+
+- `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort_attribute`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:cohort_definition_id` and `:subject_id`
+"""
+function GetCohortSubjects(
+    cohort_ids, 
+    conn; 
+    tab = cohort_attribute
+)
+
+    df = DBInterface.execute(conn, GetCohortSubjects(cohort_ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+function GetCohortSubjects(df:DataFrame, conn; tab = cohort_attribute)
+
+Given a `DataFrame` with a `:cohort_definition_id` column, return the `DataFrame` with an associated `:subject_id` for each `cohort_definition_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetCohortSubjects(ids, conn; tab = cohort_attribute)`
+"""
+
+function GetCohortSubjects(
+    df::DataFrame,
+    conn;
+    tab=cohort_attribute
+)
+
+    df_ids= df[:,"cohort_definition_id"]
+    
+    return outerjoin(GetCohortSubjects(df_ids, conn; tab=tab), df, on = :cohort_definition_id)
+
+end
+
+"""
+GetCohortSubjects(cohort_ids; tab = cohort_attribute)
+
+Produces SQL statement that, given a list of `cohort_id`'s, finds the subjects associated with that cohort.
+
+# Arguments:
+
+- `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort_attribute`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:cohort_definition_id` and `:subject_id`
+"""
+function GetCohortSubjects(
+    cohort_ids;
+    tab=cohort_attribute
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.cohort_definition_id, cohort_ids...)) |>
+        Select(Get.cohort_definition_id, Get.subject_id) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetCohortSubjects
