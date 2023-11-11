@@ -17,7 +17,7 @@ New minor release to introduce some new functionalities and novel extensions of 
 
 - New functions for drug queries:
 
-  * GetDrugExposures
+  * GetDrugExposureIDs
 
   * GetDrugConceptIDs
 
