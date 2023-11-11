@@ -402,6 +402,23 @@ end
 	@test GetDrugConceptIDs(drug_exposure_ids, sqlite_conn) == GetDrugConceptIDs(GetDrugExposureIDs(test_ids, sqlite_conn), sqlite_conn)
 end
 
+
+@testset "GetVisitProcedure Tests" begin
+    test_visit_occurrence_ids = [22951.0, 23670.0, 26205.0, 26759.0, 27401.0, 28537.0, 29330.0, 30237.0, 31282.0, 32616.0]
+
+    test_procedure_concept_ids = [4.107731e6, 4.107731e6, 4.107731e6, 4.107731e6, 4.107731e6, 4.058899e6, 4.107731e6, 4.043071e6, 4.043071e6, 4.151422e6]
+
+    test_df = DataFrame(visit_occurrence_id = test_visit_occurrence_ids, procedure_concept_id = test_procedure_concept_ids)
+
+    test_ids = [22951.0, 23670.0, 26205.0, 26759.0, 27401.0, 28537.0, 29330.0, 30237.0, 31282.0, 32616.0]
+
+    @test test_df == GetVisitProcedure(test_ids, sqlite_conn)
+    @test isa(GetVisitProcedure(test_ids, sqlite_conn), DataFrame)
+    @test test_df == GetVisitProcedure(test_df[:,"visit_occurrence_id"], sqlite_conn)
+
+end
+
+
 """
 
 This test is blocked as there is no amount_value in eunomia, Looking at the https://ohdsi.github.io/CommonDataModel/cdm54.html#DRUG_STRENGTH to add it says there is no primary key!
