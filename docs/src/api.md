@@ -24,7 +24,7 @@ GetMostRecentConditions
 GetMostRecentVisit
 GetVisitCondition
 GetDatabaseYearRange
-GetDrugExposureIDs
+GetDrugExposure
 GetDrugConceptIDs
 GetDrugAmounts
 GetVisitProcedure

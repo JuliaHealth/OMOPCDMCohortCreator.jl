@@ -194,7 +194,7 @@ end
     
 end
 
-@testset "GetDrugExposureIDs Tests" begin
+@testset "GetDrugExposures Tests" begin
 
     test_ids = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(10) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
@@ -203,7 +203,7 @@ end
     Drug_exposure_ids = test_query |> LeftJoin(drug_exposures, on =  test_query.person_id.== drug_exposures.person_id) |>
     Select(test_query.person_id, drug_exposures.drug_exposure_id)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
     Drug_exposure_ids = sort( Drug_exposure_ids, :person_id)
-    df = GetDrugExposureIDs(test_ids, sqlite_conn)
+    df = GetDrugExposures(test_ids, sqlite_conn)
 
 	@test Drug_exposure_ids == sort(df, :person_id)
 end
@@ -382,7 +382,7 @@ end
 end
 
 
-@testset "GetDrugExposureIDs multiple dispatch Tests" begin
+@testset "GetDrugExposures multiple dispatch Tests" begin
     test_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.person_id) |> Limit(1) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
     test_query = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id, Get.person_id) |> Where(Get.person_id .== 573.0)
@@ -390,7 +390,7 @@ end
     Drug_exposure_genders = test_query |> LeftJoin(genders, on =  test_query.person_id.== genders.person_id) |>
     Select(genders.person_id, test_query.drug_exposure_id, genders.gender_concept_id)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-    @test Drug_exposure_genders == GetDrugExposureIDs(GetPatientGender(test_ids, sqlite_conn), sqlite_conn)
+    @test Drug_exposure_genders == GetDrugExposures(GetPatientGender(test_ids, sqlite_conn), sqlite_conn)
 end
 
 
@@ -399,7 +399,7 @@ end
 
 	drug_exposure_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id, Get.person_id) |> Where(Get.person_id .== 573.0) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame 
 
-	@test GetDrugConceptIDs(drug_exposure_ids, sqlite_conn) == GetDrugConceptIDs(GetDrugExposureIDs(test_ids, sqlite_conn), sqlite_conn)
+	@test GetDrugConceptIDs(drug_exposure_ids, sqlite_conn) == GetDrugConceptIDs(GetDrugExposures(test_ids, sqlite_conn), sqlite_conn)
 end
 
 
@@ -429,7 +429,7 @@ This test is blocked as there is no amount_value in eunomia, Looking at the http
 
     drug_conceptIDs_exposures = GetDrugConceptIDs(From(OMOPCDMCohortCreator.drug_exposure) |> Select( Get.drug_exposure_id, Get.person_id)|> Where(Get.person_id .== 573.0)  |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame,sqlite_conn)
 
-	@test GetDrugAmounts(drug_conceptIDs_exposures, sqlite_conn) == GetDrugAmounts(GetDrugConceptIDs(GetDrugExposureIDs(test_ids,sqlite_conn),sqlite_conn), sqlite_conn)
+	@test GetDrugAmounts(drug_conceptIDs_exposures, sqlite_conn) == GetDrugAmounts(GetDrugConceptIDs(GetDrugExposures(test_ids,sqlite_conn),sqlite_conn), sqlite_conn)
 end
 
 """
