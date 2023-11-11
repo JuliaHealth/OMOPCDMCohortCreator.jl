@@ -1238,7 +1238,7 @@ function GetVisitDate(
 end
 
 """
-GetDrugExposures(ids, conn; tab = drug_exposure)
+GetDrugExposureIDs(ids, conn; tab = drug_exposure)
 
 Given a list of person IDs, find their drug exposure.
 
@@ -1256,26 +1256,26 @@ Given a list of person IDs, find their drug exposure.
 
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:drug_exposure_id`
 """
-function GetDrugExposures(
+function GetDrugExposureIDs(
     ids,
     conn;
     tab=drug_exposure
 )
-    df = DBInterface.execute(conn, GetDrugExposures(ids; tab=tab)) |> DataFrame
+    df = DBInterface.execute(conn, GetDrugExposureIDs(ids; tab=tab)) |> DataFrame
 
     return df
 
 end
 
 """
-function GetDrugExposures(df:DataFrame, conn; tab = drug_exposure)
+function GetDrugExposureIDs(df:DataFrame, conn; tab = drug_exposure)
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:drug_exposure_id`for each `person_id` in the `DataFrame`
 
-Multiple dispatch that accepts all other arguments like in `GetDrugExposures(ids, conn; tab = drug_exposure)`
+Multiple dispatch that accepts all other arguments like in `GetDrugExposureIDs(ids, conn; tab = drug_exposure)`
 """
 
-function GetDrugExposures(
+function GetDrugExposureIDs(
     df::DataFrame,
     conn;
     tab=drug_exposure
@@ -1284,11 +1284,11 @@ function GetDrugExposures(
     df_ids= df[:,"person_id"]
     
 
-    return outerjoin(GetDrugExposures(df_ids, conn; tab=tab), df, on = :person_id)
+    return outerjoin(GetDrugExposureIDs(df_ids, conn; tab=tab), df, on = :person_id)
 end
 
 """
-GetDrugExposures(ids; tab = drug_exposure)
+GetDrugExposureIDs(ids; tab = drug_exposure)
 
 Return SQL statement that gets the `drug_exposure_id` for a given list of `person_id`'s
 
@@ -1305,7 +1305,7 @@ Return SQL statement that gets the `drug_exposure_id` for a given list of `perso
 - `df::DataFrame` - a two column `DataFrame` comprised of columns: `:person_id` and `:drug_exposure_id`
 """
 
-function GetDrugExposures(
+function GetDrugExposureIDs(
     ids;
     tab=drug_exposure
 )
@@ -1564,4 +1564,4 @@ function GetVisitProcedure(
 
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposureIDs, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- Misc
+
+  * Changed GetDrugExposures to GetDrugExposureIDs
+
 ## [0.3.0] - August 25th, 2023
 
 New minor release to introduce some new functionalities and novel extensions of the API
