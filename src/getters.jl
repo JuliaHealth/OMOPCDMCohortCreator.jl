@@ -1503,7 +1503,7 @@ Given a list of cohort IDs, find their corresponding subjects.
 function GetCohortSubjects(
     cohort_ids, 
     conn; 
-    tab = cohort_attribute
+    tab = cohort
 )
 
     df = DBInterface.execute(conn, GetCohortSubjects(cohort_ids; tab=tab)) |> DataFrame
@@ -1523,7 +1523,7 @@ Multiple dispatch that accepts all other arguments like in `GetCohortSubjects(id
 function GetCohortSubjects(
     df::DataFrame,
     conn;
-    tab=cohort_attribute
+    tab=cohort
 )
 
     df_ids= df[:,"cohort_definition_id"]
@@ -1551,7 +1551,7 @@ Produces SQL statement that, given a list of `cohort_id`'s, finds the subjects a
 """
 function GetCohortSubjects(
     cohort_ids;
-    tab=cohort_attribute
+    tab=cohort
 )
 
     sql =
