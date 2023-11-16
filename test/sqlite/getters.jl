@@ -218,6 +218,42 @@ end
 	@test Drug_concept_ids == sort(df, :drug_exposure_id)
 end
 
+@testset "GetCohortSubjects Tests" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    res = sort(GetCohortSubjects([1.0], sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = res.subject_id[1:8])
+
+    new = GetCohortSubjects(test_df1[:,"cohort_definition_id"], sqlite_conn) 
+
+    @test test_subject_ids == res.subject_id[1:8]
+    @test isa(GetCohortSubjects(test_cohort_definition_ids, sqlite_conn), DataFrame)
+    @test new.subject_id[1:8] == test_df1.subject_id[1:8]
+    
+end
+
+@testset "GetCohortSubjectStartDate" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    test_start_dates = [-533347200.0, 334281600.0, 555811200.0, -117849600.0, 74563200.0, -312336000.0, 296352000.0, 958348800.0]
+
+    res = sort(GetCohortSubjectStartDate([1.0], test_subject_ids, sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = test_subject_ids, cohort_start_date = res.cohort_start_date[1:8])
+
+    new = GetCohortSubjectStartDate(test_df1[:,"cohort_definition_id"], test_df1[:,"subject_id"], sqlite_conn)
+
+    @test test_start_dates == res.cohort_start_date[1:8]
+    @test isa(GetCohortSubjectStartDate(test_cohort_definition_ids, test_subject_ids, sqlite_conn), DataFrame)
+    @test new.cohort_start_date[1:8] == test_df1.cohort_start_date[1:8]
+    
+end
+
 """
 This testset will work once amount_value is added to the eunomia database
 
@@ -402,22 +438,6 @@ end
 	@test GetDrugConceptIDs(drug_exposure_ids, sqlite_conn) == GetDrugConceptIDs(GetDrugExposures(test_ids, sqlite_conn), sqlite_conn)
 end
 
-@testset "GetCohortSubjects Tests" begin
-    
-    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-
-    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
-
-    res = sort(GetCohortSubjects([1.0], sqlite_conn))
-    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = res.subject_id[1:8])
-
-    new = GetCohortSubjects(test_df1[:,"cohort_definition_id"], sqlite_conn) 
-
-    @test test_subject_ids == res.subject_id[1:8]
-    @test isa(GetCohortSubjects(test_cohort_definition_ids, sqlite_conn), DataFrame)
-    @test new.subject_id[1:8] == test_df1.subject_id[1:8]
-    
-end
 
 """
 
