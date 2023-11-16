@@ -28,6 +28,7 @@ GetDrugExposure
 GetDrugConceptIDs
 GetDrugAmounts
 GetCohortSubjects
+GetCohortSubjectStartDate
 ```
 
 ## Filters

@@ -1482,7 +1482,7 @@ function GetDrugAmounts(
 end
 
 """
-GetCohortSubjects(cohort_ids, conn; tab = cohort_attribute)
+GetCohortSubjects(cohort_ids, conn; tab = cohort)
 
 Given a list of cohort IDs, find their corresponding subjects.
 
@@ -1494,7 +1494,7 @@ Given a list of cohort IDs, find their corresponding subjects.
 
 # Keyword Arguments:
 
-- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort_attribute`
+- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
 
 # Returns
 
@@ -1513,17 +1513,17 @@ function GetCohortSubjects(
 end
 
 """
-function GetCohortSubjects(df:DataFrame, conn; tab = cohort_attribute)
+function GetCohortSubjects(df:DataFrame, conn; tab = cohort)
 
 Given a `DataFrame` with a `:cohort_definition_id` column, return the `DataFrame` with an associated `:subject_id` for each `cohort_definition_id` in the `DataFrame`
 
-Multiple dispatch that accepts all other arguments like in `GetCohortSubjects(ids, conn; tab = cohort_attribute)`
+Multiple dispatch that accepts all other arguments like in `GetCohortSubjects(ids, conn; tab = cohort)`
 """
 
 function GetCohortSubjects(
     df::DataFrame,
     conn;
-    tab=cohort
+    tab = cohort
 )
 
     df_ids= df[:,"cohort_definition_id"]
@@ -1533,7 +1533,7 @@ function GetCohortSubjects(
 end
 
 """
-GetCohortSubjects(cohort_ids; tab = cohort_attribute)
+GetCohortSubjects(cohort_ids; tab = cohort)
 
 Produces SQL statement that, given a list of `cohort_id`'s, finds the subjects associated with that cohort.
 
@@ -1543,7 +1543,7 @@ Produces SQL statement that, given a list of `cohort_id`'s, finds the subjects a
 
 # Keyword Arguments:
 
-- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort_attribute`
+- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
 
 # Returns
 
@@ -1551,7 +1551,7 @@ Produces SQL statement that, given a list of `cohort_id`'s, finds the subjects a
 """
 function GetCohortSubjects(
     cohort_ids;
-    tab=cohort
+    tab = cohort
 )
 
     sql =
@@ -1564,4 +1564,101 @@ function GetCohortSubjects(
 
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetCohortSubjects
+"""
+function GetCohortSubjectStartDate(cohort_ids, subject_ids, conn; tab=cohort)
+
+    Given a list of cohort IDs and subject IDs return their start dates.
+    
+    # Arguments:
+    
+    - `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Float64`
+        
+    - `subject_id` - list of `subject_id`'s; each ID must be of subtype `Float64`
+        
+    - `conn` - database connection using DBInterface
+        
+    # Keyword Arguments:
+        
+    - `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
+
+# Returns
+
+- `df::DataFrame` - a three column `DataFrame` comprised of columns: `:cohort_definition_id` , `:subject_id` and `:cohort_start_date`
+"""
+function GetCohortSubjectStartDate(
+    cohort_ids,
+    subject_ids,
+    conn;
+    tab = cohort
+)
+
+    df = DBInterface.execute(conn, GetCohortSubjectStartDate(cohort_ids, subject_ids; tab=tab)) |> DataFrame
+
+    return df
+    
+end
+
+
+
+"""
+function GetCohortSubjectStartDate(df:DataFrame, conn; tab = cohort)
+
+Given a `DataFrame` with a `:cohort_definition_id` column and `:subject_id` column, return the `DataFrame` with an associated `:cohort_start_date` corresponding to a given `cohort_definition_id` and `subject_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetCohortSubjectStartDate(ids, conn; tab = cohort)`
+"""
+function GetCohortSubjectStartDate(
+    df::DataFrame, 
+    conn; 
+    tab = cohort
+)
+
+    df_ids1 = df[:,"cohort_definition_id"]
+    df_ids2 = df[:,"subject_id"]
+
+    return outerjoin(GetCohortSubjectStartDate(df_ids1, df_ids2, conn; tab=tab), df, on = :cohort_definition_id)
+
+end
+
+
+
+"""
+function GetCohortSubjectStartDate(cohort_ids; subject_ids; tab=cohort)
+
+Given a list of cohort IDs and subject IDs return their start dates.
+
+# Arguments:
+
+- `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Float64`
+    
+- `subject_id` - list of `subject_id`'s; each ID must be of subtype `Float64`
+    
+- `conn` - database connection using DBInterface
+    
+# Keyword Arguments:
+    
+- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
+    
+# Returns
+    
+- `df::DataFrame` - a three column `DataFrame` comprised of columns: `:cohort_definition_id` , `:subject_id` and `:cohort_start_date`
+
+"""
+function GetCohortSubjectStartDate(
+    cohort_ids,
+    subject_ids;
+    tab = cohort
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.cohort_definition_id, cohort_ids...)) |>
+        Where(Fun.in(Get.subject_id, subject_ids...)) |>
+        Select(Get.cohort_definition_id, Get.subject_id, Get.cohort_start_date) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+    
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetCohortSubjects, GetCohortSubjectStartDate
