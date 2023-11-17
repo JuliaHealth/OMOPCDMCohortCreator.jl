@@ -1494,7 +1494,7 @@ Given a list of cohort IDs, find their corresponding subjects.
 
 # Keyword Arguments:
 
-- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
+- `tab` - the `SQLTable` representing the `cohort` table; default `cohort`
 
 # Returns
 
@@ -1543,7 +1543,7 @@ Produces SQL statement that, given a list of `cohort_id`'s, finds the subjects a
 
 # Keyword Arguments:
 
-- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
+- `tab` - the `SQLTable` representing the `cohort` table; default `cohort`
 
 # Returns
 
@@ -1567,19 +1567,19 @@ end
 """
 function GetCohortSubjectStartDate(cohort_ids, subject_ids, conn; tab=cohort)
 
-    Given a list of cohort IDs and subject IDs return their start dates.
+    Given a single or list of cohort IDs and subject IDs, return their start dates.
     
     # Arguments:
     
-    - `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Float64`
+    - `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Integer`
         
-    - `subject_id` - list of `subject_id`'s; each ID must be of subtype `Float64`
+    - `subject_id` - list of `subject_id`'s; each ID must be of subtype `Integer`
         
     - `conn` - database connection using DBInterface
         
     # Keyword Arguments:
         
-    - `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
+    - `tab` - the `SQLTable` representing the `cohort` table; default `cohort`
 
 # Returns
 
@@ -1598,12 +1598,10 @@ function GetCohortSubjectStartDate(
     
 end
 
-
-
 """
 function GetCohortSubjectStartDate(df:DataFrame, conn; tab = cohort)
 
-Given a `DataFrame` with a `:cohort_definition_id` column and `:subject_id` column, return the `DataFrame` with an associated `:cohort_start_date` corresponding to a given `cohort_definition_id` and `subject_id` in the `DataFrame`
+Given a `DataFrame` with a `:cohort_definition_id` column and `:subject_id` column, return the `DataFrame` with an associated `:cohort_start_date` corresponding to a cohort's subject ID in the `DataFrame`
 
 Multiple dispatch that accepts all other arguments like in `GetCohortSubjectStartDate(ids, conn; tab = cohort)`
 """
@@ -1613,6 +1611,13 @@ function GetCohortSubjectStartDate(
     tab = cohort
 )
 
+    #= 
+    #
+    # I would not assign this to another variable as it 
+    # creates additional copies of the columns.
+    # Instead, perhaps look at views or put them directly within 
+    # the function call
+    =#
     df_ids1 = df[:,"cohort_definition_id"]
     df_ids2 = df[:,"subject_id"]
 
@@ -1620,10 +1625,8 @@ function GetCohortSubjectStartDate(
 
 end
 
-
-
 """
-function GetCohortSubjectStartDate(cohort_ids; subject_ids; tab=cohort)
+function GetCohortSubjectStartDate(cohort_ids, subject_ids; tab=cohort)
 
 Given a list of cohort IDs and subject IDs return their start dates.
 
@@ -1637,7 +1640,7 @@ Given a list of cohort IDs and subject IDs return their start dates.
     
 # Keyword Arguments:
     
-- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
+- `tab` - the `SQLTable` representing the `cohort` table; default `cohort`
     
 # Returns
     
@@ -1676,7 +1679,7 @@ function GetCohortSubjectEndDate(cohort_ids, subject_ids, conn; tab=cohort)
         
     # Keyword Arguments:
         
-    - `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
+    - `tab` - the `SQLTable` representing the `cohort` table; default `cohort`
 
 # Returns
 
@@ -1695,8 +1698,6 @@ function GetCohortSubjectEndDate(
     
 end
 
-
-
 """
 function GetCohortSubjectEndDate(df:DataFrame, conn; tab = cohort)
 
@@ -1710,14 +1711,15 @@ function GetCohortSubjectEndDate(
     tab = cohort
 )
 
+    #=
+    # The same comment I made for Start Date also
+    # applies here.
     df_ids1 = df[:,"cohort_definition_id"]
     df_ids2 = df[:,"subject_id"]
 
     return outerjoin(GetCohortSubjectEndDate(df_ids1, df_ids2, conn; tab=tab), df, on = :cohort_definition_id)
 
 end
-
-
 
 """
 function GetCohortSubjectEndDate(cohort_ids; subject_ids; tab=cohort)
@@ -1734,8 +1736,8 @@ Given a list of cohort IDs and subject IDs return their end date.
     
 # Keyword Arguments:
     
-- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
-    
+- `tab` - the `SQLTable` representing the `cohort` table; default `cohort`
+   
 # Returns
     
 - `df::DataFrame` - a three column `DataFrame` comprised of columns: `:cohort_definition_id` , `:subject_id` and `:cohort_end_date`
@@ -1776,6 +1778,13 @@ function GetDatabaseCohorts(
     tab=cohort
 )
 
+    #=
+    # Please remove the unique for two reasons:
+    # 1. I don't think we can generate SQL from this
+    # 2. I am fairly certain Select already gives a unique return
+    # You can check me on this -- I'd be curious to see what
+    # you'd discover
+    =#
     sql = 
         From(tab)  |>
         Select(unique(Get.cohort_definition_id))  |>
