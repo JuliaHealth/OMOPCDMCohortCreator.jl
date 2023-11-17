@@ -1661,4 +1661,31 @@ function GetCohortSubjectStartDate(
     
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetCohortSubjects, GetCohortSubjectStartDate
+"""
+function GetDatabaseCohorts(tab=cohort)
+Given a DataFrame returns all unique IDs associated with a database.
+
+#Arguments:
+
+- `tab` - the `SQLTable` representing the Cohort table; default `cohort`
+
+# Returns
+    
+- `df::DataFrame` - a one column `DataFrame` comprised of columns: `:cohort_definition_id`
+
+"""
+
+function GetDatabaseCohorts(
+    tab=cohort
+)
+
+    sql = 
+        From(tab)  |>
+        Select(unique(Get.cohort_definition_id))  |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+    
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate
