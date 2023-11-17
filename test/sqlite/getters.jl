@@ -254,6 +254,24 @@ end
     
 end
 
+@testset "GetCohortSubjectEndDate" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    test_end_dates = [1558656000.0, 1535500800.0, 1540425600.0, 1557187200.0, 1551830400.0, 1546819200.0, 1541548800.0, 1534636800.0]
+
+    res = sort(GetCohortSubjectEndDate([1.0], test_subject_ids, sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = test_subject_ids, cohort_end_date = res.cohort_end_date[1:8])
+
+    new = GetCohortSubjectEndDate(test_df1[:,"cohort_definition_id"], test_df1[:,"subject_id"], sqlite_conn)
+
+    @test test_end_dates == res.cohort_end_date[1:8]
+    @test isa(GetCohortSubjectEndDate(test_cohort_definition_ids, test_subject_ids, sqlite_conn), DataFrame)
+    @test new.cohort_end_date[1:8] == test_df1.cohort_end_date[1:8]
+end
+
 """
 This testset will work once amount_value is added to the eunomia database
 

@@ -30,6 +30,7 @@ GetDrugAmounts
 GetDatabaseCohorts
 GetCohortSubjects
 GetCohortSubjectStartDate
+GetCohortSubjectEndDate
 ```
 
 ## Filters

@@ -25,11 +25,13 @@ New minor release to introduce some new functionalities and novel extensions of 
 
 - New functions for creating Cohort queries:
 
+  * GetDatabaseCohorts
+
   * GetCohortSubjects
 
   * GetCohortSubjectStartDate
 
-  * GetDatabaseCohorts
+  * GetCohortSubjectEndDate
 
 
 - Extensive test suite for new features

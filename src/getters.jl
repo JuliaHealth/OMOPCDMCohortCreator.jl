@@ -1662,6 +1662,103 @@ function GetCohortSubjectStartDate(
 end
 
 """
+function GetCohortSubjectEndDate(cohort_ids, subject_ids, conn; tab=cohort)
+
+    Given a list of cohort IDs and subject IDs return their end dates.
+    
+    # Arguments:
+    
+    - `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Float64`
+        
+    - `subject_id` - list of `subject_id`'s; each ID must be of subtype `Float64`
+        
+    - `conn` - database connection using DBInterface
+        
+    # Keyword Arguments:
+        
+    - `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
+
+# Returns
+
+- `df::DataFrame` - a three column `DataFrame` comprised of columns: `:cohort_definition_id` , `:subject_id` and `:cohort_end_date`
+"""
+function GetCohortSubjectEndDate(
+    cohort_ids,
+    subject_ids,
+    conn;
+    tab = cohort
+)
+
+    df = DBInterface.execute(conn, GetCohortSubjectEndDate(cohort_ids, subject_ids; tab=tab)) |> DataFrame
+
+    return df
+    
+end
+
+
+
+"""
+function GetCohortSubjectEndDate(df:DataFrame, conn; tab = cohort)
+
+Given a `DataFrame` with a `:cohort_definition_id` column and `:subject_id` column, return the `DataFrame` with an associated `:cohort_end_date` corresponding to a given `cohort_definition_id` and `subject_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetCohortSubjectEndDate(ids, conn; tab = cohort)`
+"""
+function GetCohortSubjectEndDate(
+    df::DataFrame, 
+    conn; 
+    tab = cohort
+)
+
+    df_ids1 = df[:,"cohort_definition_id"]
+    df_ids2 = df[:,"subject_id"]
+
+    return outerjoin(GetCohortSubjectEndDate(df_ids1, df_ids2, conn; tab=tab), df, on = :cohort_definition_id)
+
+end
+
+
+
+"""
+function GetCohortSubjectEndDate(cohort_ids; subject_ids; tab=cohort)
+
+Given a list of cohort IDs and subject IDs return their end date.
+
+# Arguments:
+
+- `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Float64`
+    
+- `subject_id` - list of `subject_id`'s; each ID must be of subtype `Float64`
+    
+- `conn` - database connection using DBInterface
+    
+# Keyword Arguments:
+    
+- `tab` - the `SQLTable` representing the Cohort Attribute table; default `cohort`
+    
+# Returns
+    
+- `df::DataFrame` - a three column `DataFrame` comprised of columns: `:cohort_definition_id` , `:subject_id` and `:cohort_end_date`
+
+"""
+function GetCohortSubjectEndDate(
+    cohort_ids,
+    subject_ids;
+    tab=cohort
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.cohort_definition_id, cohort_ids...)) |>
+        Where(Fun.in(Get.subject_id, subject_ids...)) |>
+        Select(Get.cohort_definition_id, Get.subject_id, Get.cohort_end_date) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+    
+end
+
+"""
 function GetDatabaseCohorts(tab=cohort)
 Given a DataFrame returns all unique IDs associated with a database.
 
@@ -1688,4 +1785,5 @@ function GetDatabaseCohorts(
     
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate
