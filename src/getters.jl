@@ -1488,7 +1488,7 @@ Given a list of cohort IDs, find their corresponding subjects.
 
 # Arguments:
 
-- `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Integer`
+- `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Float64`
 
 - `conn` - database connection using DBInterface
 
@@ -1539,7 +1539,7 @@ Produces SQL statement that, given a list of `cohort_id`'s, finds the subjects a
 
 # Arguments:
 
-- `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Integer`
+- `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Float64`
 
 # Keyword Arguments:
 
@@ -1571,9 +1571,9 @@ function GetCohortSubjectStartDate(cohort_ids, subject_ids, conn; tab=cohort)
     
     # Arguments:
     
-    - `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Integer`
+    - `cohort_ids` - list of `cohort_id`'s; each ID must be of subtype `Float64`
         
-    - `subject_id` - list of `subject_id`'s; each ID must be of subtype `Integer`
+    - `subject_id` - list of `subject_id`'s; each ID must be of subtype `Float64`
         
     - `conn` - database connection using DBInterface
         
@@ -1611,17 +1611,7 @@ function GetCohortSubjectStartDate(
     tab = cohort
 )
 
-    #= 
-    #
-    # I would not assign this to another variable as it 
-    # creates additional copies of the columns.
-    # Instead, perhaps look at views or put them directly within 
-    # the function call
-    =#
-    df_ids1 = df[:,"cohort_definition_id"]
-    df_ids2 = df[:,"subject_id"]
-
-    return outerjoin(GetCohortSubjectStartDate(df_ids1, df_ids2, conn; tab=tab), df, on = :cohort_definition_id)
+    return outerjoin(GetCohortSubjectStartDate(df[:,"cohort_definition_id"], df[:,"subject_id"], conn; tab=tab), df, on = :cohort_definition_id)
 
 end
 
@@ -1711,13 +1701,7 @@ function GetCohortSubjectEndDate(
     tab = cohort
 )
 
-    #=
-    # The same comment I made for Start Date also
-    # applies here.
-    df_ids1 = df[:,"cohort_definition_id"]
-    df_ids2 = df[:,"subject_id"]
-
-    return outerjoin(GetCohortSubjectEndDate(df_ids1, df_ids2, conn; tab=tab), df, on = :cohort_definition_id)
+    return outerjoin(GetCohortSubjectEndDate(df[:,"cohort_definition_id"], df[:,"subject_id"], conn; tab=tab), df, on = :cohort_definition_id)
 
 end
 
@@ -1778,16 +1762,9 @@ function GetDatabaseCohorts(
     tab=cohort
 )
 
-    #=
-    # Please remove the unique for two reasons:
-    # 1. I don't think we can generate SQL from this
-    # 2. I am fairly certain Select already gives a unique return
-    # You can check me on this -- I'd be curious to see what
-    # you'd discover
-    =#
     sql = 
         From(tab)  |>
-        Select(unique(Get.cohort_definition_id))  |>
+        Select(Get.cohort_definition_id)  |>
         q -> render(q, dialect=dialect)
 
     return String(sql)
