@@ -1745,8 +1745,36 @@ function GetCohortSubjectEndDate(
 end
 
 """
+GetDatabaseCohorts(conn; tab=cohort)
+Given a `DataFrame` returns all unique cohort_definition_id associated with a database.
+
+#Arguments:
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Cohort table; default `cohort`
+
+# Returns
+    
+- `df::DataFrame` - a one column `DataFrame` comprised of columns: `:cohort_definition_id`
+
+
+"""
+function GetDatabaseCohorts(
+    conn; 
+    tab=cohort
+)
+    ids = DBInterface.execute(conn, String(GetDatabaseCohorts(tab=tab)))  |> DataFrame
+
+    return convert(Vector{Int}, ids.cohort_definition_id)
+    
+end
+
+"""
 function GetDatabaseCohorts(tab=cohort)
-Given a DataFrame returns all unique IDs associated with a database.
+Given a cohort table returns all unique IDs associated with a database.
 
 #Arguments:
 
@@ -1759,12 +1787,12 @@ Given a DataFrame returns all unique IDs associated with a database.
 """
 
 function GetDatabaseCohorts(
-    tab=cohort
+   ; tab=cohort
 )
 
     sql = 
         From(tab)  |>
-        Select(Get.cohort_definition_id)  |>
+        Select(unique(Get.cohort_definition_id))  |>
         q -> render(q, dialect=dialect)
 
     return String(sql)
