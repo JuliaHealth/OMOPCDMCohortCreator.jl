@@ -1766,7 +1766,7 @@ function GetDatabaseCohorts(
     conn; 
     tab=cohort
 )
-    ids = DBInterface.execute(conn, String(GetDatabaseCohorts(tab=tab)))  |> DataFrame
+    ids = DBInterface.execute(conn, GetDatabaseCohorts(tab=tab))  |> DataFrame
 
     return convert(Vector{Int}, ids.cohort_definition_id)
     
@@ -1792,7 +1792,7 @@ function GetDatabaseCohorts(
 
     sql = 
         From(tab)  |>
-        Select(unique(Get.cohort_definition_id))  |>
+        Select((Get.cohort_definition_id))  |>
         q -> render(q, dialect=dialect)
 
     return String(sql)

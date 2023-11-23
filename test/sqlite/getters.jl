@@ -272,6 +272,14 @@ end
     @test new.cohort_end_date[1:8] == test_df1.cohort_end_date[1:8]
 end
 
+@testset "GetDatabaseCohorts" begin
+
+    test_ids=[1.0]
+    new=GetDatabaseCohorts(sqlite_conn)
+
+    @test test_ids == new[1:1]
+end
+
 """
 This testset will work once amount_value is added to the eunomia database
 
