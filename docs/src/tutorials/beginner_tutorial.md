@@ -108,7 +108,7 @@ For the patients who have strep throat diagnoses, find their race.
 Suggested solution:
 
 ```julia
-strep_patients_race = occ.GetPatientRace(strep_patients, conn)
+strep_patients_race = occ.GetPatientRace(strep_patients.person_id, conn)
 ```
 
 ### Task: Find the Gender of Patients with Strep Throat
