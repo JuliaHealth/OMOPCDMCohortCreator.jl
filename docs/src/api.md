@@ -27,6 +27,10 @@ GetDatabaseYearRange
 GetDrugExposureIDs
 GetDrugConceptIDs
 GetDrugAmounts
+GetDatabaseCohorts
+GetCohortSubjects
+GetCohortSubjectStartDate
+GetCohortSubjectEndDate
 GetVisitProcedure
 ```
 

@@ -29,6 +29,17 @@ New minor release to introduce some new functionalities and novel extensions of 
 
   * GetDrugAmounts
 
+- New functions for creating Cohort queries:
+
+  * GetDatabaseCohorts
+
+  * GetCohortSubjects
+
+  * GetCohortSubjectStartDate
+
+  * GetCohortSubjectEndDate
+
+
 - Extensive test suite for new features
 
 ### Changed

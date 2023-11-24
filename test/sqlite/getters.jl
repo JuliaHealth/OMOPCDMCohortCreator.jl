@@ -218,6 +218,68 @@ end
 	@test Drug_concept_ids == sort(df, :drug_exposure_id)
 end
 
+@testset "GetCohortSubjects Tests" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    res = sort(GetCohortSubjects([1.0], sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = res.subject_id[1:8])
+
+    new = GetCohortSubjects(test_df1[:,"cohort_definition_id"], sqlite_conn) 
+
+    @test test_subject_ids == res.subject_id[1:8]
+    @test isa(GetCohortSubjects(test_cohort_definition_ids, sqlite_conn), DataFrame)
+    @test new.subject_id[1:8] == test_df1.subject_id[1:8]
+    
+end
+
+@testset "GetCohortSubjectStartDate" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    test_start_dates = [-533347200.0, 334281600.0, 555811200.0, -117849600.0, 74563200.0, -312336000.0, 296352000.0, 958348800.0]
+
+    res = sort(GetCohortSubjectStartDate([1.0], test_subject_ids, sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = test_subject_ids, cohort_start_date = res.cohort_start_date[1:8])
+
+    new = GetCohortSubjectStartDate(test_df1[:,"cohort_definition_id"], test_df1[:,"subject_id"], sqlite_conn)
+
+    @test test_start_dates == res.cohort_start_date[1:8]
+    @test isa(GetCohortSubjectStartDate(test_cohort_definition_ids, test_subject_ids, sqlite_conn), DataFrame)
+    @test new.cohort_start_date[1:8] == test_df1.cohort_start_date[1:8]
+    
+end
+
+@testset "GetCohortSubjectEndDate" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    test_end_dates = [1558656000.0, 1535500800.0, 1540425600.0, 1557187200.0, 1551830400.0, 1546819200.0, 1541548800.0, 1534636800.0]
+
+    res = sort(GetCohortSubjectEndDate([1.0], test_subject_ids, sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = test_subject_ids, cohort_end_date = res.cohort_end_date[1:8])
+
+    new = GetCohortSubjectEndDate(test_df1[:,"cohort_definition_id"], test_df1[:,"subject_id"], sqlite_conn)
+
+    @test test_end_dates == res.cohort_end_date[1:8]
+    @test isa(GetCohortSubjectEndDate(test_cohort_definition_ids, test_subject_ids, sqlite_conn), DataFrame)
+    @test new.cohort_end_date[1:8] == test_df1.cohort_end_date[1:8]
+end
+
+@testset "GetDatabaseCohorts" begin
+
+    test_ids=[1.0]
+    new=GetDatabaseCohorts(sqlite_conn)
+
+    @test test_ids == new[1:1]
+end
+
 """
 This testset will work once amount_value is added to the eunomia database
 
@@ -402,6 +464,67 @@ end
 	@test GetDrugConceptIDs(drug_exposure_ids, sqlite_conn) == GetDrugConceptIDs(GetDrugExposureIDs(test_ids, sqlite_conn), sqlite_conn)
 end
 
+@testset "GetCohortSubjects Tests" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    res = sort(GetCohortSubjects([1.0], sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = res.subject_id[1:8])
+
+    new = GetCohortSubjects(test_df1[:,"cohort_definition_id"], sqlite_conn) 
+
+    @test test_subject_ids == res.subject_id[1:8]
+    @test isa(GetCohortSubjects(test_cohort_definition_ids, sqlite_conn), DataFrame)
+    @test new.subject_id[1:8] == test_df1.subject_id[1:8]
+    
+end
+
+@testset "GetCohortSubjectStartDate" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    test_start_dates = [-533347200.0, 334281600.0, 555811200.0, -117849600.0, 74563200.0, -312336000.0, 296352000.0, 958348800.0]
+
+    res = sort(GetCohortSubjectStartDate([1.0], test_subject_ids, sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = test_subject_ids, cohort_start_date = res.cohort_start_date[1:8])
+
+    new = GetCohortSubjectStartDate(test_df1[:,"cohort_definition_id"], test_df1[:,"subject_id"], sqlite_conn)
+
+    @test test_start_dates == res.cohort_start_date[1:8]
+    @test isa(GetCohortSubjectStartDate(test_cohort_definition_ids, test_subject_ids, sqlite_conn), DataFrame)
+    @test new.cohort_start_date[1:8] == test_df1.cohort_start_date[1:8]
+    
+end
+
+@testset "GetCohortSubjectEndDate" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    test_end_dates = [1558656000.0, 1535500800.0, 1540425600.0, 1557187200.0, 1551830400.0, 1546819200.0, 1541548800.0, 1534636800.0]
+
+    res = sort(GetCohortSubjectEndDate([1.0], test_subject_ids, sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = test_subject_ids, cohort_end_date = res.cohort_end_date[1:8])
+
+    new = GetCohortSubjectEndDate(test_df1[:,"cohort_definition_id"], test_df1[:,"subject_id"], sqlite_conn)
+
+    @test test_end_dates == res.cohort_end_date[1:8]
+    @test isa(GetCohortSubjectEndDate(test_cohort_definition_ids, test_subject_ids, sqlite_conn), DataFrame)
+    @test new.cohort_end_date[1:8] == test_df1.cohort_end_date[1:8]
+end
+
+@testset "GetDatabaseCohorts" begin
+
+    test_ids=[1.0]
+    new=GetDatabaseCohorts(sqlite_conn)
+
+    @test test_ids == new[1:1]
+end
 
 @testset "GetVisitProcedure Tests" begin
     test_visit_occurrence_ids = [22951.0, 23670.0, 26205.0, 26759.0, 27401.0, 28537.0, 29330.0, 30237.0, 31282.0, 32616.0]
@@ -417,7 +540,6 @@ end
     @test test_df == GetVisitProcedure(test_df[:,"visit_occurrence_id"], sqlite_conn)
 
 end
-
 
 """
 
