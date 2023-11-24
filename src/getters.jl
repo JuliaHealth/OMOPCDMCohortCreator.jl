@@ -1746,6 +1746,7 @@ end
 
 """
 GetDatabaseCohorts(conn; tab=cohort)
+
 Given a `DataFrame` returns all unique cohort_definition_id associated with a database.
 
 #Arguments:
@@ -1773,10 +1774,11 @@ function GetDatabaseCohorts(
 end
 
 """
-function GetDatabaseCohorts(tab=cohort)
+function GetDatabaseCohorts(; tab=cohort)
+
 Given a cohort table returns all unique IDs associated with a database.
 
-#Arguments:
+# Arguments:
 
 - `tab` - the `SQLTable` representing the Cohort table; default `cohort`
 
@@ -1792,7 +1794,8 @@ function GetDatabaseCohorts(
 
     sql = 
         From(tab)  |>
-        Select((Get.cohort_definition_id))  |>
+        Group(Get.cohort_definition_id) |>
+        Select(Get.cohort_definition_id) |>
         q -> render(q, dialect=dialect)
 
     return String(sql)
