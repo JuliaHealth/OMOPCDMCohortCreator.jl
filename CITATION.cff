@@ -8,7 +8,9 @@ authors:
     given-names: Varshini
   - family-names: Abdelazeez
     given-names: Fareeda
-title: "OMOPCDMCohortCreator 0.3.0"
-version: 0.3.0
+  - family-names: Sanjay
+    given-names: Jay
+title: "OMOPCDMCohortCreator 0.4.0"
+version: 0.4.0
 doi: 10.5281/zenodo.7052105
-date-released: 2023-08-25
+date-released: 2023-12-01

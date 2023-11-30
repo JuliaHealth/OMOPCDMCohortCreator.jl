@@ -194,7 +194,7 @@ end
     
 end
 
-@testset "GetDrugExposures Tests" begin
+@testset "GetDrugExposureIDs Tests" begin
 
     test_ids = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(10) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
@@ -203,7 +203,7 @@ end
     Drug_exposure_ids = test_query |> LeftJoin(drug_exposures, on =  test_query.person_id.== drug_exposures.person_id) |>
     Select(test_query.person_id, drug_exposures.drug_exposure_id)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
     Drug_exposure_ids = sort( Drug_exposure_ids, :person_id)
-    df = GetDrugExposures(test_ids, sqlite_conn)
+    df = GetDrugExposureIDs(test_ids, sqlite_conn)
 
 	@test Drug_exposure_ids == sort(df, :person_id)
 end
@@ -216,6 +216,68 @@ end
     df = GetDrugConceptIDs(test_ids, sqlite_conn)
 
 	@test Drug_concept_ids == sort(df, :drug_exposure_id)
+end
+
+@testset "GetCohortSubjects Tests" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    res = sort(GetCohortSubjects([1.0], sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = res.subject_id[1:8])
+
+    new = GetCohortSubjects(test_df1[:,"cohort_definition_id"], sqlite_conn) 
+
+    @test test_subject_ids == res.subject_id[1:8]
+    @test isa(GetCohortSubjects(test_cohort_definition_ids, sqlite_conn), DataFrame)
+    @test new.subject_id[1:8] == test_df1.subject_id[1:8]
+    
+end
+
+@testset "GetCohortSubjectStartDate" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    test_start_dates = [-533347200.0, 334281600.0, 555811200.0, -117849600.0, 74563200.0, -312336000.0, 296352000.0, 958348800.0]
+
+    res = sort(GetCohortSubjectStartDate([1.0], test_subject_ids, sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = test_subject_ids, cohort_start_date = res.cohort_start_date[1:8])
+
+    new = GetCohortSubjectStartDate(test_df1[:,"cohort_definition_id"], test_df1[:,"subject_id"], sqlite_conn)
+
+    @test test_start_dates == res.cohort_start_date[1:8]
+    @test isa(GetCohortSubjectStartDate(test_cohort_definition_ids, test_subject_ids, sqlite_conn), DataFrame)
+    @test new.cohort_start_date[1:8] == test_df1.cohort_start_date[1:8]
+    
+end
+
+@testset "GetCohortSubjectEndDate" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    test_end_dates = [1558656000.0, 1535500800.0, 1540425600.0, 1557187200.0, 1551830400.0, 1546819200.0, 1541548800.0, 1534636800.0]
+
+    res = sort(GetCohortSubjectEndDate([1.0], test_subject_ids, sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = test_subject_ids, cohort_end_date = res.cohort_end_date[1:8])
+
+    new = GetCohortSubjectEndDate(test_df1[:,"cohort_definition_id"], test_df1[:,"subject_id"], sqlite_conn)
+
+    @test test_end_dates == res.cohort_end_date[1:8]
+    @test isa(GetCohortSubjectEndDate(test_cohort_definition_ids, test_subject_ids, sqlite_conn), DataFrame)
+    @test new.cohort_end_date[1:8] == test_df1.cohort_end_date[1:8]
+end
+
+@testset "GetDatabaseCohorts" begin
+
+    test_ids=[1.0]
+    new=GetDatabaseCohorts(sqlite_conn)
+
+    @test test_ids == new[1:1]
 end
 
 """
@@ -382,7 +444,7 @@ end
 end
 
 
-@testset "GetDrugExposures multiple dispatch Tests" begin
+@testset "GetDrugExposureIDs multiple dispatch Tests" begin
     test_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.person_id) |> Limit(1) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
     test_query = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id, Get.person_id) |> Where(Get.person_id .== 573.0)
@@ -390,7 +452,7 @@ end
     Drug_exposure_genders = test_query |> LeftJoin(genders, on =  test_query.person_id.== genders.person_id) |>
     Select(genders.person_id, test_query.drug_exposure_id, genders.gender_concept_id)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-    @test Drug_exposure_genders == GetDrugExposures(GetPatientGender(test_ids, sqlite_conn), sqlite_conn)
+    @test Drug_exposure_genders == GetDrugExposureIDs(GetPatientGender(test_ids, sqlite_conn), sqlite_conn)
 end
 
 
@@ -399,7 +461,84 @@ end
 
 	drug_exposure_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id, Get.person_id) |> Where(Get.person_id .== 573.0) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame 
 
-	@test GetDrugConceptIDs(drug_exposure_ids, sqlite_conn) == GetDrugConceptIDs(GetDrugExposures(test_ids, sqlite_conn), sqlite_conn)
+	@test GetDrugConceptIDs(drug_exposure_ids, sqlite_conn) == GetDrugConceptIDs(GetDrugExposureIDs(test_ids, sqlite_conn), sqlite_conn)
+end
+
+@testset "GetCohortSubjects Tests" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    res = sort(GetCohortSubjects([1.0], sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = res.subject_id[1:8])
+
+    new = GetCohortSubjects(test_df1[:,"cohort_definition_id"], sqlite_conn) 
+
+    @test test_subject_ids == res.subject_id[1:8]
+    @test isa(GetCohortSubjects(test_cohort_definition_ids, sqlite_conn), DataFrame)
+    @test new.subject_id[1:8] == test_df1.subject_id[1:8]
+    
+end
+
+@testset "GetCohortSubjectStartDate" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    test_start_dates = [-533347200.0, 334281600.0, 555811200.0, -117849600.0, 74563200.0, -312336000.0, 296352000.0, 958348800.0]
+
+    res = sort(GetCohortSubjectStartDate([1.0], test_subject_ids, sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = test_subject_ids, cohort_start_date = res.cohort_start_date[1:8])
+
+    new = GetCohortSubjectStartDate(test_df1[:,"cohort_definition_id"], test_df1[:,"subject_id"], sqlite_conn)
+
+    @test test_start_dates == res.cohort_start_date[1:8]
+    @test isa(GetCohortSubjectStartDate(test_cohort_definition_ids, test_subject_ids, sqlite_conn), DataFrame)
+    @test new.cohort_start_date[1:8] == test_df1.cohort_start_date[1:8]
+    
+end
+
+@testset "GetCohortSubjectEndDate" begin
+    
+    test_cohort_definition_ids = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+
+    test_end_dates = [1558656000.0, 1535500800.0, 1540425600.0, 1557187200.0, 1551830400.0, 1546819200.0, 1541548800.0, 1534636800.0]
+
+    res = sort(GetCohortSubjectEndDate([1.0], test_subject_ids, sqlite_conn))
+    test_df1 = DataFrame(cohort_definition_id = test_cohort_definition_ids, subject_id = test_subject_ids, cohort_end_date = res.cohort_end_date[1:8])
+
+    new = GetCohortSubjectEndDate(test_df1[:,"cohort_definition_id"], test_df1[:,"subject_id"], sqlite_conn)
+
+    @test test_end_dates == res.cohort_end_date[1:8]
+    @test isa(GetCohortSubjectEndDate(test_cohort_definition_ids, test_subject_ids, sqlite_conn), DataFrame)
+    @test new.cohort_end_date[1:8] == test_df1.cohort_end_date[1:8]
+end
+
+@testset "GetDatabaseCohorts" begin
+
+    test_ids=[1.0]
+    new=GetDatabaseCohorts(sqlite_conn)
+
+    @test test_ids == new[1:1]
+end
+
+@testset "GetVisitProcedure Tests" begin
+    test_visit_occurrence_ids = [22951.0, 23670.0, 26205.0, 26759.0, 27401.0, 28537.0, 29330.0, 30237.0, 31282.0, 32616.0]
+
+    test_procedure_concept_ids = [4.107731e6, 4.107731e6, 4.107731e6, 4.107731e6, 4.107731e6, 4.058899e6, 4.107731e6, 4.043071e6, 4.043071e6, 4.151422e6]
+
+    test_df = DataFrame(visit_occurrence_id = test_visit_occurrence_ids, procedure_concept_id = test_procedure_concept_ids)
+
+    test_ids = [22951.0, 23670.0, 26205.0, 26759.0, 27401.0, 28537.0, 29330.0, 30237.0, 31282.0, 32616.0]
+
+    @test test_df == GetVisitProcedure(test_ids, sqlite_conn)
+    @test isa(GetVisitProcedure(test_ids, sqlite_conn), DataFrame)
+    @test test_df == GetVisitProcedure(test_df[:,"visit_occurrence_id"], sqlite_conn)
+
 end
 
 """
@@ -412,7 +551,7 @@ This test is blocked as there is no amount_value in eunomia, Looking at the http
 
     drug_conceptIDs_exposures = GetDrugConceptIDs(From(OMOPCDMCohortCreator.drug_exposure) |> Select( Get.drug_exposure_id, Get.person_id)|> Where(Get.person_id .== 573.0)  |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame,sqlite_conn)
 
-	@test GetDrugAmounts(drug_conceptIDs_exposures, sqlite_conn) == GetDrugAmounts(GetDrugConceptIDs(GetDrugExposures(test_ids,sqlite_conn),sqlite_conn), sqlite_conn)
+	@test GetDrugAmounts(drug_conceptIDs_exposures, sqlite_conn) == GetDrugAmounts(GetDrugConceptIDs(GetDrugExposureIDs(test_ids,sqlite_conn),sqlite_conn), sqlite_conn)
 end
 
 """

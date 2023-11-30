@@ -24,9 +24,14 @@ GetMostRecentConditions
 GetMostRecentVisit
 GetVisitCondition
 GetDatabaseYearRange
-GetDrugExposure
+GetDrugExposureIDs
 GetDrugConceptIDs
 GetDrugAmounts
+GetDatabaseCohorts
+GetCohortSubjects
+GetCohortSubjectStartDate
+GetCohortSubjectEndDate
+GetVisitProcedure
 ```
 
 ## Filters
