@@ -25,10 +25,10 @@ If you want to contribute, please check out our [Contributing](https://juliaheal
 The biggest features of this package are:
 
 - Incremental building blocks for creating an analysis pipeline in the form of (more information in [API](https://juliahealth.org/OMOPCDMCohortCreator.jl/api)):
-  - "Getter" functions to "get" information from a database 
-  - "Filter" functions to "filter" information from a database 
+  - "Getter" functions to "get" information from a database
+  - "Filter" functions to "filter" information from a database
   - "Generator" functions to "generate" database information and connections
-  - "Executor" functions to "execute" on retrieved information 
+  - "Executor" functions to "execute" on retrieved information
 - Automatic targeting and support for the SQL flavors (via [FunSQL.jl](https://mechanicalrabbit.github.io/FunSQL.jl/)):
   - `postgresql`
   - `sqlite`
