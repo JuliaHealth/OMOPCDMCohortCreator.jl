@@ -1917,7 +1917,26 @@ function GetDrugExposureEndDate(
     return df
 end
 
+"""
+function GetDrugExposureEndDate(df:DataFrame, conn; tab = drug_exposure)
 
+Given a `DataFrame` with a `:drug_exposure_id` column and `:drug_exposure_end_date` column, return the `DataFrame` with an associated 
+`:drug_exposure_end_date` corresponding to a given `drug_exposure_id` and `drug_exposure_end_date` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in ` GetDrugExposureEndDate(ids, conn; tab = drug_exposure)`
+"""
+
+function GetDrugExposureEndDate(
+    df::DataFrame,
+    conn;
+    tab = drug_exposure
+)
+
+    df_ids = df[:,"drug_exposure_id"]
+
+    return outerjoin(GetDrugExposureEndDate(df_ids, conn; tab=tab), df, on = :drug_exposure_id)
+    
+end
 
 """
 function GetDrugExposureEndDate(drug_exposure_ids; tab = drug_exposure)
