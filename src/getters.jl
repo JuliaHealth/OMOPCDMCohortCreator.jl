@@ -1885,4 +1885,71 @@ function GetDatabaseCohorts(
     
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs
+"""
+function GetDrugExposureEndDate(drug_exposure_ids; tab = drug_exposure)
+
+Given a list of drug_exposure IDs, find their corresponding drug_exposure_end_date ID.
+
+# Arguments:
+
+- `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Float64`
+
+- `conn` - database connection using DBInterface
+
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Drug Exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_exposure_id` and `:drug_exposure_end_date`
+"""
+
+function GetDrugExposureEndDate(
+    drug_exposure_ids,
+    conn;
+    tab = drug_exposure 
+)
+
+    df = DBInterface.execute(conn, GetDrugExposureEndDate(drug_exposure_ids; tab=tab)) |> DataFrame
+
+    return df
+end
+
+
+
+"""
+function GetDrugExposureEndDate(drug_exposure_ids; tab = drug_exposure)
+
+Given a list of drug_exposure IDs, find their corresponding drug_exposure_end_date ID.
+
+# Arguments:
+
+- `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Float64`
+
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Drug Exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_exposure_id` and `:drug_exposure_end_date`
+"""
+function GetDrugExposureEndDate(
+    drug_exposure_ids;
+    tab = drug_exposure
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.drug_exposure_id, drug_exposure_ids...)) |>
+        Select(Get.drug_exposure_id, Get.drug_exposure_end_date) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs, GetDrugExposureEndDate
