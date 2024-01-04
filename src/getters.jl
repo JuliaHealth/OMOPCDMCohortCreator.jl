@@ -1481,6 +1481,29 @@ function GetDrugAmounts(
 
 end
 
+# GetDrugExposureStartDate function to retrieve drug exposure start dates based on provided drug_exposure_ids
+# Parameters:
+# - drug_exposure_ids: An array of drug exposure IDs for which start dates need to be retrieved
+# - conn: Database connection object to execute the SQL query
+# - tab: Optional parameter specifying the table name, defaults to "drug_exposure"
+# Returns: A DataFrame containing drug_exposure_id and drug_exposure_start_date
+
+function GetDrugExposureStartDate(
+    drug_exposure_ids,
+    conn;
+    tab = drug_exposure
+)
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.drug_exposure_id, drug_exposure_ids...)) |>
+        Select(Get.drug_exposure_id, Get.drug_exposure_start_date) |>
+        q -> render(q, dialect=dialect)
+
+    df = DBInterface.execute(conn, sql) |> DataFrame
+
+    return df
+end
+
 """
 GetVisitProcedure(visit_ids, conn; tab = procedure_occurrence)
 
@@ -1885,4 +1908,4 @@ function GetDatabaseCohorts(
     
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetDrugExposureStartDate, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs
