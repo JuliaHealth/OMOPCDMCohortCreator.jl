@@ -1886,9 +1886,9 @@ function GetDatabaseCohorts(
 end
 
 """
-function GetDrugExposureEndDate(drug_exposure_ids; tab = drug_exposure)
+function GetDrugExposureEndDate(drug_exposure_ids, conn; tab = drug_exposure)
 
-Given a list of drug_exposure IDs, find their corresponding drug_exposure_end_date ID.
+Given a list of drug_exposure IDs, find their exposure end dates.
 
 # Arguments:
 
@@ -1920,8 +1920,7 @@ end
 """
 function GetDrugExposureEndDate(df:DataFrame, conn; tab = drug_exposure)
 
-Given a `DataFrame` with a `:drug_exposure_id` column and `:drug_exposure_end_date` column, return the `DataFrame` with an associated 
-`:drug_exposure_end_date` corresponding to a given `drug_exposure_id` and `drug_exposure_end_date` in the `DataFrame`
+Given a DataFrame with a :drug_exposure_id column, return the DataFrame with an associated :drug_exposure_end_date corresponding to a given drug_exposure_id in the DataFrame.
 
 Multiple dispatch that accepts all other arguments like in ` GetDrugExposureEndDate(ids, conn; tab = drug_exposure)`
 """
@@ -1954,7 +1953,7 @@ Given a list of drug_exposure IDs, find their corresponding drug_exposure_end_da
 
 # Returns
 
-- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_exposure_id` and `:drug_exposure_end_date`
+- SQL statement -comprised of: `:drug_exposure_id` and `:drug_exposure_end_date`
 """
 function GetDrugExposureEndDate(
     drug_exposure_ids;

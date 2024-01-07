@@ -32,6 +32,7 @@ GetCohortSubjects
 GetCohortSubjectStartDate
 GetCohortSubjectEndDate
 GetVisitProcedure
+GetDrugExposureEndDate
 ```
 
 ## Filters
