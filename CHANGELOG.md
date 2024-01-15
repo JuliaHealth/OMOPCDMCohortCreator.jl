@@ -49,6 +49,8 @@ New minor release to introduce some new functionalities and novel extensions of 
 
   * GetDrugAmounts
 
+  * GetDrugExposureEndDate
+
 - Extensive test suite for new features
 
 ### Changed
