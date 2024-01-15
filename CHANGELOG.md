@@ -5,11 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+
+## [0.4.0] - December 1st, 2023
+
+Patch release to add in some new features and fixes 
+
+### Added 
+
+- Added Getters that return Cohort information
+
+  *  GetDatabaseCohorts 
+
+  *  GetCohortSubjects
+
+  *  GetCohortSubjectEndDate 
+
+  *  GetCohortSubjectStartDate 
 
 - Misc
 
   * Changed GetDrugExposures to GetDrugExposureIDs
+
+  * Added GetVisitProcedure in getters
+
+- Extensive test suite for new features
+
 
 ## [0.3.0] - August 25th, 2023
 
@@ -28,17 +48,6 @@ New minor release to introduce some new functionalities and novel extensions of 
   * GetDrugConceptIDs
 
   * GetDrugAmounts
-
-- New functions for creating Cohort queries:
-
-  * GetDatabaseCohorts
-
-  * GetCohortSubjects
-
-  * GetCohortSubjectStartDate
-
-  * GetCohortSubjectEndDate
-
 
 - Extensive test suite for new features
 
