@@ -2038,7 +2038,7 @@ function GetDrugExposureStartDate(drug_exposure_ids; tab = drug_exposure)
     
     # Returns
     
-    - SQL statement -comprised of: `:drug_exposure_id` and `:drug_exposure_start_date`
+    - SQL statement comprised of: `:drug_exposure_id` and `:drug_exposure_start_date`
 """
 function GetDrugExposureStartDate(
     drug_exposure_ids;
