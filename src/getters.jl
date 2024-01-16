@@ -1953,7 +1953,7 @@ Given a list of drug_exposure IDs, find their corresponding drug_exposure_end_da
 
 # Returns
 
-- SQL statement -comprised of: `:drug_exposure_id` and `:drug_exposure_end_date`
+- SQL statement comprised of: `:drug_exposure_id` and `:drug_exposure_end_date`
 """
 function GetDrugExposureEndDate(
     drug_exposure_ids;
