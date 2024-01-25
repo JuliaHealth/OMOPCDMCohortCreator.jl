@@ -543,6 +543,23 @@ end
 
 end
 
+@testset "GetDrugExposureStartDate" begin
+    
+    test_drug_exposure_ids = [1.0, 2.0, 3.0, 4.0, 5.0]
+
+    test_drug_exposure_start_date_ids = [-3.727296e8, 2.90304e7, -5.333472e8, -8.18208e7, 1.3291776e9]
+
+    res = sort(GetDrugExposureStartDate(test_drug_exposure_ids, sqlite_conn))
+    test_df1 = DataFrame(drug_exposure_id = test_drug_exposure_ids, drug_exposure_start_date = res.drug_exposure_start_date[1:5])
+
+    new = GetDrugExposureStartDate(test_df1[:,"drug_exposure_id"], sqlite_conn)
+
+    @test test_drug_exposure_start_date_ids == res.drug_exposure_start_date[1:5]
+    @test new.drug_exposure_start_date[1:5] == test_df1.drug_exposure_start_date[1:5]
+    @test isa(GetDrugExposureStartDate(test_drug_exposure_ids, sqlite_conn), DataFrame)
+
+end
+
 @testset "GetVisitProcedure Tests" begin
     test_visit_occurrence_ids = [22951.0, 23670.0, 26205.0, 26759.0, 27401.0, 28537.0, 29330.0, 30237.0, 31282.0, 32616.0]
 
