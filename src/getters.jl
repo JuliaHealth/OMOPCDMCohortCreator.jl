@@ -603,7 +603,7 @@ function GetPatientAgeGroup(
     sql = From(tab) |>
           Where(Fun.in(Get.person_id, ids...)) |>
           Select(Get.person_id, :age => minuend .- Get.year_of_birth) |>
-          Define(:age_group => Fun.case(age_arr...)) |>
+          Define(:age_group => Fun.case(age_arr..., "Unspecified")) |>
           Select(Get.person_id, Get.age_group) |>
           q -> render(q, dialect=dialect)
 
