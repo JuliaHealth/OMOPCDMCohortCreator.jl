@@ -65,7 +65,7 @@ end
                 push!(age_groups, default_age_grouping_values[idx])
                 break
             elseif ismissing(grouping)
-                push!(age_groups, missing)
+                push!(age_groups, "Unspecified")
             end
         end
     end
@@ -74,7 +74,7 @@ end
     default_test = default_test[!, [:person_id, :age_group]]
     default_test.age_group = convert(Vector{Union{Missing,String}}, default_test.age_group)
 
-    minuend_now_test = DataFrame(:person_id => [6.0, 123.0, 129.0, 16.0, 65.0, 74.0, 42.0, 187.0, 18.0, 111.0], :age_group => ["55 - 59", "70 - 74", "45 - 49", "50 - 54", "55 - 59", "50 - 54", missing, "75 - 79", "55 - 59", "45 - 49"])
+    minuend_now_test = DataFrame(:person_id => [6.0, 123.0, 129.0, 16.0, 65.0, 74.0, 42.0, 187.0, 18.0, 111.0], :age_group => ["55 - 59", "70 - 74", "45 - 49", "50 - 54", "55 - 59", "50 - 54", "Unspecified", "75 - 79", "55 - 59", "45 - 49"])
 
     @test isequal(default_test, GetPatientAgeGroup(test_ids, sqlite_conn; minuend=default_minuend, age_groupings=default_age_grouping))
     @test isequal(minuend_now_test, GetPatientAgeGroup(test_ids, sqlite_conn; minuend=minuend_now, age_groupings=test_age_grouping_2))
@@ -341,7 +341,7 @@ end
                 push!(age_groups, default_age_grouping_values[idx])
                 break
             elseif ismissing(grouping)
-                push!(age_groups, missing)
+                push!(age_groups, "Unspecified")
             end
         end
     end

@@ -432,6 +432,7 @@ GetPatientAgeGroup(
         [80, 89],
     ],
     tab = person,
+    ungrouped_label = "Unspecified"
 )
 
 Finds all individuals in age groups as specified by `age_groupings`.
@@ -451,6 +452,8 @@ Finds all individuals in age groups as specified by `age_groupings`.
     - any year provided by a user as long as it is an `Integer` (such as 2022, 1998, etc.)
 
 - `tab` - the `SQLTable` representing the Person table; default `person`
+    
+- `ungrouped_label` - the label to assign persons who do not fit to a provided matching age group; default label "Unspecified"
 
 # Returns
 
@@ -483,10 +486,11 @@ function GetPatientAgeGroup(
         [70, 79],
         [80, 89],
     ],
-    tab=person
+    tab=person,
+    ungrouped_label = "Unspecified"
 )
 
-    df = DBInterface.execute(conn, GetPatientAgeGroup(ids; minuend=minuend, age_groupings=age_groupings, tab=tab)) |> DataFrame
+    df = DBInterface.execute(conn, GetPatientAgeGroup(ids; minuend=minuend, age_groupings=age_groupings, tab=tab, ungrouped_label=ungrouped_label)) |> DataFrame
 
     return df
 
@@ -504,7 +508,9 @@ age_groupings=[
     [60, 69],
     [70, 79],
     [80, 89],
-], tab = person)
+], 
+tab = person,
+ungrouped_label = "Unspecified")
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:ageGroup` for each person in the `DataFrame`
 
@@ -515,13 +521,13 @@ function GetPatientAgeGroup(
     df::DataFrame,
     conn;
     minuend=:now,
-    tab=person
+    tab=person,
+    ungrouped_label = "Unspecified"
     )
 
     df_ids= df[:,"person_id"]
     
-
-    return outerjoin(GetPatientAgeGroup(df_ids, conn; minuend=minuend, tab=tab), df, on = :person_id)
+    return outerjoin(GetPatientAgeGroup(df_ids, conn; minuend=minuend, tab=tab, ungrouped_label=ungrouped_label), df, on = :person_id)
 end
 
 """
@@ -540,6 +546,7 @@ GetPatientAgeGroup(
         [80, 89],
     ],
     tab = person,
+    ungrouped_label = "Unspecified"
 )
 
 Return SQL statement that assigns an age group to each patient in a given patient list. 
@@ -558,6 +565,8 @@ Customized age groupings can be provided as a list.
     - any year provided by a user as long as it is an `Integer` (such as 2022, 1998, etc.)
 
 - `tab` - the `SQLTable` representing the Person table; default `person`
+
+- `ungrouped_label` - the label to assign persons who do not fit to a provided matching age group; default label "Unspecified"
 
 # Returns
 
@@ -589,7 +598,8 @@ function GetPatientAgeGroup(
         [70, 79],
         [80, 89],
     ],
-    tab=person
+    tab=person,
+    ungrouped_label = "Unspecified"
 )
 
     minuend = _determine_calculated_year(minuend)
@@ -603,7 +613,7 @@ function GetPatientAgeGroup(
     sql = From(tab) |>
           Where(Fun.in(Get.person_id, ids...)) |>
           Select(Get.person_id, :age => minuend .- Get.year_of_birth) |>
-          Define(:age_group => Fun.case(age_arr...)) |>
+          Define(:age_group => Fun.case(age_arr..., ungrouped_label)) |>
           Select(Get.person_id, Get.age_group) |>
           q -> render(q, dialect=dialect)
 
