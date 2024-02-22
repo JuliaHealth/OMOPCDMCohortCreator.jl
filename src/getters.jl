@@ -432,6 +432,7 @@ GetPatientAgeGroup(
         [80, 89],
     ],
     tab = person,
+    ungrouped_label = "Unspecified"
 )
 
 Finds all individuals in age groups as specified by `age_groupings`.
@@ -451,6 +452,8 @@ Finds all individuals in age groups as specified by `age_groupings`.
     - any year provided by a user as long as it is an `Integer` (such as 2022, 1998, etc.)
 
 - `tab` - the `SQLTable` representing the Person table; default `person`
+    
+- `ungrouped_label` - the label to assign persons who do not fit to a provided matching age group; default label "Unspecified"
 
 # Returns
 
@@ -483,10 +486,11 @@ function GetPatientAgeGroup(
         [70, 79],
         [80, 89],
     ],
-    tab=person
+    tab=person,
+    ungrouped_label = "Unspecified"
 )
 
-    df = DBInterface.execute(conn, GetPatientAgeGroup(ids; minuend=minuend, age_groupings=age_groupings, tab=tab)) |> DataFrame
+    df = DBInterface.execute(conn, GetPatientAgeGroup(ids; minuend=minuend, age_groupings=age_groupings, tab=tab, ungrouped_label=ungrouped_label)) |> DataFrame
 
     return df
 
@@ -504,7 +508,9 @@ age_groupings=[
     [60, 69],
     [70, 79],
     [80, 89],
-], tab = person)
+], 
+tab = person,
+ungrouped_label = "Unspecified")
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:ageGroup` for each person in the `DataFrame`
 
@@ -515,13 +521,13 @@ function GetPatientAgeGroup(
     df::DataFrame,
     conn;
     minuend=:now,
-    tab=person
+    tab=person,
+    ungrouped_label = "Unspecified"
     )
 
     df_ids= df[:,"person_id"]
     
-
-    return outerjoin(GetPatientAgeGroup(df_ids, conn; minuend=minuend, tab=tab), df, on = :person_id)
+    return outerjoin(GetPatientAgeGroup(df_ids, conn; minuend=minuend, tab=tab, ungrouped_label=ungrouped_label), df, on = :person_id)
 end
 
 """
@@ -540,6 +546,7 @@ GetPatientAgeGroup(
         [80, 89],
     ],
     tab = person,
+    ungrouped_label = "Unspecified"
 )
 
 Return SQL statement that assigns an age group to each patient in a given patient list. 
@@ -558,6 +565,8 @@ Customized age groupings can be provided as a list.
     - any year provided by a user as long as it is an `Integer` (such as 2022, 1998, etc.)
 
 - `tab` - the `SQLTable` representing the Person table; default `person`
+
+- `ungrouped_label` - the label to assign persons who do not fit to a provided matching age group; default label "Unspecified"
 
 # Returns
 
@@ -589,7 +598,8 @@ function GetPatientAgeGroup(
         [70, 79],
         [80, 89],
     ],
-    tab=person
+    tab=person,
+    ungrouped_label = "Unspecified"
 )
 
     minuend = _determine_calculated_year(minuend)
@@ -603,7 +613,7 @@ function GetPatientAgeGroup(
     sql = From(tab) |>
           Where(Fun.in(Get.person_id, ids...)) |>
           Select(Get.person_id, :age => minuend .- Get.year_of_birth) |>
-          Define(:age_group => Fun.case(age_arr...)) |>
+          Define(:age_group => Fun.case(age_arr..., ungrouped_label)) |>
           Select(Get.person_id, Get.age_group) |>
           q -> render(q, dialect=dialect)
 
@@ -1885,4 +1895,174 @@ function GetDatabaseCohorts(
     
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs
+"""
+function GetDrugExposureEndDate(drug_exposure_ids, conn; tab = drug_exposure)
+
+Given a list of drug_exposure IDs, find their exposure end dates.
+
+# Arguments:
+
+- `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Float64`
+
+- `conn` - database connection using DBInterface
+
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Drug Exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_exposure_id` and `:drug_exposure_end_date`
+"""
+
+function GetDrugExposureEndDate(
+    drug_exposure_ids,
+    conn;
+    tab = drug_exposure 
+)
+
+    df = DBInterface.execute(conn, GetDrugExposureEndDate(drug_exposure_ids; tab=tab)) |> DataFrame
+
+    return df
+end
+
+"""
+function GetDrugExposureEndDate(df:DataFrame, conn; tab = drug_exposure)
+
+Given a DataFrame with a :drug_exposure_id column, return the DataFrame with an associated :drug_exposure_end_date corresponding to a given drug_exposure_id in the DataFrame.
+
+Multiple dispatch that accepts all other arguments like in ` GetDrugExposureEndDate(ids, conn; tab = drug_exposure)`
+"""
+
+function GetDrugExposureEndDate(
+    df::DataFrame,
+    conn;
+    tab = drug_exposure
+)
+
+    df_ids = df[:,"drug_exposure_id"]
+
+    return outerjoin(GetDrugExposureEndDate(df_ids, conn; tab=tab), df, on = :drug_exposure_id)
+    
+end
+
+"""
+function GetDrugExposureEndDate(drug_exposure_ids; tab = drug_exposure)
+
+Given a list of drug_exposure IDs, find their corresponding drug_exposure_end_date ID.
+
+# Arguments:
+
+- `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Float64`
+
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Drug Exposure table; default `drug_exposure`
+
+# Returns
+
+- SQL statement comprised of: `:drug_exposure_id` and `:drug_exposure_end_date`
+"""
+function GetDrugExposureEndDate(
+    drug_exposure_ids;
+    tab = drug_exposure
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.drug_exposure_id, drug_exposure_ids...)) |>
+        Select(Get.drug_exposure_id, Get.drug_exposure_end_date) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+"""
+function GetDrugExposureStartDate(drug_exposure_ids, conn; tab = drug_exposure)
+
+Given a list of drug_exposure IDs, find their exposure start dates.
+
+# Arguments:
+
+- `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Float64`
+
+- `conn` - database connection using DBInterface
+
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Drug Exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_exposure_id` and `:drug_exposure_start_date`
+"""
+
+function GetDrugExposureStartDate(
+    drug_exposure_ids,
+    conn;
+    tab = drug_exposure 
+)
+
+    df = DBInterface.execute(conn, GetDrugExposureStartDate(drug_exposure_ids; tab=tab)) |> DataFrame
+
+    return df
+end
+
+"""
+function GetDrugExposureStartDate(df:DataFrame, conn; tab = drug_exposure)
+
+Given a DataFrame with a :drug_exposure_id column, return the DataFrame with an associated :drug_exposure_start_date corresponding to a given drug_exposure_id in the DataFrame.
+
+Multiple dispatch that accepts all other arguments like in ` GetDrugExposureStartDate(ids, conn; tab = drug_exposure)`
+"""
+function GetDrugExposureStartDate(
+    df::DataFrame,
+    conn;
+    tab = drug_exposure
+)
+
+    df_ids = df[:,"drug_exposure_id"]
+
+    return outerjoin(GetDrugExposureStartDate(df_ids, conn; tab=tab), df, on = :drug_exposure_id)
+    
+end
+
+"""
+function GetDrugExposureStartDate(drug_exposure_ids; tab = drug_exposure)
+
+
+    Given a list of drug_exposure IDs, find their corresponding drug_exposure_start_date ID.
+
+    # Arguments:
+    
+    - `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Float64`
+    
+    
+    # Keyword Arguments:
+    
+    - `tab` - the `SQLTable` representing the Drug Exposure table; default `drug_exposure`
+    
+    # Returns
+    
+    - SQL statement comprised of: `:drug_exposure_id` and `:drug_exposure_start_date`
+"""
+function GetDrugExposureStartDate(
+    drug_exposure_ids;
+    tab = drug_exposure
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.drug_exposure_id, drug_exposure_ids...)) |>
+        Select(Get.drug_exposure_id, Get.drug_exposure_start_date) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs, GetDrugExposureEndDate, GetDrugExposureStartDate

@@ -65,7 +65,7 @@ end
                 push!(age_groups, default_age_grouping_values[idx])
                 break
             elseif ismissing(grouping)
-                push!(age_groups, missing)
+                push!(age_groups, "Unspecified")
             end
         end
     end
@@ -74,7 +74,7 @@ end
     default_test = default_test[!, [:person_id, :age_group]]
     default_test.age_group = convert(Vector{Union{Missing,String}}, default_test.age_group)
 
-    minuend_now_test = DataFrame(:person_id => [6.0, 123.0, 129.0, 16.0, 65.0, 74.0, 42.0, 187.0, 18.0, 111.0], :age_group => ["55 - 59", "70 - 74", "45 - 49", "50 - 54", "55 - 59", "50 - 54", missing, "75 - 79", "55 - 59", "45 - 49"])
+    minuend_now_test = DataFrame(:person_id => [6.0, 123.0, 129.0, 16.0, 65.0, 74.0, 42.0, 187.0, 18.0, 111.0], :age_group => ["55 - 59", "70 - 74", "45 - 49", "50 - 54", "55 - 59", "50 - 54", "Unspecified", "75 - 79", "55 - 59", "45 - 49"])
 
     @test isequal(default_test, GetPatientAgeGroup(test_ids, sqlite_conn; minuend=default_minuend, age_groupings=default_age_grouping))
     @test isequal(minuend_now_test, GetPatientAgeGroup(test_ids, sqlite_conn; minuend=minuend_now, age_groupings=test_age_grouping_2))
@@ -341,7 +341,7 @@ end
                 push!(age_groups, default_age_grouping_values[idx])
                 break
             elseif ismissing(grouping)
-                push!(age_groups, missing)
+                push!(age_groups, "Unspecified")
             end
         end
     end
@@ -524,6 +524,40 @@ end
     new=GetDatabaseCohorts(sqlite_conn)
 
     @test test_ids == new[1:1]
+end
+
+@testset "GetDrugExposureEndDate" begin
+
+    test_drug_exposure_ids = [1.0, 2.0, 3.0, 4.0, 5.0]
+
+    test_drug_exposure_end_date_ids = [-364953600, 31449600, -532483200, -80006400, 1330387200]
+
+    res = sort(GetDrugExposureEndDate(test_drug_exposure_ids, sqlite_conn))
+    test_df1 = DataFrame(drug_exposure_id = test_drug_exposure_ids, drug_exposure_end_date = res.drug_exposure_end_date[1:5])
+
+    new = GetDrugExposureEndDate(test_df1[:,"drug_exposure_id"], sqlite_conn)
+
+    @test test_drug_exposure_end_date_ids == res.drug_exposure_end_date[1:5]
+    @test new.drug_exposure_end_date[1:5] == test_df1.drug_exposure_end_date[1:5]
+    @test isa(GetDrugExposureEndDate(test_drug_exposure_ids, sqlite_conn), DataFrame)
+
+end
+
+@testset "GetDrugExposureStartDate" begin
+    
+    test_drug_exposure_ids = [1.0, 2.0, 3.0, 4.0, 5.0]
+
+    test_drug_exposure_start_date_ids = [-3.727296e8, 2.90304e7, -5.333472e8, -8.18208e7, 1.3291776e9]
+
+    res = sort(GetDrugExposureStartDate(test_drug_exposure_ids, sqlite_conn))
+    test_df1 = DataFrame(drug_exposure_id = test_drug_exposure_ids, drug_exposure_start_date = res.drug_exposure_start_date[1:5])
+
+    new = GetDrugExposureStartDate(test_df1[:,"drug_exposure_id"], sqlite_conn)
+
+    @test test_drug_exposure_start_date_ids == res.drug_exposure_start_date[1:5]
+    @test new.drug_exposure_start_date[1:5] == test_df1.drug_exposure_start_date[1:5]
+    @test isa(GetDrugExposureStartDate(test_drug_exposure_ids, sqlite_conn), DataFrame)
+
 end
 
 @testset "GetVisitProcedure Tests" begin
