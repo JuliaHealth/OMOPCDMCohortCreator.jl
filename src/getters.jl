@@ -1885,4 +1885,89 @@ function GetDatabaseCohorts(
     
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs
+"""
+function GetDrugExposureStartDate(drug_exposure_ids, conn; tab = drug_exposure)
+
+Given a list of drug_exposure IDs, find their exposure start dates.
+
+# Arguments:
+
+- `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Float64`
+
+- `conn` - database connection using DBInterface
+
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Drug Exposure table; default `drug_exposure`
+
+# Returns
+
+- `df::DataFrame` - a two column `DataFrame` comprised of columns: `:drug_exposure_id` and `:drug_exposure_start_date`
+"""
+
+function GetDrugExposureStartDate(
+    drug_exposure_ids,
+    conn;
+    tab = drug_exposure 
+)
+
+    df = DBInterface.execute(conn, GetDrugExposureStartDate(drug_exposure_ids; tab=tab)) |> DataFrame
+
+    return df
+end
+
+"""
+function GetDrugExposureStartDate(df:DataFrame, conn; tab = drug_exposure)
+
+Given a DataFrame with a :drug_exposure_id column, return the DataFrame with an associated :drug_exposure_start_date corresponding to a given drug_exposure_id in the DataFrame.
+
+Multiple dispatch that accepts all other arguments like in ` GetDrugExposureStartDate(ids, conn; tab = drug_exposure)`
+"""
+function GetDrugExposureStartDate(
+    df::DataFrame,
+    conn;
+    tab = drug_exposure
+)
+
+    df_ids = df[:,"drug_exposure_id"]
+
+    return outerjoin(GetDrugExposureStartDate(df_ids, conn; tab=tab), df, on = :drug_exposure_id)
+    
+end
+
+"""
+function GetDrugExposureStartDate(drug_exposure_ids; tab = drug_exposure)
+
+
+    Given a list of drug_exposure IDs, find their corresponding drug_exposure_start_date ID.
+
+    # Arguments:
+    
+    - `drug_exposure_ids` - list of `drug_exposure_id`'s; each ID must be of subtype `Float64`
+    
+    
+    # Keyword Arguments:
+    
+    - `tab` - the `SQLTable` representing the Drug Exposure table; default `drug_exposure`
+    
+    # Returns
+    
+    - SQL statement -comprised of: `:drug_exposure_id` and `:drug_exposure_start_date`
+"""
+function GetDrugExposureStartDate(
+    drug_exposure_ids;
+    tab = drug_exposure
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.drug_exposure_id, drug_exposure_ids...)) |>
+        Select(Get.drug_exposure_id, Get.drug_exposure_start_date) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs, GetDrugExposureStartDate
