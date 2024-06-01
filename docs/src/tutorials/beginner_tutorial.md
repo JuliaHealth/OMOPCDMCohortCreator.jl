@@ -151,7 +151,7 @@ age_groups = [
 	[90, 94],
 	[95, 99]
 ]
-strep_patients_age_group = occ.GetPatientAgeGroup(strep_patients, conn; age_groupings = age_groups)
+strep_patients_age_group = occ.GetPatientAgeGroup(strep_patients.person_id, conn; age_groupings = age_groups)
 ```
 
 ### Task: Characterize Each Person by Gender, Race, and Age Group
@@ -184,7 +184,7 @@ Suggested solution:
 ```julia
 strep_patients_characterized = strep_patients_characterized[:, DF.Not(:person_id)]
 strep_patient_groups = DF.groupby(strep_patients_characterized, [:race_concept_id, :gender_concept_id, :age_group])
-strep_patient_groups = DF.combine(strep_patient_groups, DF.nrow => :counts)
+strep_patient_groups = DF.combine(strep_patient_groups, DF.nrow => :count)
 ```
 
 ### Task: Execute Safety Audit
