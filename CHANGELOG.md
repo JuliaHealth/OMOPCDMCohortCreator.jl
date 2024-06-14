@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.1] - June 17th, 2024
+
+### Added 
+
+- Minor bump to update FunSQL dependency
+
+  * Dropped support for FunSQL 0.11
+
+  * Updated support for FunSQL 0.13 series
 
 ## [0.5.0] - February 23rd, 2024
 
