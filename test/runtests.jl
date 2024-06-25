@@ -1,5 +1,6 @@
 using DataFrames
 using Dates
+using Documenter
 using FunSQL:
 	From,
 	Fun,
@@ -21,6 +22,9 @@ using JSON3
 using OHDSICohortExpressions: translate, Model
 
 import DBInterface as DBI
+
+# Testing doctests within the documentation
+doctest(OMOPCDMCohortCreator)
 
 # For allowing HealthSampleData to always download sample data
 ENV["DATADEPS_ALWAYS_ACCEPT"] = true

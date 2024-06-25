@@ -2,6 +2,7 @@
 DBInterface = "a10d1c49-ce27-4219-8d33-6db1a4562965"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 FunSQL = "cf6cc811-59f4-4a10-b258-a8547a8f6407"
 HealthSampleData = "b8464e9a-ae38-46a4-977b-86f00930f698"
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
