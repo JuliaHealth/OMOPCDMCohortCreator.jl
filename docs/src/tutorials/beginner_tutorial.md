@@ -34,44 +34,44 @@ To learn more about these packages, see the [Appendix](#appendix).
 For this tutorial, we will work with data from [Eunomia](https://github.com/OHDSI/Eunomia) that is stored in a SQLite format.
 To install the data on your machine, execute the following code block and follow the prompts - you will need a stable internet connection for the download to complete: 
 
-```julia
-import HealthSampleData: Eunomia
+```jldoctest doctest-scope
+julia> import HealthSampleData: Eunomia
 
-eunomia = Eunomia()
+julia> eunomia = Eunomia();
+[ Info: Eunomia data source is downloaded!
 ```
 
 ## Connecting to the Eunomia Database 💾
 
 After you have finished your set up in the Julia, we need to establish a connection to the Eunomia SQLite database that we will use for the rest of the tutorial: 
 
-```julia
-import SQLite: DB
+```jldoctest doctest-scope
+julia> import SQLite: DB
 
-conn = DB(eunomia)
+julia> conn = DB(eunomia);
 ```
 
 With Eunomia, the database's schema is simply called "main".
 We will use this to generate database connection details that will inform `OMOPCDMCohortCreator` about the type of queries we will write (i.e. SQLite) and the name of the database's schema.
 For this step, we will use `OMOPCDMCohortCreator`:
 
-```julia
-import OMOPCDMCohortCreator as occ
+```jldoctest doctest-scope
+julia> import OMOPCDMCohortCreator as occ
 
-occ.GenerateDatabaseDetails(
-    :sqlite,
-    "main"
-)
+julia> occ.GenerateDatabaseDetails(:sqlite, "main");
+[ Info: Global database dialect set to: sqlite
+[ Info: Global schema set to: main
 ```
 
 Finally, we will generate internal representations of each table found within Eunomia for OMOPCDMCohortCreator to use:
 
-```julia
+```jldoctest doctest-scope
 occ.GenerateTables(conn)
 ```
 
 As a check to make sure everything was correctly installed and works properly, the following block should work and return a list of all person ids in this data:
 
-```julia
+```jldoctest doctest-scope
 occ.GetDatabasePersonIDs(conn)
 ```
 
@@ -91,12 +91,12 @@ Using the [API](@ref), find all patients with strep throat.
 
 Suggested solution:
 
-```julia
+```jldoctest doctest-scope
 strep_patients = occ.ConditionFilterPersonIDs(28060, conn)
 ```
 Note: This function can accept more than one condition_concept_id. 
 Example:
-```
+```julia
 concept_ids = [28060, 433037, 372654, 443599, 436519]
 patients = occ.ConditionFilterPersonIDs(concept_ids, conn)
 ```
@@ -107,7 +107,7 @@ For the patients who have strep throat diagnoses, find their race.
 
 Suggested solution:
 
-```julia
+```jldoctest doctest-scope
 strep_patients_race = occ.GetPatientRace(strep_patients.person_id, conn)
 ```
 
@@ -117,7 +117,7 @@ For the patients who have strep throat diagnoses, find their gender.
 
 Suggested solution:
 
-```julia
+```jldoctest doctest-scope
 strep_patients_gender = occ.GetPatientGender(strep_patients.person_id, conn)
 ```
 
@@ -128,7 +128,7 @@ The age groupings must follow $5$ year intervals when assigned to a person up to
 
 Suggested solution:
 
-```julia
+```jldoctest doctest-scope
 age_groups = [
 	[0, 4],
 	[5, 9],
@@ -162,7 +162,7 @@ Hint: The DataFrames.jl [documentation section on joins](https://dataframes.juli
 
 Suggested solution:
 
-```julia
+```jldoctest doctest-scope
 import DataFrames as DF
 
 strep_patients_characterized = DF.outerjoin(strep_patients_race, strep_patients_gender, strep_patients_age_group; on = :person_id, matchmissing = :equal)
