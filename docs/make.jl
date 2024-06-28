@@ -11,7 +11,9 @@ makedocs(;
     format=DocumenterVitepress.MarkdownVitepress(
         repo = "github.com/JuliaHealth/OMOPCDMCohortCreator.jl", # this must be the full URL!
         devbranch = "main",
-        devurl = "dev";
+        md_output_path = ".",
+        devurl = "dev",
+        build_vitepress = false
     ),
     pages = [
         "Home" => "index.md",
@@ -25,7 +27,8 @@ makedocs(;
     ],
     draft = false,
     source = "src",
-    build = "build"
+    build = "build",
+    clean = false
 )
 
 deploydocs(;
