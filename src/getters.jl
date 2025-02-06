@@ -2721,7 +2721,7 @@ function GetVisitAnatomicSite(
 
 end
 
-function GetSubjectVisit(ids, cohort_id; tab = cohort, join_tab = visit_occurrence)
+function GetSubjectVisit(ids, cohort_id, conn; tab = cohort, join_tab = visit_occurrence)
 
     sql = 
         From(tab) |>
