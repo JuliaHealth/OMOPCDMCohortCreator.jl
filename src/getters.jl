@@ -603,19 +603,28 @@ function GetPatientAgeGroup(
 )
 
     minuend = _determine_calculated_year(minuend)
-    age_arr = []
 
-    for grp in age_groupings
-        push!(age_arr, Get.age .< grp[2] + 1)
-        push!(age_arr, "$(grp[1]) - $(grp[2])")
+    if age_groupings == :actual
+        sql = From(tab) |>
+              Where(Fun.in(Get.person_id, ids...)) |>
+              Select(Get.person_id, :age_group => minuend .- Get.year_of_birth) |>
+              Select(Get.person_id, Get.age_group) |>
+              q -> render(q, dialect=dialect)
+    else    
+        age_arr = []
+
+        for grp in age_groupings
+            push!(age_arr, Get.age .< grp[2] + 1)
+            push!(age_arr, "$(grp[1]) - $(grp[2])")
+        end
+        
+        sql = From(tab) |>
+              Where(Fun.in(Get.person_id, ids...)) |>
+              Select(Get.person_id, :age => minuend .- Get.year_of_birth) |>
+              Define(:age_group => Fun.case(age_arr..., ungrouped_label)) |>
+              Select(Get.person_id, Get.age_group) |>
+              q -> render(q, dialect=dialect)
     end
-
-    sql = From(tab) |>
-          Where(Fun.in(Get.person_id, ids...)) |>
-          Select(Get.person_id, :age => minuend .- Get.year_of_birth) |>
-          Define(:age_group => Fun.case(age_arr..., ungrouped_label)) |>
-          Select(Get.person_id, Get.age_group) |>
-          q -> render(q, dialect=dialect)
 
     return String(sql)
 
