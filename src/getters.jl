@@ -1704,7 +1704,7 @@ function GetCohortSubjectStartDate(
     tab = cohort
 )
 
-    return outerjoin(GetCohortSubjectStartDate(df[:,"cohort_definition_id"], df[:,"subject_id"], conn; tab=tab), df, on = :cohort_definition_id)
+    return outerjoin(GetCohortSubjectStartDate(df[:,"cohort_definition_id"], df[:,"subject_id"], conn; tab=tab), df, on = [:cohort_definition_id, :subject_id])
 
 end
 
@@ -1794,7 +1794,7 @@ function GetCohortSubjectEndDate(
     tab = cohort
 )
 
-    return outerjoin(GetCohortSubjectEndDate(df[:,"cohort_definition_id"], df[:,"subject_id"], conn; tab=tab), df, on = :cohort_definition_id)
+    return outerjoin(GetCohortSubjectEndDate(df[:,"cohort_definition_id"], df[:,"subject_id"], conn; tab=tab), df, on = [:cohort_definition_id, :subject_id])
 
 end
 
