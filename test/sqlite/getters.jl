@@ -282,6 +282,28 @@ end
     @test test_ids == new[1:1]
 end
 
+@testset "GetCohortSubjectStartDate and GetCohortSubjectEndDate DataFrame Dispatch" begin
+
+    test_subject_ids = [1.0, 5.0, 9.0, 11.0, 12.0, 17.0, 18.0, 19.0]
+    test_df = DataFrame(cohort_definition_id = fill(1.0, 8), subject_id = test_subject_ids)
+
+    start_dates = sort(GetCohortSubjectStartDate([1.0], test_subject_ids, sqlite_conn), :subject_id)
+    end_dates = sort(GetCohortSubjectEndDate([1.0], test_subject_ids, sqlite_conn), :subject_id)
+
+    start_res = sort(GetCohortSubjectStartDate(test_df, sqlite_conn), :subject_id)
+    end_res = sort(GetCohortSubjectEndDate(test_df, sqlite_conn), :subject_id)
+
+    @test nrow(start_res) == nrow(test_df)
+    @test names(start_res) == ["cohort_definition_id", "subject_id", "cohort_start_date"]
+    @test start_res.subject_id == test_subject_ids
+    @test start_res.cohort_start_date == start_dates.cohort_start_date
+
+    @test nrow(end_res) == nrow(test_df)
+    @test names(end_res) == ["cohort_definition_id", "subject_id", "cohort_end_date"]
+    @test end_res.subject_id == test_subject_ids
+    @test end_res.cohort_end_date == end_dates.cohort_end_date
+end
+
 """
 This testset will work once amount_value is added to the eunomia database
 
