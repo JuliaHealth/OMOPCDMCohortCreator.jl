@@ -127,7 +127,7 @@ function GetPatientState(
 end
 
 """
-GetPatientState(df:DataFrame, conn; tab = location)
+GetPatientState(df::DataFrame, conn; tab = location)
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:state` for each person in the `DataFrame`
 
@@ -214,7 +214,7 @@ function GetPatientGender(
 end
 
 """
-GetPatientGender(df:DataFrame, conn; tab = person)
+GetPatientGender(df::DataFrame, conn; tab = person)
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:gender_concept_id` for each person in the `DataFrame`
 
@@ -294,7 +294,7 @@ function GetPatientEthnicity(
 end
 
 """
-GetPatientEthnicity(df:DataFrame, conn; tab = person)
+GetPatientEthnicity(df::DataFrame, conn; tab = person)
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:ethnicity` for each person in the `DataFrame`
 
@@ -370,7 +370,7 @@ function GetPatientRace(ids, conn; tab=person)
 end
 
 """
-GetPatientRace(df:DataFrame, conn; tab = person)
+GetPatientRace(df::DataFrame, conn; tab = person)
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:race` for each person in the `DataFrame`
 
@@ -497,7 +497,7 @@ function GetPatientAgeGroup(
 end
 
 """
-GetPatientAgeGroup(df:DataFrame, conn; minuend=:now,
+GetPatientAgeGroup(df::DataFrame, conn; minuend=:now,
 age_groupings=[
     [0, 9],
     [10, 19],
@@ -663,7 +663,7 @@ function GetPatientVisits(
 end
 
 """
-GetPatientVisits(df:DataFrame, conn; tab = visit_occurrence)
+GetPatientVisits(df::DataFrame, conn; tab = visit_occurrence)
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:visit_occurrence_id` for each person in the `DataFrame`
 
@@ -746,7 +746,7 @@ function GetMostRecentConditions(
 end
 
 """
-GetMostRecentConditions(df:DataFrame, conn; tab = condition_occurrence)
+GetMostRecentConditions(df::DataFrame, conn; tab = condition_occurrence)
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:condition_concept_id` for each person in the `DataFrame`
 
@@ -838,7 +838,7 @@ function GetMostRecentVisit(
 end
 
 """
-function GetMostRecentVisit(df:DataFrame, conn; tab = visit_occurrence)
+function GetMostRecentVisit(df::DataFrame, conn; tab = visit_occurrence)
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:visit_occurrence_id` for each person in the `DataFrame`
 
@@ -930,7 +930,7 @@ function GetVisitCondition(
 end
 
 """
-function GetVisitCondition(df:DataFrame, conn; tab = condition_occurrence)
+function GetVisitCondition(df::DataFrame, conn; tab = condition_occurrence)
 
 Given a `DataFrame` with a `:visit_occurrence_id` column, return the `DataFrame` with an associated `:condition_concept_id` for each `visit_occurrence_id` in the `DataFrame`
 
@@ -1021,7 +1021,7 @@ function GetVisitPlaceOfService(
 end
 
 """
-function GetVisitPlaceOfService(df:DataFrame, conn; tab = visit_occurrence, join_tab=care_site)
+function GetVisitPlaceOfService(df::DataFrame, conn; tab = visit_occurrence, join_tab=care_site)
 
 Given a `DataFrame` with a `:visit_occurrence_ids` column, return the `DataFrame` with an associated `:visit_occurrence_id` and `:condition_concept_id` for each `visit_id` in the `DataFrame` joined by `care_site` table.
 
@@ -1115,7 +1115,7 @@ function GetVisitConcept(
 end
 
 """
-function GetVisitConcept(df:DataFrame, conn; tab = visit_occurrence)
+function GetVisitConcept(df::DataFrame, conn; tab = visit_occurrence)
 
 Given a `DataFrame` with a `:visit_occurrence_id` column, return the `DataFrame` with an associated `:visit_occurrence_id` and `:visit_concept_id` for each `visit_id` in the `DataFrame`
 
@@ -1194,7 +1194,7 @@ function GetVisitDate(
 end
 
 """
-function GetVisitDate(df:DataFrame, conn; interval::Symbol = :start, tab = visit_occurrence)
+function GetVisitDate(df::DataFrame, conn; interval::Symbol = :start, tab = visit_occurrence)
 
 Given a `DataFrame` with a `:visit_occurrence_id` column, return the `visit_occurrence_id` and either `visit_start_date` or `visit_end_date`, depending on the value of the `interval` for each `visit_occurrence_id` 
 
@@ -1287,7 +1287,7 @@ function GetDrugExposureIDs(
 end
 
 """
-function GetDrugExposureIDs(df:DataFrame, conn; tab = drug_exposure)
+function GetDrugExposureIDs(df::DataFrame, conn; tab = drug_exposure)
 
 Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with an associated `:drug_exposure_id`for each `person_id` in the `DataFrame`
 
@@ -1369,7 +1369,7 @@ function GetDrugConceptIDs(
 end
 
 """
-function GetDrugConceptIDs(df:DataFrame, conn; tab = drug_exposure)
+function GetDrugConceptIDs(df::DataFrame, conn; tab = drug_exposure)
 
 Given a `DataFrame` with a `:drug_exposure_id` column, return the `DataFrame` with an associated `:drug_concept_id`for each `drug_exposure_id` in the `DataFrame`
 
@@ -1450,7 +1450,7 @@ function GetDrugAmounts(
 end
 
 """
-function GetDrugAmounts(df:DataFrame, conn; tab = drug_strength)
+function GetDrugAmounts(df::DataFrame, conn; tab = drug_strength)
 
 Given a `DataFrame` with a `:drug_concept_id` column, return the `DataFrame` with an associated `:amount_value`for each `drug_concept_id` in the `DataFrame`
 
@@ -1532,7 +1532,7 @@ function GetVisitProcedure(
 end
 
 """
-function GetVisitProcedure(df:DataFrame, conn; tab = procedure_occurrence)
+function GetVisitProcedure(df::DataFrame, conn; tab = procedure_occurrence)
 
 Given a `DataFrame` with a `:visit_occurrence_id` column, return the `DataFrame` with an associated `:procedure_concept_id` for each `visit_occurrence_id` in the `DataFrame`
 
@@ -1615,7 +1615,7 @@ function GetCohortSubjects(
 end
 
 """
-function GetCohortSubjects(df:DataFrame, conn; tab = cohort)
+function GetCohortSubjects(df::DataFrame, conn; tab = cohort)
 
 Given a `DataFrame` with a `:cohort_definition_id` column, return the `DataFrame` with an associated `:subject_id` for each `cohort_definition_id` in the `DataFrame`
 
@@ -1701,7 +1701,7 @@ function GetCohortSubjectStartDate(
 end
 
 """
-function GetCohortSubjectStartDate(df:DataFrame, conn; tab = cohort)
+function GetCohortSubjectStartDate(df::DataFrame, conn; tab = cohort)
 
 Given a `DataFrame` with a `:cohort_definition_id` column and `:subject_id` column, return the `DataFrame` with an associated `:cohort_start_date` corresponding to a cohort's subject ID in the `DataFrame`
 
@@ -1791,7 +1791,7 @@ function GetCohortSubjectEndDate(
 end
 
 """
-function GetCohortSubjectEndDate(df:DataFrame, conn; tab = cohort)
+function GetCohortSubjectEndDate(df::DataFrame, conn; tab = cohort)
 
 Given a `DataFrame` with a `:cohort_definition_id` column and `:subject_id` column, return the `DataFrame` with an associated `:cohort_end_date` corresponding to a given `cohort_definition_id` and `subject_id` in the `DataFrame`
 
@@ -1937,7 +1937,7 @@ function GetDrugExposureEndDate(
 end
 
 """
-function GetDrugExposureEndDate(df:DataFrame, conn; tab = drug_exposure)
+function GetDrugExposureEndDate(df::DataFrame, conn; tab = drug_exposure)
 
 Given a DataFrame with a :drug_exposure_id column, return the DataFrame with an associated :drug_exposure_end_date corresponding to a given drug_exposure_id in the DataFrame.
 
@@ -2022,7 +2022,7 @@ function GetDrugExposureStartDate(
 end
 
 """
-function GetDrugExposureStartDate(df:DataFrame, conn; tab = drug_exposure)
+function GetDrugExposureStartDate(df::DataFrame, conn; tab = drug_exposure)
 
 Given a DataFrame with a :drug_exposure_id column, return the DataFrame with an associated :drug_exposure_start_date corresponding to a given drug_exposure_id in the DataFrame.
 
@@ -2074,4 +2074,4 @@ function GetDrugExposureStartDate(
 
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs, GetDrugExposureEndDate, GetDrugExposureStartDate
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs, GetDrugExposureEndDate, GetDrugExposureStartDate
