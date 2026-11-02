@@ -194,21 +194,18 @@ end
     
 end
 
-#=
 @testset "GetDrugExposureIDs Tests" begin
 
     test_ids = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(10) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-    test_query = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(10)
-    drug_exposures = From(OMOPCDMCohortCreator.drug_exposure)
-    Drug_exposure_ids = test_query |> LeftJoin(drug_exposures, on =  test_query.person_id.== drug_exposures.person_id) |>
-    Select(test_query.person_id, drug_exposures.drug_exposure_id)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+    Drug_exposure_ids = From(OMOPCDMCohortCreator.person) |> Select(Get.person_id) |> Limit(10) |>
+    LeftJoin(:drug_exposures => From(OMOPCDMCohortCreator.drug_exposure), Get.person_id .== Get.drug_exposures.person_id) |>
+    Select(Get.person_id, Get.drug_exposures.drug_exposure_id)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
     Drug_exposure_ids = sort( Drug_exposure_ids, :person_id)
     df = GetDrugExposureIDs(test_ids, sqlite_conn)
 
 	@test Drug_exposure_ids == sort(df, :person_id)
 end
-=#
 
 @testset "GetDrugConceptIDs Tests" begin
 
@@ -378,20 +375,17 @@ end
     @test isequal(default_test, GetPatientAgeGroup(races_ethnicity, sqlite_conn))
 end
 
-#=
 #Tests for GetPatientVisits
 @testset "GetPatientVisits multiple dispatch Tests" begin
     #test for person with multiple visits 
     visit_table = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id) |> Limit(5)|> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> unique
 
-    test_ids =  From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Limit(5)
-    genders = From(OMOPCDMCohortCreator.person)
-    test_ids_genders = test_ids |> LeftJoin(genders, on = genders.person_id .== test_ids.person_id) |>
-    Select(genders.person_id, test_ids.visit_occurrence_id, genders.gender_concept_id)|> Limit(5)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+    test_ids_genders = From(OMOPCDMCohortCreator.visit_occurrence) |> Select(Get.person_id, Get.visit_occurrence_id) |> Limit(5) |>
+    LeftJoin(:genders => From(OMOPCDMCohortCreator.person), Get.person_id .== Get.genders.person_id) |>
+    Select(Get.genders.person_id, Get.visit_occurrence_id, Get.genders.gender_concept_id)|> Limit(5)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
     
     @test test_ids_genders == GetPatientVisits(GetPatientGender(visit_table,sqlite_conn), sqlite_conn)
 end
-=#
 
 @testset "GetMostRecentConditions multiple dispatch Tests" begin
         # Test to get most recent conditions for multiple patients
@@ -470,18 +464,15 @@ end
 end
 
 
-#=
 @testset "GetDrugExposureIDs multiple dispatch Tests" begin
     test_ids = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.person_id) |> Limit(1) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
-    test_query = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id, Get.person_id) |> Where(Get.person_id .== 573.0)
-    genders = From(OMOPCDMCohortCreator.person)
-    Drug_exposure_genders = test_query |> LeftJoin(genders, on =  test_query.person_id.== genders.person_id) |>
-    Select(genders.person_id, test_query.drug_exposure_id, genders.gender_concept_id)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+    Drug_exposure_genders = From(OMOPCDMCohortCreator.drug_exposure) |> Select(Get.drug_exposure_id, Get.person_id) |> Where(Get.person_id .== 573.0) |>
+    LeftJoin(:genders => From(OMOPCDMCohortCreator.person), Get.person_id .== Get.genders.person_id) |>
+    Select(Get.genders.person_id, Get.drug_exposure_id, Get.genders.gender_concept_id)  |> q -> render(q, dialect=OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
 
     @test Drug_exposure_genders == GetDrugExposureIDs(GetPatientGender(test_ids, sqlite_conn), sqlite_conn)
 end
-=#
 
 
 @testset "GetDrugConceptIDs multiple dispatch Tests" begin
