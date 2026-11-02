@@ -2074,4 +2074,86 @@ function GetDrugExposureStartDate(
 
 end
 
-export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs, GetDrugExposureEndDate, GetDrugExposureStartDate
+"""
+GetPatientMeasurements(ids, conn; tab = measurement)
+
+Given a list of person IDs, find their measurements such as lab results and vital signs.
+
+# Arguments:
+
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+- `conn` - database connection using DBInterface
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Measurement table; default `measurement`
+
+# Returns
+
+- `df::DataFrame` - a five column `DataFrame` comprised of columns: `:person_id`, `:measurement_concept_id`, `:measurement_date`, `:value_as_number` and `:unit_concept_id`
+"""
+function GetPatientMeasurements(
+    ids,
+    conn;
+    tab = measurement
+)
+
+    df = DBInterface.execute(conn, GetPatientMeasurements(ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+
+"""
+GetPatientMeasurements(df::DataFrame, conn; tab = measurement)
+
+Given a `DataFrame` with a `:person_id` column, return the `DataFrame` with the associated measurements for each `person_id` in the `DataFrame`
+
+Multiple dispatch that accepts all other arguments like in `GetPatientMeasurements(ids, conn; tab = measurement)`
+"""
+function GetPatientMeasurements(
+    df::DataFrame,
+    conn;
+    tab = measurement
+)
+
+    df_ids = df[:, "person_id"]
+
+    return outerjoin(GetPatientMeasurements(df_ids, conn; tab=tab), df, on = :person_id)
+
+end
+
+"""
+GetPatientMeasurements(ids; tab = measurement)
+
+Return SQL statement that gets the measurements for a given list of `person_id`'s
+
+# Arguments:
+
+- `ids` - list of `person_id`'s; each ID must be of subtype `Integer`
+
+# Keyword Arguments:
+
+- `tab` - the `SQLTable` representing the Measurement table; default `measurement`
+
+# Returns
+
+- SQL statement comprised of: `:person_id`, `:measurement_concept_id`, `:measurement_date`, `:value_as_number` and `:unit_concept_id`
+"""
+function GetPatientMeasurements(
+    ids;
+    tab = measurement
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.person_id, ids...)) |>
+        Select(Get.person_id, Get.measurement_concept_id, Get.measurement_date, Get.value_as_number, Get.unit_concept_id) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+
+export GetDatabasePersonIDs, GetPatientState, GetPatientGender, GetPatientRace, GetPatientAgeGroup, GetPatientVisits, GetMostRecentConditions, GetMostRecentVisit, GetVisitCondition, GetPatientEthnicity, GetDatabaseYearRange, GetVisitPlaceOfService, GetVisitConcept, GetVisitDate, GetDrugExposures, GetDrugConceptIDs, GetDrugAmounts, GetVisitProcedure, GetDatabaseCohorts, GetCohortSubjects, GetCohortSubjectStartDate, GetCohortSubjectEndDate, GetDrugExposureIDs, GetDrugExposureEndDate, GetDrugExposureStartDate, GetPatientMeasurements

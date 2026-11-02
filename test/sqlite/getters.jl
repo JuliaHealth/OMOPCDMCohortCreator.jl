@@ -603,6 +603,22 @@ end
 
 end
 
+@testset "GetPatientMeasurements Tests" begin
+
+    test_ids = From(OMOPCDMCohortCreator.measurement) |> Select(Get.person_id) |> Limit(5) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame |> Array |> vec |> unique
+
+    expected = From(OMOPCDMCohortCreator.measurement) |> Where(Fun.in(Get.person_id, test_ids...)) |> Select(Get.person_id, Get.measurement_concept_id, Get.measurement_date, Get.value_as_number, Get.unit_concept_id) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+
+    df = GetPatientMeasurements(test_ids, sqlite_conn)
+
+    @test isa(df, DataFrame)
+    @test names(df) == ["person_id", "measurement_concept_id", "measurement_date", "value_as_number", "unit_concept_id"]
+    @test nrow(df) > 0
+    @test isequal(sort(expected), sort(df))
+    @test isequal(sort(df), sort(GetPatientMeasurements(DataFrame(person_id = test_ids), sqlite_conn)[:, names(df)]))
+
+end
+
 """
 
 This test is blocked as there is no amount_value in eunomia, Looking at the https://ohdsi.github.io/CommonDataModel/cdm54.html#DRUG_STRENGTH to add it says there is no primary key!
