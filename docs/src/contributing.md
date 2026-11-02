@@ -73,6 +73,122 @@ You may get some questions about it, and possibly suggestions of how to make it 
 If you had test errors or problems, we are happy to help you. 
 Then, if all goes according to plan, it gets merged... **Thanks for the contribution!!** 🎉 🎉 🎉
 
+## Creating a New Function 🛠️
+
+Most functions in OMOPCDMCohortCreator are small queries over one OMOP CDM table.
+This section walks through adding one, using a hypothetical `GetPatientYearOfBirth` that returns the `year_of_birth` of each patient.
+
+### Setting up a test database
+
+[HealthSampleData.jl](https://github.com/JuliaHealth/HealthSampleData.jl) provides Eunomia, a small synthetic OMOP CDM database in SQLite that the test suite also uses.
+In a Julia session with `HealthSampleData`, `OMOPCDMCohortCreator`, `SQLite`, `DataFrames`, `DBInterface` and `FunSQL` available, connect to it and generate the tables:
+
+```julia
+using HealthSampleData
+using OMOPCDMCohortCreator
+using SQLite
+using DataFrames
+using DBInterface
+using FunSQL: From, Get, Select, Where, Fun, render
+
+conn = SQLite.DB(Eunomia())
+GenerateDatabaseDetails(:sqlite, "main")
+tables = GenerateTables(conn; exported = true)
+```
+
+`GenerateTables` with `exported = true` returns a `Dict` of FunSQL table representations, so you can build and try out queries yourself:
+
+```julia
+q = From(tables[:person]) |> Select(Get.person_id, Get.year_of_birth)
+DBInterface.execute(conn, String(render(q, dialect = :sqlite))) |> DataFrame
+```
+
+If you are new to FunSQL, the [FunSQL.jl tutorials](https://mechanicalrabbit.github.io/FunSQL.jl/stable/) and the [beginner tutorial](https://juliahealth.org/OMOPCDMCohortCreator.jl/stable/tutorials/beginner_tutorial/) for this package are good places to start.
+
+### Writing the function
+
+Getters live in `src/getters.jl` and usually have three methods.
+Inside the package, the tables (such as `person`) and `dialect` are available as globals once `GenerateDatabaseDetails` and `GenerateTables` have been called.
+
+1. A method that only takes the IDs and returns the SQL as a `String`:
+
+```julia
+function GetPatientYearOfBirth(
+    ids;
+    tab = person
+)
+
+    sql =
+        From(tab) |>
+        Where(Fun.in(Get.person_id, ids...)) |>
+        Select(Get.person_id, Get.year_of_birth) |>
+        q -> render(q, dialect=dialect)
+
+    return String(sql)
+
+end
+```
+
+2. A method that also takes a connection, runs the query and returns a `DataFrame`:
+
+```julia
+function GetPatientYearOfBirth(
+    ids,
+    conn;
+    tab = person
+)
+
+    df = DBInterface.execute(conn, GetPatientYearOfBirth(ids; tab=tab)) |> DataFrame
+
+    return df
+
+end
+```
+
+3. A method that takes a `DataFrame` with a `:person_id` column and joins the result onto it, so calls can be chained:
+
+```julia
+function GetPatientYearOfBirth(
+    df::DataFrame,
+    conn;
+    tab = person
+)
+
+    df_ids = df[:, "person_id"]
+
+    return outerjoin(GetPatientYearOfBirth(df_ids, conn; tab=tab), df, on = :person_id)
+
+end
+```
+
+With all three, `GetPatientYearOfBirth(GetPatientGender([1, 2, 3], conn), conn)` returns `person_id`, `year_of_birth` and `gender_concept_id` together.
+
+Add the function name to the `export` line at the end of `src/getters.jl`.
+
+### Documenting the function
+
+Give each method a docstring with `# Arguments:`, `# Keyword Arguments:` and `# Returns` sections, following the existing getters.
+Then add the function name to the matching `@docs` block in `docs/src/api.md` so it appears in the API reference.
+
+### Testing the function
+
+Tests for getters are in `test/sqlite/getters.jl` and run against Eunomia.
+A common pattern is to compare the result of the new function with the same query written directly in FunSQL:
+
+```julia
+@testset "GetPatientYearOfBirth Tests" begin
+
+    test_ids = [1, 2, 3]
+
+    expected = From(OMOPCDMCohortCreator.person) |> Where(Fun.in(Get.person_id, test_ids...)) |> Select(Get.person_id, Get.year_of_birth) |> q -> render(q, dialect = OMOPCDMCohortCreator.dialect) |> q -> DBInterface.execute(sqlite_conn, q) |> DataFrame
+
+    @test sort(expected) == sort(GetPatientYearOfBirth(test_ids, sqlite_conn))
+
+end
+```
+
+Run the full test suite as described in step 4 before opening your PR, and mention in the PR which issue the function addresses.
+
 ## Note on Adding Dependencies 📚
 
 As a rule, we try to avoid having too many dependencies.
