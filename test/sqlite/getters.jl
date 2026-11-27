@@ -17,7 +17,7 @@ labels: tests, moderate
 
 @testset "GetDatabaseYearRange Tests" begin
     # Test to see if correct years are reported for Eunomia
-    first_year = 1922
+    first_year = 1908
     last_year = 2019
 
     check_first_year, check_last_year = GetDatabaseYearRange(sqlite_conn)

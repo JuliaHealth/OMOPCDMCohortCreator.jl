@@ -62,7 +62,7 @@ Return SQL to find the years for which data is available from a database.
 function GetDatabaseYearRange(; tab=observation_period)
     sql = From(tab) |>
           Group() |>
-          Select(:first_year => Agg.min(Get.observation_period_end_date),
+          Select(:first_year => Agg.min(Get.observation_period_start_date),
               :last_year => Agg.max(Get.observation_period_end_date)) |>
           q -> render(q, dialect=OMOPCDMCohortCreator.dialect)
 
